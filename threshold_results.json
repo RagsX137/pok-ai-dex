@@ -1,0 +1,1631 @@
+[
+  {
+    "sweep_timestamp": "2026-08-28T11:18:47.124014+00:00",
+    "thresholds": [
+      {
+        "threshold": 0.7,
+        "timestamp": "2026-08-28T11:18:29.274512+00:00",
+        "total_passed": 5,
+        "by_category": {
+          "exact": "3/3",
+          "semantic": "1/5",
+          "trait": "1/3"
+        },
+        "results": [
+          {
+            "query": "pikachu",
+            "expected": "Pikachu",
+            "category": "exact",
+            "passed": true,
+            "top_titles": [
+              "Pikachu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Clefable Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Squirtle Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Meowth Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Bulbasaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "query": "charizard",
+            "expected": "Charizard",
+            "category": "exact",
+            "passed": true,
+            "top_titles": [
+              "Charizard Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pok\u00e9mon Shiny-dex (list of shiny sprites) | Pok\u00e9mon Database",
+              "Venusaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Charmeleon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Charmander Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1898,
+              682,
+              509,
+              509,
+              500
+            ]
+          },
+          {
+            "query": "mewtwo",
+            "expected": "Mewtwo",
+            "category": "exact",
+            "passed": true,
+            "top_titles": [
+              "Mewtwo Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Mew Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pok\u00e9mon Shiny-dex (list of shiny sprites) | Pok\u00e9mon Database",
+              "Pok\u00e9mon Pok\u00e9dex: list of Pok\u00e9mon with stats | Pok\u00e9mon Database",
+              "Zeraora Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1806,
+              988,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "query": "electric mouse",
+            "expected": "Pikachu",
+            "category": "semantic",
+            "passed": false,
+            "top_titles": [
+              "Pawmi Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pichu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Raichu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pawmo Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pikachu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "query": "fire breathing dragon",
+            "expected": "Charizard",
+            "category": "semantic",
+            "passed": true,
+            "top_titles": [
+              "Charizard Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Dialga Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Flygon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Charmander Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Charmeleon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              938,
+              536,
+              791,
+              716,
+              698
+            ]
+          },
+          {
+            "query": "psychic clone legendary",
+            "expected": "Mewtwo",
+            "category": "semantic",
+            "passed": false,
+            "top_titles": [
+              "Articuno Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Hoopa Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Alakazam Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Zapdos Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Clefable Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              684,
+              901,
+              766,
+              493,
+              1047
+            ]
+          },
+          {
+            "query": "land shark dragon",
+            "expected": "Garchomp",
+            "category": "semantic",
+            "passed": false,
+            "top_titles": [
+              "Gible Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Wailmer Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Hydreigon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Carvanha Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Gyarados Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              339,
+              303,
+              328,
+              394,
+              100
+            ]
+          },
+          {
+            "query": "ghost haunted tower",
+            "expected": "Gengar",
+            "category": "semantic",
+            "passed": false,
+            "top_titles": [
+              "Chatot Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Duskull Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Gastly Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Haunter Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Mamoswine Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              0,
+              0,
+              465,
+              290,
+              177
+            ]
+          },
+          {
+            "query": "fast pokemon that loves to sleep in forests",
+            "expected": "Snorlax",
+            "category": "trait",
+            "passed": false,
+            "top_titles": [
+              "Breloom Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Heracross Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Wurmple Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Shroomish Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Sceptile Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              996,
+              660,
+              739,
+              503,
+              592
+            ]
+          },
+          {
+            "query": "pokemon that evolves using a thunder stone",
+            "expected": "Raichu",
+            "category": "trait",
+            "passed": false,
+            "top_titles": [
+              "Jolteon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Vaporeon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Aggron Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Sylveon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pichu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1142,
+              890,
+              1211,
+              1024,
+              1076
+            ]
+          },
+          {
+            "query": "tiny seed pokemon that grows into a flower",
+            "expected": "Bulbasaur",
+            "category": "trait",
+            "passed": true,
+            "top_titles": [
+              "Bulbasaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Ivysaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Roselia Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Butterfree Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Venusaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1133,
+              1302,
+              1038,
+              840,
+              948
+            ]
+          }
+        ]
+      },
+      {
+        "threshold": 0.72,
+        "timestamp": "2026-08-28T11:18:32.163321+00:00",
+        "total_passed": 5,
+        "by_category": {
+          "exact": "3/3",
+          "semantic": "1/5",
+          "trait": "1/3"
+        },
+        "results": [
+          {
+            "query": "pikachu",
+            "expected": "Pikachu",
+            "category": "exact",
+            "passed": true,
+            "top_titles": [
+              "Pikachu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Clefable Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Squirtle Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Meowth Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Bulbasaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1406,
+              1026,
+              1003,
+              699,
+              981
+            ]
+          },
+          {
+            "query": "charizard",
+            "expected": "Charizard",
+            "category": "exact",
+            "passed": true,
+            "top_titles": [
+              "Charizard Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pok\u00e9mon Shiny-dex (list of shiny sprites) | Pok\u00e9mon Database",
+              "Venusaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Charmeleon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Charmander Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1898,
+              682,
+              509,
+              509,
+              500
+            ]
+          },
+          {
+            "query": "mewtwo",
+            "expected": "Mewtwo",
+            "category": "exact",
+            "passed": true,
+            "top_titles": [
+              "Mewtwo Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Mew Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pok\u00e9mon Shiny-dex (list of shiny sprites) | Pok\u00e9mon Database",
+              "Pok\u00e9mon Pok\u00e9dex: list of Pok\u00e9mon with stats | Pok\u00e9mon Database",
+              "Zeraora Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1806,
+              988,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "query": "electric mouse",
+            "expected": "Pikachu",
+            "category": "semantic",
+            "passed": false,
+            "top_titles": [
+              "Pawmi Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pichu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Raichu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pawmo Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pikachu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              337,
+              254,
+              185,
+              0,
+              0
+            ]
+          },
+          {
+            "query": "fire breathing dragon",
+            "expected": "Charizard",
+            "category": "semantic",
+            "passed": true,
+            "top_titles": [
+              "Charizard Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Dialga Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Flygon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Charmander Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Charmeleon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "query": "psychic clone legendary",
+            "expected": "Mewtwo",
+            "category": "semantic",
+            "passed": false,
+            "top_titles": [
+              "Articuno Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Hoopa Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Alakazam Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Zapdos Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Clefable Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              684,
+              901,
+              766,
+              493,
+              1047
+            ]
+          },
+          {
+            "query": "land shark dragon",
+            "expected": "Garchomp",
+            "category": "semantic",
+            "passed": false,
+            "top_titles": [
+              "Gible Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Wailmer Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Hydreigon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Carvanha Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Gyarados Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              339,
+              303,
+              328,
+              394,
+              100
+            ]
+          },
+          {
+            "query": "ghost haunted tower",
+            "expected": "Gengar",
+            "category": "semantic",
+            "passed": false,
+            "top_titles": [
+              "Chatot Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Duskull Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Gastly Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Haunter Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Mamoswine Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              0,
+              0,
+              465,
+              290,
+              177
+            ]
+          },
+          {
+            "query": "fast pokemon that loves to sleep in forests",
+            "expected": "Snorlax",
+            "category": "trait",
+            "passed": false,
+            "top_titles": [
+              "Breloom Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Heracross Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Wurmple Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Shroomish Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Sceptile Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              996,
+              660,
+              739,
+              503,
+              592
+            ]
+          },
+          {
+            "query": "pokemon that evolves using a thunder stone",
+            "expected": "Raichu",
+            "category": "trait",
+            "passed": false,
+            "top_titles": [
+              "Jolteon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Vaporeon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Aggron Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Sylveon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pichu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "query": "tiny seed pokemon that grows into a flower",
+            "expected": "Bulbasaur",
+            "category": "trait",
+            "passed": true,
+            "top_titles": [
+              "Bulbasaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Ivysaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Roselia Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Butterfree Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Venusaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1133,
+              1302,
+              1038,
+              840,
+              948
+            ]
+          }
+        ]
+      },
+      {
+        "threshold": 0.75,
+        "timestamp": "2026-08-28T11:18:34.853826+00:00",
+        "total_passed": 5,
+        "by_category": {
+          "exact": "3/3",
+          "semantic": "1/5",
+          "trait": "1/3"
+        },
+        "results": [
+          {
+            "query": "pikachu",
+            "expected": "Pikachu",
+            "category": "exact",
+            "passed": true,
+            "top_titles": [
+              "Pikachu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Clefable Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Squirtle Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Meowth Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Bulbasaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1406,
+              1026,
+              1003,
+              699,
+              981
+            ]
+          },
+          {
+            "query": "charizard",
+            "expected": "Charizard",
+            "category": "exact",
+            "passed": true,
+            "top_titles": [
+              "Charizard Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pok\u00e9mon Shiny-dex (list of shiny sprites) | Pok\u00e9mon Database",
+              "Venusaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Charmeleon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Charmander Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1898,
+              682,
+              509,
+              509,
+              500
+            ]
+          },
+          {
+            "query": "mewtwo",
+            "expected": "Mewtwo",
+            "category": "exact",
+            "passed": true,
+            "top_titles": [
+              "Mewtwo Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Mew Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pok\u00e9mon Shiny-dex (list of shiny sprites) | Pok\u00e9mon Database",
+              "Pok\u00e9mon Pok\u00e9dex: list of Pok\u00e9mon with stats | Pok\u00e9mon Database",
+              "Zeraora Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1806,
+              988,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "query": "electric mouse",
+            "expected": "Pikachu",
+            "category": "semantic",
+            "passed": false,
+            "top_titles": [
+              "Pawmi Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pichu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Raichu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pawmo Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pikachu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              337,
+              254,
+              185,
+              0,
+              0
+            ]
+          },
+          {
+            "query": "fire breathing dragon",
+            "expected": "Charizard",
+            "category": "semantic",
+            "passed": true,
+            "top_titles": [
+              "Charizard Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Dialga Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Flygon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Charmander Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Charmeleon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              938,
+              536,
+              791,
+              716,
+              698
+            ]
+          },
+          {
+            "query": "psychic clone legendary",
+            "expected": "Mewtwo",
+            "category": "semantic",
+            "passed": false,
+            "top_titles": [
+              "Articuno Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Hoopa Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Alakazam Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Zapdos Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Clefable Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              684,
+              901,
+              766,
+              493,
+              1047
+            ]
+          },
+          {
+            "query": "land shark dragon",
+            "expected": "Garchomp",
+            "category": "semantic",
+            "passed": false,
+            "top_titles": [
+              "Gible Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Wailmer Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Hydreigon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Carvanha Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Gyarados Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              339,
+              303,
+              328,
+              394,
+              100
+            ]
+          },
+          {
+            "query": "ghost haunted tower",
+            "expected": "Gengar",
+            "category": "semantic",
+            "passed": false,
+            "top_titles": [
+              "Chatot Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Duskull Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Gastly Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Haunter Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Mamoswine Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              0,
+              0,
+              465,
+              290,
+              177
+            ]
+          },
+          {
+            "query": "fast pokemon that loves to sleep in forests",
+            "expected": "Snorlax",
+            "category": "trait",
+            "passed": false,
+            "top_titles": [
+              "Breloom Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Heracross Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Wurmple Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Shroomish Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Sceptile Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              996,
+              660,
+              739,
+              503,
+              592
+            ]
+          },
+          {
+            "query": "pokemon that evolves using a thunder stone",
+            "expected": "Raichu",
+            "category": "trait",
+            "passed": false,
+            "top_titles": [
+              "Jolteon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Vaporeon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Aggron Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Sylveon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pichu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1142,
+              890,
+              1211,
+              1024,
+              1076
+            ]
+          },
+          {
+            "query": "tiny seed pokemon that grows into a flower",
+            "expected": "Bulbasaur",
+            "category": "trait",
+            "passed": true,
+            "top_titles": [
+              "Bulbasaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Ivysaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Roselia Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Butterfree Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Venusaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1133,
+              1302,
+              1038,
+              840,
+              948
+            ]
+          }
+        ]
+      },
+      {
+        "threshold": 0.78,
+        "timestamp": "2026-08-28T11:18:37.360826+00:00",
+        "total_passed": 5,
+        "by_category": {
+          "exact": "3/3",
+          "semantic": "1/5",
+          "trait": "1/3"
+        },
+        "results": [
+          {
+            "query": "pikachu",
+            "expected": "Pikachu",
+            "category": "exact",
+            "passed": true,
+            "top_titles": [
+              "Pikachu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Clefable Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Squirtle Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Meowth Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Bulbasaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1406,
+              1026,
+              1003,
+              699,
+              981
+            ]
+          },
+          {
+            "query": "charizard",
+            "expected": "Charizard",
+            "category": "exact",
+            "passed": true,
+            "top_titles": [
+              "Charizard Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pok\u00e9mon Shiny-dex (list of shiny sprites) | Pok\u00e9mon Database",
+              "Venusaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Charmeleon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Charmander Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1898,
+              682,
+              509,
+              509,
+              500
+            ]
+          },
+          {
+            "query": "mewtwo",
+            "expected": "Mewtwo",
+            "category": "exact",
+            "passed": true,
+            "top_titles": [
+              "Mewtwo Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Mew Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pok\u00e9mon Shiny-dex (list of shiny sprites) | Pok\u00e9mon Database",
+              "Pok\u00e9mon Pok\u00e9dex: list of Pok\u00e9mon with stats | Pok\u00e9mon Database",
+              "Zeraora Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1806,
+              988,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "query": "electric mouse",
+            "expected": "Pikachu",
+            "category": "semantic",
+            "passed": false,
+            "top_titles": [
+              "Pawmi Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pichu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Raichu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pawmo Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pikachu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              337,
+              254,
+              185,
+              0,
+              0
+            ]
+          },
+          {
+            "query": "fire breathing dragon",
+            "expected": "Charizard",
+            "category": "semantic",
+            "passed": true,
+            "top_titles": [
+              "Charizard Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Dialga Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Flygon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Charmander Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Charmeleon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              938,
+              536,
+              791,
+              716,
+              698
+            ]
+          },
+          {
+            "query": "psychic clone legendary",
+            "expected": "Mewtwo",
+            "category": "semantic",
+            "passed": false,
+            "top_titles": [
+              "Articuno Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Hoopa Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Alakazam Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Zapdos Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Clefable Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              684,
+              901,
+              766,
+              493,
+              1047
+            ]
+          },
+          {
+            "query": "land shark dragon",
+            "expected": "Garchomp",
+            "category": "semantic",
+            "passed": false,
+            "top_titles": [
+              "Gible Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Wailmer Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Hydreigon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Carvanha Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Gyarados Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              339,
+              303,
+              328,
+              394,
+              100
+            ]
+          },
+          {
+            "query": "ghost haunted tower",
+            "expected": "Gengar",
+            "category": "semantic",
+            "passed": false,
+            "top_titles": [
+              "Chatot Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Duskull Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Gastly Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Haunter Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Mamoswine Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              0,
+              0,
+              465,
+              290,
+              177
+            ]
+          },
+          {
+            "query": "fast pokemon that loves to sleep in forests",
+            "expected": "Snorlax",
+            "category": "trait",
+            "passed": false,
+            "top_titles": [
+              "Breloom Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Heracross Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Wurmple Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Shroomish Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Sceptile Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              996,
+              660,
+              739,
+              503,
+              592
+            ]
+          },
+          {
+            "query": "pokemon that evolves using a thunder stone",
+            "expected": "Raichu",
+            "category": "trait",
+            "passed": false,
+            "top_titles": [
+              "Jolteon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Vaporeon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Aggron Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Sylveon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pichu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1142,
+              890,
+              1211,
+              1024,
+              1076
+            ]
+          },
+          {
+            "query": "tiny seed pokemon that grows into a flower",
+            "expected": "Bulbasaur",
+            "category": "trait",
+            "passed": true,
+            "top_titles": [
+              "Bulbasaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Ivysaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Roselia Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Butterfree Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Venusaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1133,
+              1302,
+              1038,
+              840,
+              948
+            ]
+          }
+        ]
+      },
+      {
+        "threshold": 0.8,
+        "timestamp": "2026-08-28T11:18:39.858716+00:00",
+        "total_passed": 5,
+        "by_category": {
+          "exact": "3/3",
+          "semantic": "1/5",
+          "trait": "1/3"
+        },
+        "results": [
+          {
+            "query": "pikachu",
+            "expected": "Pikachu",
+            "category": "exact",
+            "passed": true,
+            "top_titles": [
+              "Pikachu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Clefable Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Squirtle Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Meowth Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Bulbasaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1406,
+              1026,
+              1003,
+              699,
+              981
+            ]
+          },
+          {
+            "query": "charizard",
+            "expected": "Charizard",
+            "category": "exact",
+            "passed": true,
+            "top_titles": [
+              "Charizard Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pok\u00e9mon Shiny-dex (list of shiny sprites) | Pok\u00e9mon Database",
+              "Venusaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Charmeleon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Charmander Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1898,
+              682,
+              509,
+              509,
+              500
+            ]
+          },
+          {
+            "query": "mewtwo",
+            "expected": "Mewtwo",
+            "category": "exact",
+            "passed": true,
+            "top_titles": [
+              "Mewtwo Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Mew Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pok\u00e9mon Shiny-dex (list of shiny sprites) | Pok\u00e9mon Database",
+              "Pok\u00e9mon Pok\u00e9dex: list of Pok\u00e9mon with stats | Pok\u00e9mon Database",
+              "Zeraora Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1806,
+              988,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "query": "electric mouse",
+            "expected": "Pikachu",
+            "category": "semantic",
+            "passed": false,
+            "top_titles": [
+              "Pawmi Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pichu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Raichu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pawmo Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pikachu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              337,
+              254,
+              185,
+              0,
+              0
+            ]
+          },
+          {
+            "query": "fire breathing dragon",
+            "expected": "Charizard",
+            "category": "semantic",
+            "passed": true,
+            "top_titles": [
+              "Charizard Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Dialga Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Flygon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Charmander Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Charmeleon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              938,
+              536,
+              791,
+              716,
+              698
+            ]
+          },
+          {
+            "query": "psychic clone legendary",
+            "expected": "Mewtwo",
+            "category": "semantic",
+            "passed": false,
+            "top_titles": [
+              "Articuno Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Hoopa Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Alakazam Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Zapdos Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Clefable Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              684,
+              901,
+              766,
+              493,
+              1047
+            ]
+          },
+          {
+            "query": "land shark dragon",
+            "expected": "Garchomp",
+            "category": "semantic",
+            "passed": false,
+            "top_titles": [
+              "Gible Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Wailmer Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Hydreigon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Carvanha Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Gyarados Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              339,
+              303,
+              328,
+              394,
+              100
+            ]
+          },
+          {
+            "query": "ghost haunted tower",
+            "expected": "Gengar",
+            "category": "semantic",
+            "passed": false,
+            "top_titles": [
+              "Chatot Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Duskull Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Gastly Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Haunter Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Mamoswine Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              0,
+              0,
+              465,
+              290,
+              177
+            ]
+          },
+          {
+            "query": "fast pokemon that loves to sleep in forests",
+            "expected": "Snorlax",
+            "category": "trait",
+            "passed": false,
+            "top_titles": [
+              "Breloom Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Wurmple Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Heracross Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Shroomish Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Sceptile Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              996,
+              739,
+              660,
+              503,
+              592
+            ]
+          },
+          {
+            "query": "pokemon that evolves using a thunder stone",
+            "expected": "Raichu",
+            "category": "trait",
+            "passed": false,
+            "top_titles": [
+              "Jolteon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Vaporeon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Aggron Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Sylveon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pichu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1142,
+              890,
+              1211,
+              1024,
+              1076
+            ]
+          },
+          {
+            "query": "tiny seed pokemon that grows into a flower",
+            "expected": "Bulbasaur",
+            "category": "trait",
+            "passed": true,
+            "top_titles": [
+              "Bulbasaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Ivysaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Roselia Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Butterfree Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Venusaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1133,
+              1302,
+              1038,
+              840,
+              948
+            ]
+          }
+        ]
+      },
+      {
+        "threshold": 0.82,
+        "timestamp": "2026-08-28T11:18:42.313979+00:00",
+        "total_passed": 5,
+        "by_category": {
+          "exact": "3/3",
+          "semantic": "1/5",
+          "trait": "1/3"
+        },
+        "results": [
+          {
+            "query": "pikachu",
+            "expected": "Pikachu",
+            "category": "exact",
+            "passed": true,
+            "top_titles": [
+              "Pikachu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Clefable Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Squirtle Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Meowth Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Bulbasaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1406,
+              1026,
+              1003,
+              699,
+              981
+            ]
+          },
+          {
+            "query": "charizard",
+            "expected": "Charizard",
+            "category": "exact",
+            "passed": true,
+            "top_titles": [
+              "Charizard Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pok\u00e9mon Shiny-dex (list of shiny sprites) | Pok\u00e9mon Database",
+              "Venusaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Charmeleon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Charmander Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1898,
+              682,
+              509,
+              509,
+              500
+            ]
+          },
+          {
+            "query": "mewtwo",
+            "expected": "Mewtwo",
+            "category": "exact",
+            "passed": true,
+            "top_titles": [
+              "Mewtwo Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Mew Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pok\u00e9mon Shiny-dex (list of shiny sprites) | Pok\u00e9mon Database",
+              "Pok\u00e9mon Pok\u00e9dex: list of Pok\u00e9mon with stats | Pok\u00e9mon Database",
+              "Zeraora Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1806,
+              988,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "query": "electric mouse",
+            "expected": "Pikachu",
+            "category": "semantic",
+            "passed": false,
+            "top_titles": [
+              "Pawmi Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pichu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Raichu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pawmo Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pikachu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              337,
+              254,
+              185,
+              0,
+              0
+            ]
+          },
+          {
+            "query": "fire breathing dragon",
+            "expected": "Charizard",
+            "category": "semantic",
+            "passed": true,
+            "top_titles": [
+              "Charizard Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Dialga Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Flygon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Charmander Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Charmeleon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              938,
+              536,
+              791,
+              716,
+              698
+            ]
+          },
+          {
+            "query": "psychic clone legendary",
+            "expected": "Mewtwo",
+            "category": "semantic",
+            "passed": false,
+            "top_titles": [
+              "Articuno Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Hoopa Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Alakazam Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Zapdos Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Clefable Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              684,
+              901,
+              766,
+              493,
+              1047
+            ]
+          },
+          {
+            "query": "land shark dragon",
+            "expected": "Garchomp",
+            "category": "semantic",
+            "passed": false,
+            "top_titles": [
+              "Gible Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Wailmer Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Hydreigon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Carvanha Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Gyarados Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              339,
+              303,
+              328,
+              394,
+              100
+            ]
+          },
+          {
+            "query": "ghost haunted tower",
+            "expected": "Gengar",
+            "category": "semantic",
+            "passed": false,
+            "top_titles": [
+              "Chatot Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Duskull Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Gastly Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Haunter Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Mamoswine Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              0,
+              0,
+              465,
+              290,
+              177
+            ]
+          },
+          {
+            "query": "fast pokemon that loves to sleep in forests",
+            "expected": "Snorlax",
+            "category": "trait",
+            "passed": false,
+            "top_titles": [
+              "Breloom Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Wurmple Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Heracross Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Shroomish Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Sceptile Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              996,
+              739,
+              660,
+              503,
+              592
+            ]
+          },
+          {
+            "query": "pokemon that evolves using a thunder stone",
+            "expected": "Raichu",
+            "category": "trait",
+            "passed": false,
+            "top_titles": [
+              "Jolteon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Vaporeon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Aggron Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Sylveon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pichu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1142,
+              890,
+              1211,
+              1024,
+              1076
+            ]
+          },
+          {
+            "query": "tiny seed pokemon that grows into a flower",
+            "expected": "Bulbasaur",
+            "category": "trait",
+            "passed": true,
+            "top_titles": [
+              "Bulbasaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Ivysaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Roselia Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Butterfree Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Venusaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1133,
+              1302,
+              1038,
+              840,
+              948
+            ]
+          }
+        ]
+      },
+      {
+        "threshold": 0.85,
+        "timestamp": "2026-08-28T11:18:44.716937+00:00",
+        "total_passed": 5,
+        "by_category": {
+          "exact": "3/3",
+          "semantic": "1/5",
+          "trait": "1/3"
+        },
+        "results": [
+          {
+            "query": "pikachu",
+            "expected": "Pikachu",
+            "category": "exact",
+            "passed": true,
+            "top_titles": [
+              "Pikachu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Clefable Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Squirtle Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Meowth Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Bulbasaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1406,
+              1026,
+              1003,
+              699,
+              981
+            ]
+          },
+          {
+            "query": "charizard",
+            "expected": "Charizard",
+            "category": "exact",
+            "passed": true,
+            "top_titles": [
+              "Charizard Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pok\u00e9mon Shiny-dex (list of shiny sprites) | Pok\u00e9mon Database",
+              "Venusaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Charmeleon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Charmander Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1898,
+              682,
+              509,
+              509,
+              500
+            ]
+          },
+          {
+            "query": "mewtwo",
+            "expected": "Mewtwo",
+            "category": "exact",
+            "passed": true,
+            "top_titles": [
+              "Mewtwo Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Mew Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pok\u00e9mon Shiny-dex (list of shiny sprites) | Pok\u00e9mon Database",
+              "Pok\u00e9mon Pok\u00e9dex: list of Pok\u00e9mon with stats | Pok\u00e9mon Database",
+              "Zeraora Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1806,
+              988,
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "query": "electric mouse",
+            "expected": "Pikachu",
+            "category": "semantic",
+            "passed": false,
+            "top_titles": [
+              "Pawmi Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pichu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Raichu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pawmo Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pikachu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              337,
+              254,
+              185,
+              0,
+              0
+            ]
+          },
+          {
+            "query": "fire breathing dragon",
+            "expected": "Charizard",
+            "category": "semantic",
+            "passed": true,
+            "top_titles": [
+              "Charizard Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Dialga Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Flygon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Charmander Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Charmeleon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              938,
+              536,
+              791,
+              716,
+              698
+            ]
+          },
+          {
+            "query": "psychic clone legendary",
+            "expected": "Mewtwo",
+            "category": "semantic",
+            "passed": false,
+            "top_titles": [
+              "Articuno Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Hoopa Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Alakazam Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Zapdos Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Clefable Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              684,
+              901,
+              766,
+              493,
+              1047
+            ]
+          },
+          {
+            "query": "land shark dragon",
+            "expected": "Garchomp",
+            "category": "semantic",
+            "passed": false,
+            "top_titles": [
+              "Gible Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Wailmer Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Hydreigon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Carvanha Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Gyarados Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              339,
+              303,
+              328,
+              394,
+              100
+            ]
+          },
+          {
+            "query": "ghost haunted tower",
+            "expected": "Gengar",
+            "category": "semantic",
+            "passed": false,
+            "top_titles": [
+              "Chatot Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Duskull Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Gastly Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Haunter Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Mamoswine Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              0,
+              0,
+              465,
+              290,
+              177
+            ]
+          },
+          {
+            "query": "fast pokemon that loves to sleep in forests",
+            "expected": "Snorlax",
+            "category": "trait",
+            "passed": false,
+            "top_titles": [
+              "Breloom Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Wurmple Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Heracross Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Shroomish Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Sceptile Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              996,
+              739,
+              660,
+              503,
+              592
+            ]
+          },
+          {
+            "query": "pokemon that evolves using a thunder stone",
+            "expected": "Raichu",
+            "category": "trait",
+            "passed": false,
+            "top_titles": [
+              "Jolteon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Vaporeon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Aggron Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Sylveon Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Pichu Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1142,
+              890,
+              1211,
+              1024,
+              1076
+            ]
+          },
+          {
+            "query": "tiny seed pokemon that grows into a flower",
+            "expected": "Bulbasaur",
+            "category": "trait",
+            "passed": true,
+            "top_titles": [
+              "Bulbasaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Ivysaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Roselia Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Butterfree Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database",
+              "Venusaur Pok\u00e9dex: stats, moves, evolution & locations | Pok\u00e9mon Database"
+            ],
+            "knn_scores": [
+              1133,
+              1302,
+              1038,
+              840,
+              948
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

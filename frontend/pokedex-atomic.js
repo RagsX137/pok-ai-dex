@@ -29,23 +29,26 @@ async function initAtomic() {
     search: {
       pipeline:  'default',
       searchHub: 'PokedexUI',
+      // The Semantic Encoder (Semantic-PokEncoder) is active via the pipeline's
+      // KNN Ranking Function — no mlParameters flag needed on the client.
     },
   });
 
   // Trigger an initial search to populate results on load
   searchInterface.executeFirstSearch();
 
-  // Populate model dropdown from live Ollama models
+  // Append live Ollama models to the Ollama optgroup in the dropdown
   try {
     const resp   = await fetch('/api/models');
     const data   = await resp.json();
     const select = document.getElementById('model-select');
-    if (select && data.models?.length) {
-      select.innerHTML = data.models
+    const ollamaGroup = select?.querySelector('optgroup[label="Ollama (local)"]');
+    if (ollamaGroup && data.models?.length) {
+      ollamaGroup.innerHTML = data.models
         .map(m => `<option value="${m}">${m}</option>`)
         .join('');
     }
-  } catch (_) { /* keep static options if Ollama is offline */ }
+  } catch (_) { /* keep static Ollama options if Ollama is offline */ }
 }
 
 // ────────────────────────────────────────────────────────────
@@ -53,14 +56,10 @@ async function initAtomic() {
 //     When user clicks a result, populate the bottom panel
 // ────────────────────────────────────────────────────────────
 function wireResultClicks() {
-  document.addEventListener('atomic/result/select', async (e) => {
+  document.addEventListener('atomic/result/select', (e) => {
     const result = e.detail?.result;
     if (!result) return;
 
-    // The Coveo source is raw HTML — it has no structured fields like hp/type1.
-    // Extract the Pokémon name from the page title and look it up in our CSV
-    // via the Flask /api/pokemon-detail endpoint.
-    //
     // Title format examples:
     //   "Garchomp Pokédex: stats, moves, evolution & locations | Pokémon Database"
     //   "Dragon type Pokémon | Pokémon Database"
@@ -68,40 +67,22 @@ function wireResultClicks() {
     const pokemonName = rawTitle.split(/\s+Pokédex/i)[0].trim()
                      || rawTitle.split(' | ')[0].trim();
 
-    // Show the name immediately while we fetch stats
+    // Show the name from the Coveo result title
     const nameEl = document.querySelector('.photo-name');
     if (nameEl) nameEl.textContent = pokemonName;
 
-    // Fetch structured stats from CSV via Flask
-    try {
-      const resp = await fetch(`/api/pokemon-detail?name=${encodeURIComponent(pokemonName)}`);
-      if (resp.ok) {
-        const data = await resp.json();
+    // Use Coveo raw fields for type badges and stats if available
+    const type1 = result.raw?.type1 ?? '';
+    const type2 = result.raw?.type2 ?? '';
+    renderTypeBadges([type1, type2].filter(Boolean));
 
-        // Photo panel
-        const sprite = document.querySelector('.photo-sprite');
-        if (sprite) sprite.src = data.image_url ?? `/images/${pokemonName.toLowerCase()}_image.jpg`;
+    renderStatsRow({
+      hp:      result.raw?.hp      ?? null,
+      attack:  result.raw?.attack  ?? null,
+      defense: result.raw?.defense ?? null,
+      speed:   result.raw?.speed   ?? null,
+    });
 
-        // Type badges in control row
-        renderTypeBadges([data.type1, data.type2].filter(Boolean));
-
-        // Stats row in screen
-        renderStatsRow({
-          hp:      data.hp,
-          attack:  data.attack,
-          defense: data.defense,
-          speed:   data.speed,
-        });
-      } else {
-        // Page is a type/category page, not a specific Pokémon — clear panels
-        renderTypeBadges([]);
-        renderStatsRow({ hp: null, attack: null, defense: null, speed: null });
-      }
-    } catch (_) {
-      // Network error — silently leave panels as-is
-    }
-
-    // Evolutions: not in CSV, leave empty for now
     renderEvolutionChain([]);
   });
 }
@@ -111,23 +92,40 @@ function wireResultClicks() {
 //     Sends top-5 snippets to /api/rga and streams answer
 // ────────────────────────────────────────────────────────────
 async function fetchRGAAnswer(query, results) {
-  const context = results.slice(0, 5).map(r => ({
-    title:   r.title ?? '',
-    excerpt: r.raw?.excerpt ?? r.excerpt ?? '',
-  }));
-
   const rgaPanel = document.querySelector('.rga-panel');
   if (!rgaPanel) return;
   rgaPanel.textContent = '…';
 
+  const model = document.getElementById('model-select')?.value ?? '';
+
   try {
-    const resp = await fetch('/api/rga', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query, context }),
-    });
-    const data = await resp.json();
-    rgaPanel.textContent = data.answer ?? '—';
+    let answer;
+    if (model === 'coveo-rga') {
+      // ── Coveo Relevance Generative Answering (Professor-Oak) ──────────────
+      // Sends just the query — Coveo retrieves passages and generates the answer
+      // server-side using the model associated with the pipeline.
+      const resp = await fetch('/api/rga-coveo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query }),
+      });
+      const data = await resp.json();
+      answer = data.answer ?? '—';
+    } else {
+      // ── Ollama (local LLM) ────────────────────────────────────────────────
+      const context = results.slice(0, 5).map(r => ({
+        title:   r.title ?? '',
+        excerpt: r.raw?.excerpt ?? r.excerpt ?? '',
+      }));
+      const resp = await fetch('/api/rga', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, context }),
+      });
+      const data = await resp.json();
+      answer = data.answer ?? '—';
+    }
+    rgaPanel.textContent = answer;
   } catch (_) {
     rgaPanel.textContent = '(AI answer unavailable)';
   }
