@@ -31,6 +31,15 @@ async function initAtomic() {
       searchHub: 'PokedexUI',
       // The Semantic Encoder (Semantic-PokEncoder) is active via the pipeline's
       // KNN Ranking Function — no mlParameters flag needed on the client.
+
+      // Explicitly request custom Pokémon fields — Coveo only returns a default
+      // system-field subset unless these are declared here.
+      fieldsToInclude: [
+        'type1', 'type2',
+        'hp', 'attack', 'defense', 'speed', 'total',
+        'image_url', 'pokemon', 'pokedex_num',
+        'generation', 'moves',
+      ],
     },
   });
 
@@ -55,35 +64,74 @@ async function initAtomic() {
 // 3.  Coveo result → Pokédex detail panel wiring
 //     When user clicks a result, populate the bottom panel
 // ────────────────────────────────────────────────────────────
+// Cache PokéAPI responses to avoid redundant fetches
+const _pokeCache = {};
+
+async function fetchPokeData(name) {
+  const key = name.toLowerCase();
+  if (_pokeCache[key]) return _pokeCache[key];
+  try {
+    const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${key}`);
+    if (!r.ok) return null;
+    const d = await r.json();
+    const data = {
+      sprite: d.sprites?.front_default ?? '',
+      types:  d.types.map(t => t.type.name),
+      stats:  Object.fromEntries(d.stats.map(s => [s.stat.name, s.base_stat])),
+    };
+    _pokeCache[key] = data;
+    return data;
+  } catch { return null; }
+}
+
+async function populateBottomPanel(result) {
+  // Extract the Pokémon's plain name from the title
+  // e.g. "Garchomp Pokédex: stats, moves…" → "Garchomp"
+  const rawTitle = result.title ?? '';
+  const pokemonName = (rawTitle.split(/\s+Pokédex/i)[0].trim()
+                   || rawTitle.split(' | ')[0].trim());
+
+  if (!pokemonName || pokemonName.toLowerCase().includes('type')) return;
+
+  // Name label — set immediately
+  const nameEl = document.querySelector('.photo-name');
+  if (nameEl) nameEl.textContent = pokemonName;
+
+  // Fetch live data from PokéAPI (Coveo raw fields are empty — Sitemap source
+  // only crawls HTML, no structured metadata was indexed).
+  const poke = await fetchPokeData(pokemonName);
+
+  // Photo sprite
+  const sprite = document.querySelector('.photo-sprite');
+  if (sprite) {
+    sprite.src = poke?.sprite
+              || result.raw?.image_url
+              || `/images/${pokemonName.toLowerCase()}_image.jpg`;
+    sprite.style.display = '';
+  }
+
+  // Type badges in the controls row
+  const types = poke?.types
+             ?? [result.raw?.type1, result.raw?.type2].filter(Boolean);
+  renderTypeBadges(types);
+
+  // Stats row
+  const stats = poke?.stats ?? {};
+  renderStatsRow({
+    hp:      stats.hp         ?? result.raw?.hp      ?? null,
+    attack:  stats.attack     ?? result.raw?.attack  ?? null,
+    defense: stats.defense    ?? result.raw?.defense ?? null,
+    speed:   stats.speed      ?? result.raw?.speed   ?? null,
+  });
+
+  renderEvolutionChain([]);
+}
+
 function wireResultClicks() {
   document.addEventListener('atomic/result/select', (e) => {
     const result = e.detail?.result;
     if (!result) return;
-
-    // Title format examples:
-    //   "Garchomp Pokédex: stats, moves, evolution & locations | Pokémon Database"
-    //   "Dragon type Pokémon | Pokémon Database"
-    const rawTitle = result.title ?? '';
-    const pokemonName = rawTitle.split(/\s+Pokédex/i)[0].trim()
-                     || rawTitle.split(' | ')[0].trim();
-
-    // Show the name from the Coveo result title
-    const nameEl = document.querySelector('.photo-name');
-    if (nameEl) nameEl.textContent = pokemonName;
-
-    // Use Coveo raw fields for type badges and stats if available
-    const type1 = result.raw?.type1 ?? '';
-    const type2 = result.raw?.type2 ?? '';
-    renderTypeBadges([type1, type2].filter(Boolean));
-
-    renderStatsRow({
-      hp:      result.raw?.hp      ?? null,
-      attack:  result.raw?.attack  ?? null,
-      defense: result.raw?.defense ?? null,
-      speed:   result.raw?.speed   ?? null,
-    });
-
-    renderEvolutionChain([]);
+    populateBottomPanel(result);
   });
 }
 
@@ -131,14 +179,47 @@ async function fetchRGAAnswer(query, results) {
   }
 }
 
-// Wire to Atomic's search success event
+// Subscribe to the headless engine state.
+// atomic/search/success is not dispatched in Atomic v3 — the only reliable
+// hook is engine.subscribe(), which fires on every state change.
 function wireRGA() {
-  document.addEventListener('atomic/search/success', (e) => {
-    const query   = document.querySelector('atomic-search-box')
-                      ?.shadowRoot?.querySelector('input')?.value ?? '';
-    const results = e.detail?.results ?? [];
-    if (query && results.length) fetchRGAAnswer(query, results);
-  });
+  const si = document.querySelector('atomic-search-interface');
+  if (!si) return;
+
+  // Engine may not be ready synchronously; wait for it.
+  const trySubscribe = () => {
+    const engine = si.engine;
+    if (!engine) { setTimeout(trySubscribe, 200); return; }
+
+    let lastQuery   = null;
+    let lastLoading = true; // treat initial state as loading
+
+    engine.subscribe(() => {
+      const state   = engine.state;
+      const results = state?.search?.results ?? [];
+      const query   = state?.query?.q ?? '';
+      const loading = state?.search?.isLoading ?? false;
+
+      // Only act when a search just *finished* (loading flipped false→true→false)
+      // and there are results. Guard against re-firing on unrelated state changes.
+      const justFinished = lastLoading === true && loading === false;
+      lastLoading = loading;
+
+      if (!justFinished || !results.length) return;
+
+      // Auto-populate the bottom panel with the top result immediately.
+      populateBottomPanel(results[0]);
+
+      // Only fire RGA when the query actually changed (avoids re-running on
+      // facet/pagination state changes that share the same query text).
+      if (query && query !== lastQuery) {
+        lastQuery = query;
+        fetchRGAAnswer(query, results);
+      }
+    });
+  };
+
+  trySubscribe();
 }
 
 // ────────────────────────────────────────────────────────────

@@ -129,17 +129,24 @@
         density="compact">
         <atomic-result-template>
           <template>
+            <!-- Request the fields we need from the index -->
+            <atomic-result-fields-list
+              fields="title,excerpt,image_url,type1,type2,hp,attack,defense,speed,total">
+            </atomic-result-fields-list>
+
             <atomic-result-section-title>
               <atomic-result-link></atomic-result-link>
             </atomic-result-section-title>
+
             <atomic-result-section-badges>
               <atomic-field-condition must-match-field="type1">
-                <atomic-result-badge field="type1" label="Type 1"></atomic-result-badge>
+                <atomic-result-badge field="type1"></atomic-result-badge>
               </atomic-field-condition>
               <atomic-field-condition must-match-field="type2">
-                <atomic-result-badge field="type2" label="Type 2"></atomic-result-badge>
+                <atomic-result-badge field="type2"></atomic-result-badge>
               </atomic-field-condition>
             </atomic-result-section-badges>
+
             <atomic-result-section-excerpt>
               <atomic-result-text field="excerpt" should-highlight="true">
               </atomic-result-text>
