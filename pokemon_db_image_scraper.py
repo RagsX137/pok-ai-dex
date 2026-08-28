@@ -1,16 +1,3 @@
-# ============================================
-# Pokémon Image Scraper
-# Author: Lily Gates
-# Date: May 2025
-# Description:
-# Scrapes Pokémon names and image links from pokemondb.net,
-# downloads each Pokémon's image, and saves it locally.
-# Features:
-# - Avoids duplicate downloads (tracked via text file)
-# - Retries failed downloads
-# - Adds delays to avoid overwhelming the server
-# ============================================
-
 # Import required packages
 import os
 import time

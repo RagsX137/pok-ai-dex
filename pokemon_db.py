@@ -1,9 +1,3 @@
-# ============================================
-# Pokémon Data Webscraper
-# Author: Lily Gates
-# Date: May 2025
-# Description: Scrapes detailed Pokémon data from pokemondb.net
-# ============================================
 
 # --- IMPORTS AND SETUP ---
 from requests import get

@@ -17,6 +17,10 @@ async function initAtomic() {
   const searchInterface = document.querySelector('atomic-search-interface');
   if (!searchInterface) return;
 
+  // Wait for Atomic web components to be fully defined before calling .initialize()
+  // Without this, the search-box and other components are inert shells.
+  await customElements.whenDefined('atomic-search-interface');
+
   const { token, organizationId } = await getCoveoCredentials();
 
   await searchInterface.initialize({
