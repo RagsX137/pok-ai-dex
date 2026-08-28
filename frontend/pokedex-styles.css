@@ -110,63 +110,66 @@ body {
   position: relative;
 }
 
-/* Search bar inside screen */
-.screen-search-row {
-  display: flex; gap: 6px; margin-bottom: 10px;
+/* ── Unified search + AI answer bar ── */
+.unified-bar-wrap {
+  margin-bottom: 10px;
 }
-atomic-search-box {
-  flex: 1;
-  /* Atomic design-token overrides — dark Pokédex screen palette */
-  --atomic-primary-color:    #f0d040;
-  --atomic-on-primary:       #1a1f3a;
-  --atomic-background:       #0f1228;
-  --atomic-on-background:    #f0d040;
-  --atomic-background-color: #0f1228;
-  --atomic-neutral:          rgba(240,208,64,0.25);
-  --atomic-neutral-dark:     rgba(240,208,64,0.5);
-  --atomic-neutral-dark-900: #f0d040;
-  --atomic-font-family:      "Courier New", monospace;
-  --atomic-ring-color:       rgba(240,208,64,0.6);
-}
-
-/* Input field (shadow ::part) */
-atomic-search-box::part(input) {
-  background:    #0f1228;
-  color:         #f0d040;
-  border:        1px solid rgba(240,208,64,0.4);
+.unified-bar-input-row {
+  display: flex;
+  align-items: center;
+  background: #0f1228;
+  border: 1px solid rgba(240,208,64,0.4);
   border-radius: 5px;
-  caret-color:   #f0d040;
-  font-family:   "Courier New", monospace;
-  font-size:     13px;
+  overflow: hidden;
 }
-atomic-search-box::part(input):focus {
+.unified-bar-input-row:focus-within {
   border-color: #f0d040;
-  outline:      none;
-  box-shadow:   0 0 0 2px rgba(240,208,64,0.2);
+  box-shadow: 0 0 0 2px rgba(240,208,64,0.2);
 }
-
-/* Submit / clear icon buttons */
-atomic-search-box::part(submit-button),
-atomic-search-box::part(clear-button) {
-  color:      #f0d040;
+.unified-input {
+  flex: 1;
   background: transparent;
+  border: none;
+  outline: none;
+  color: #f0d040;
+  caret-color: #f0d040;
+  font-family: "Courier New", monospace;
+  font-size: 13px;
+  padding: 9px 10px;
 }
+.unified-input::placeholder {
+  color: rgba(240,208,64,0.4);
+}
+.unified-submit-btn {
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  border-left: 1px solid rgba(240,208,64,0.2);
+  color: #f0d040;
+  font-size: 16px;
+  padding: 0 10px;
+  cursor: pointer;
+  line-height: 36px;
+  height: 36px;
+  opacity: 0.7;
+  transition: opacity 0.15s;
+}
+.unified-submit-btn:hover { opacity: 1; }
 
-/* RGA answer panel */
-.rga-panel {
-  background: rgba(240,208,64,0.08);
-  border: 1px solid rgba(240,208,64,0.25);
-  border-radius: 5px;
-  padding: 8px 10px;
+/* AI answer — shown below the input, hidden when empty */
+.unified-answer {
   font-size: 12px;
   color: var(--screen-text);
-  margin-bottom: 10px;
-  min-height: 40px;
   line-height: 1.5;
+  padding: 6px 2px 2px;
+  min-height: 0;
+  display: none;  /* hidden until an answer arrives */
 }
-.rga-label {
-  font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
-  color: rgba(240,208,64,0.5); margin-bottom: 4px;
+.unified-answer.has-answer {
+  display: block;
+  border-top: 1px solid rgba(240,208,64,0.15);
+  margin-top: 6px;
+  padding-top: 6px;
 }
 
 /* Stats row inside screen */

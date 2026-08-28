@@ -91,20 +91,30 @@
     <!-- ── SCREEN: all Atomic components live here ── -->
     <div class="pokedex-screen">
 
-      <!-- RGA / Ollama answer panel -->
-      <div class="rga-label">Pokédex AI</div>
-      <div class="rga-panel" id="rga-panel">
-        Ask me anything about Pokémon…
+      <!-- Unified search + AI answer bar -->
+      <div class="unified-bar-wrap">
+        <div class="unified-bar-input-row">
+          <input
+            id="unified-input"
+            class="unified-input"
+            type="text"
+            placeholder="Ask me anything about Pokémon…"
+            autocomplete="off"
+            spellcheck="false" />
+          <button class="unified-submit-btn" id="unified-submit" title="Search">&#x2315;</button>
+        </div>
+        <div class="unified-answer" id="rga-panel"></div>
       </div>
 
-      <!-- Search bar with Query Suggest — sits below the AI panel -->
-      <div class="screen-search-row">
-        <atomic-search-box
-          number-of-queries="5"
-          minimum-query-length="1"
-          clear-filters="false">
-        </atomic-search-box>
-      </div>
+      <!-- atomic-search-box is hidden but kept so Atomic's headless SearchBox
+           controller is available for programmatic search dispatch -->
+      <atomic-search-box
+        id="atomic-search-box-hidden"
+        number-of-queries="5"
+        minimum-query-length="1"
+        clear-filters="false"
+        style="display:none;">
+      </atomic-search-box>
 
       <!-- Quick stat row (populated on result click) -->
       <div class="screen-section-label">Stats</div>

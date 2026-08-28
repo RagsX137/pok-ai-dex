@@ -140,18 +140,16 @@ function wireResultClicks() {
 //     Sends top-5 snippets to /api/rga and streams answer
 // ────────────────────────────────────────────────────────────
 async function fetchRGAAnswer(query, results) {
-  const rgaPanel = document.querySelector('.rga-panel');
+  const rgaPanel = document.getElementById('rga-panel');
   if (!rgaPanel) return;
   rgaPanel.textContent = '…';
+  rgaPanel.classList.add('has-answer');
 
   const model = document.getElementById('model-select')?.value ?? '';
 
   try {
     let answer;
     if (model === 'coveo-rga') {
-      // ── Coveo Relevance Generative Answering (Professor-Oak) ──────────────
-      // Sends just the query — Coveo retrieves passages and generates the answer
-      // server-side using the model associated with the pipeline.
       const resp = await fetch('/api/rga-coveo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -160,7 +158,6 @@ async function fetchRGAAnswer(query, results) {
       const data = await resp.json();
       answer = data.answer ?? '—';
     } else {
-      // ── Ollama (local LLM) ────────────────────────────────────────────────
       const context = results.slice(0, 5).map(r => ({
         title:   r.title ?? '',
         excerpt: r.raw?.excerpt ?? r.excerpt ?? '',
@@ -177,6 +174,31 @@ async function fetchRGAAnswer(query, results) {
   } catch (_) {
     rgaPanel.textContent = '(AI answer unavailable)';
   }
+}
+
+// ────────────────────────────────────────────────────────────
+// 4b. Unified search bar — drives Coveo via the headless engine
+// ────────────────────────────────────────────────────────────
+function dispatchSearch(q) {
+  // Proxy through the hidden atomic-search-box's headless SearchBox controller.
+  // This is the same pattern used in test_search.py and is the only stable
+  // Atomic v3 API for programmatic search without action-creator imports.
+  const sb = document.querySelector('atomic-search-box');
+  if (sb?.searchBox) {
+    sb.searchBox.updateText(q);
+    sb.searchBox.submit();
+  }
+}
+
+function wireUnifiedBar() {
+  const input  = document.getElementById('unified-input');
+  const button = document.getElementById('unified-submit');
+  if (!input) return;
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') dispatchSearch(input.value.trim());
+  });
+  button.addEventListener('click', () => dispatchSearch(input.value.trim()));
 }
 
 // Subscribe to the headless engine state.
@@ -200,8 +222,7 @@ function wireRGA() {
       const query   = state?.query?.q ?? '';
       const loading = state?.search?.isLoading ?? false;
 
-      // Only act when a search just *finished* (loading flipped false→true→false)
-      // and there are results. Guard against re-firing on unrelated state changes.
+      // Only act when a search just *finished* loading → results ready.
       const justFinished = lastLoading === true && loading === false;
       lastLoading = loading;
 
@@ -210,8 +231,7 @@ function wireRGA() {
       // Auto-populate the bottom panel with the top result immediately.
       populateBottomPanel(results[0]);
 
-      // Only fire RGA when the query actually changed (avoids re-running on
-      // facet/pagination state changes that share the same query text).
+      // Fire RGA only when the query text changed.
       if (query && query !== lastQuery) {
         lastQuery = query;
         fetchRGAAnswer(query, results);
@@ -295,10 +315,9 @@ function renderEvolutionChain(chain) {
 }
 
 function searchPokemon(name) {
-  const searchInterface = document.querySelector('atomic-search-interface');
-  const searchBox = document.querySelector('atomic-search-box');
-  if (searchBox) searchBox.setAttribute('value', name);
-  if (searchInterface) searchInterface.executeFirstSearch();
+  const input = document.getElementById('unified-input');
+  if (input) input.value = name;
+  dispatchSearch(name);
 }
 
 // ────────────────────────────────────────────────────────────
@@ -332,6 +351,9 @@ function wireModelSelector() {
 // ────────────────────────────────────────────────────────────
 function wirePowerButton() {
   document.getElementById('power-btn')?.addEventListener('click', () => {
+    const input = document.getElementById('unified-input');
+    if (input) input.value = '';
+
     const si = document.querySelector('atomic-search-interface');
     if (si) si.executeFirstSearch();
 
@@ -341,8 +363,8 @@ function wirePowerButton() {
     const nameEl = document.querySelector('.photo-name');
     if (nameEl) nameEl.textContent = 'Pokémon';
 
-    const rgaPanel = document.querySelector('.rga-panel');
-    if (rgaPanel) rgaPanel.textContent = 'Ask me anything about Pokémon…';
+    const rgaPanel = document.getElementById('rga-panel');
+    if (rgaPanel) { rgaPanel.textContent = ''; rgaPanel.classList.remove('has-answer'); }
 
     const evoChain = document.querySelector('.evo-chain');
     if (evoChain) evoChain.innerHTML = '<div class="evo-box" style="opacity:0.4;">—</div>';
@@ -357,6 +379,7 @@ function wirePowerButton() {
 document.addEventListener('DOMContentLoaded', async () => {
   await initAtomic();
   wireResultClicks();
+  wireUnifiedBar();
   wireRGA();
   wireFacetsDrawer();
   wireModelSelector();
