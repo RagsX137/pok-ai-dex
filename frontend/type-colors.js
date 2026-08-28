@@ -1,0 +1,21 @@
+// Canonical Pokémon type color palette
+export const TYPE_COLORS = {
+  fire:     { bg: '#FF9C54', text: '#7C1F00' },
+  water:    { bg: '#4FC1FF', text: '#003A7C' },
+  grass:    { bg: '#63BB5B', text: '#1A4A00' },
+  electric: { bg: '#F3D23B', text: '#5A3E00' },
+  psychic:  { bg: '#FF6B81', text: '#5A0020' },
+  ice:      { bg: '#74CEC0', text: '#003A38' },
+  dragon:   { bg: '#6F35FC', text: '#EDE9FF' },
+  dark:     { bg: '#5A5365', text: '#EDE9FF' },
+  fairy:    { bg: '#EC8FE6', text: '#5A005A' },
+  fighting: { bg: '#CE4069', text: '#fff' },
+  poison:   { bg: '#AB6AC8', text: '#fff' },
+  ground:   { bg: '#D97845', text: '#fff' },
+  rock:     { bg: '#C9B78B', text: '#3A2800' },
+  bug:      { bg: '#90C12C', text: '#213800' },
+  ghost:    { bg: '#5269AC', text: '#fff' },
+  steel:    { bg: '#5A8EA1', text: '#fff' },
+  normal:   { bg: '#9099A1', text: '#fff' },
+  flying:   { bg: '#89AAE3', text: '#001A5A' },
+};

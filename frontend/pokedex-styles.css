@@ -1,0 +1,277 @@
+/* ====================================================
+   Pokédex Device Chrome — matches the hand-drawn sketch
+   ==================================================== */
+:root {
+  --device-red: #d32f2f;
+  --device-dark-red: #9a0007;
+  --screen-bg: #1a1f3a;
+  --screen-text: #f0d040;
+  --screen-border: #c8c8c8;
+  --bottom-white: #f9f9f9;
+  --bottom-cyan: #4dd0e1;
+  --control-row-bg: #e8e8e8;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #1a1a2e;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 24px 16px;
+  font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+}
+
+/* ── Outer device body ── */
+.pokedex-device {
+  background: var(--device-red);
+  border-radius: 20px 20px 12px 12px;
+  width: 380px;
+  max-width: 100%;
+  box-shadow: 4px 6px 0 var(--device-dark-red), 0 12px 32px rgba(0,0,0,0.6);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Top bar: camera lens + LEDs + model selector ── */
+.pokedex-top-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px 10px;
+  background: var(--device-red);
+}
+.pokedex-lens {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #81d4fa, #0288d1);
+  border: 4px solid #fff;
+  flex-shrink: 0;
+}
+.pokedex-leds {
+  display: flex; gap: 8px; margin-left: 4px;
+}
+.led {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+}
+.led-red    { background: #ff4444; box-shadow: 0 0 6px #ff4444; }
+.led-yellow { background: #ffcc00; box-shadow: 0 0 6px #ffcc00; }
+.led-green  { background: #44dd44; box-shadow: 0 0 6px #44dd44; }
+
+.pokedex-model-selector {
+  margin-left: auto;
+  display: flex; align-items: center; gap: 6px;
+  background: #f9e400;
+  border: 2px solid #333;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 13px; font-weight: 700;
+  color: #1a1a1a;
+  cursor: pointer;
+}
+.model-selector-arrow { font-size: 10px; }
+#model-select {
+  background: transparent; border: none; outline: none;
+  font-weight: 700; font-size: 13px; cursor: pointer;
+  color: #1a1a1a;
+}
+
+/* ── Screen bezel ── */
+.pokedex-screen-bezel {
+  background: #d8d8d8;
+  margin: 0 12px 8px;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+}
+.screen-indicator-dots {
+  display: flex; justify-content: center; gap: 8px; margin-bottom: 6px;
+}
+.screen-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #cc2222;
+}
+
+/* ── Screen area (Atomic results mount here) ── */
+.pokedex-screen {
+  background: var(--screen-bg);
+  border-radius: 6px;
+  min-height: 320px;
+  padding: 12px;
+  color: var(--screen-text);
+  font-family: "Courier New", monospace;
+  overflow-y: auto;
+  position: relative;
+}
+
+/* Search bar inside screen */
+.screen-search-row {
+  display: flex; gap: 6px; margin-bottom: 10px;
+}
+atomic-search-box {
+  flex: 1;
+  --atomic-primary-color: #f0d040;
+  --atomic-neutral-dark-900: #f0d040;
+  --atomic-background-color: #0f1228;
+  --atomic-font-family: "Courier New", monospace;
+}
+
+/* RGA answer panel */
+.rga-panel {
+  background: rgba(240,208,64,0.08);
+  border: 1px solid rgba(240,208,64,0.25);
+  border-radius: 5px;
+  padding: 8px 10px;
+  font-size: 12px;
+  color: var(--screen-text);
+  margin-bottom: 10px;
+  min-height: 40px;
+  line-height: 1.5;
+}
+.rga-label {
+  font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(240,208,64,0.5); margin-bottom: 4px;
+}
+
+/* Stats row inside screen */
+.screen-stats-row {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 4px; margin-top: 8px;
+}
+.stat-cell {
+  text-align: center; font-size: 11px;
+  color: var(--screen-text);
+  padding: 3px;
+  border-bottom: 1px solid rgba(240,208,64,0.3);
+}
+.stat-cell .stat-label { opacity: 0.55; font-size: 9px; text-transform: uppercase; }
+
+/* Moves section */
+.screen-section-label {
+  font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: rgba(240,208,64,0.55); margin: 8px 0 4px;
+}
+
+/* ── Control row below screen ── */
+.pokedex-controls {
+  background: var(--control-row-bg);
+  margin: 0 12px;
+  border-radius: 6px;
+  padding: 8px 12px;
+  display: flex; align-items: center; gap: 10px;
+}
+.ctrl-power-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: #cc2222;
+  border: 3px solid #880000;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  cursor: pointer; flex-shrink: 0;
+}
+.ctrl-type-badges { display: flex; gap: 4px; flex: 1; }
+.type-badge {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px; font-weight: 700;
+  cursor: pointer; text-transform: capitalize;
+  transition: opacity 0.15s;
+  border: none;
+}
+.type-badge:hover { opacity: 0.8; }
+.type-badge.active { outline: 2px solid #fff; }
+.ctrl-hamburger {
+  display: flex; flex-direction: column; gap: 3px; cursor: pointer; margin-left: auto;
+}
+.ctrl-hamburger span {
+  display: block; width: 22px; height: 2px; background: #555;
+}
+
+/* ── Bottom half: photo card + evolutions card ── */
+.pokedex-bottom {
+  display: grid; grid-template-columns: 1fr auto;
+  gap: 8px; margin: 8px 12px 14px;
+}
+.pokedex-bottom-photo {
+  background: var(--bottom-white);
+  border-radius: 8px;
+  padding: 14px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 130px;
+  border: 2px solid #ddd;
+}
+.photo-sprite {
+  width: 90px; height: 90px; object-fit: contain;
+}
+.photo-name {
+  font-size: 18px; font-weight: 900;
+  color: #2255cc; margin-top: 6px; text-align: center;
+  font-family: "Comic Sans MS", "Chalkboard SE", cursive;
+  line-height: 1.2;
+}
+.photo-placeholder {
+  font-size: 12px; color: #aaa; text-align: center;
+}
+
+.pokedex-bottom-evolutions {
+  background: var(--bottom-cyan);
+  border-radius: 8px;
+  padding: 10px 8px;
+  width: 100px;
+  display: flex; flex-direction: column; gap: 2px;
+  border: 2px solid #0097a7;
+}
+.evo-title {
+  font-size: 10px; font-weight: 800; color: #004D56; text-align: center;
+  text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;
+}
+.evo-chain {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.evo-box {
+  background: #b2ebf2;
+  border: 1.5px solid #0097a7;
+  border-radius: 4px;
+  width: 80px; padding: 4px 6px;
+  font-size: 10px; font-weight: 700; color: #004D56;
+  text-align: center;
+  cursor: pointer;
+}
+.evo-box:hover { background: #e0f7fa; }
+.evo-arrow {
+  font-size: 10px; color: #00696f;
+  display: flex; align-items: center; gap: 2px;
+}
+.evo-arrow .evo-level {
+  font-size: 9px; color: #004D56; font-weight: 700;
+}
+
+/* ── Atomic overrides — dark screen theme ── */
+atomic-result-list {
+  --atomic-result-separator-color: rgba(240,208,64,0.2);
+}
+
+/* ── Facets panel (hamburger menu) ── */
+.facets-drawer {
+  display: none;
+  position: fixed; top: 0; right: 0;
+  width: 260px; height: 100vh;
+  background: #fff;
+  box-shadow: -4px 0 20px rgba(0,0,0,0.3);
+  z-index: 100;
+  padding: 20px 16px;
+  overflow-y: auto;
+}
+.facets-drawer.open { display: block; }
+.facets-close {
+  font-size: 18px; cursor: pointer; float: right; margin-bottom: 12px;
+}
+
+/* ── Query Suggest dropdown ── */
+atomic-search-box::part(suggestions-wrapper) {
+  background: #0f1228;
+  border: 1px solid rgba(240,208,64,0.3);
+  color: #f0d040;
+}

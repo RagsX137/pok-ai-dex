@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pokédex Chrome — Visual Test</title>
+  <link rel="stylesheet" href="pokedex-styles.css" />
+</head>
+<body>
+  <!-- Renders the device chrome with static placeholder content.
+       No JS, no Coveo Atomic — pure CSS verification. -->
+
+  <!-- Facets side-drawer (verify it's hidden by default) -->
+  <div class="facets-drawer" id="facets-drawer">
+    <span class="facets-close">✕ Close</span>
+    <h3 style="font-size:14px;margin-bottom:12px;">Filter Pokémon</h3>
+    <p style="font-size:12px;color:#555;">Facets go here</p>
+  </div>
+
+  <!-- Main device -->
+  <div class="pokedex-device">
+
+    <!-- TOP BAR -->
+    <div class="pokedex-top-bar">
+      <div class="pokedex-lens"></div>
+      <div class="pokedex-leds">
+        <div class="led led-red"></div>
+        <div class="led led-yellow"></div>
+        <div class="led led-green"></div>
+      </div>
+      <div class="pokedex-model-selector">
+        <span class="model-selector-arrow">▼</span>
+        <span>llama3</span>
+      </div>
+    </div>
+
+    <!-- SCREEN BEZEL -->
+    <div class="pokedex-screen-bezel">
+      <div class="screen-indicator-dots">
+        <div class="screen-dot"></div>
+        <div class="screen-dot"></div>
+      </div>
+
+      <!-- SCREEN -->
+      <div class="pokedex-screen">
+        <!-- Placeholder search bar -->
+        <div class="screen-search-row">
+          <input type="text" placeholder="Search Pokémon…"
+            style="flex:1;background:#0f1228;border:1px solid rgba(240,208,64,0.4);
+                   color:#f0d040;padding:6px 10px;border-radius:4px;
+                   font-family:'Courier New',monospace;font-size:12px;outline:none;" />
+        </div>
+
+        <!-- RGA panel -->
+        <div class="rga-label">Pokédex AI</div>
+        <div class="rga-panel">
+          Bulbasaur is a dual Grass/Poison-type Pokémon and is one of the original starter Pokémon.
+        </div>
+
+        <!-- Stats row -->
+        <div class="screen-section-label">Stats</div>
+        <div class="screen-stats-row">
+          <div class="stat-cell"><div class="stat-label">HP</div><div>45</div></div>
+          <div class="stat-cell"><div class="stat-label">Atk</div><div>49</div></div>
+          <div class="stat-cell"><div class="stat-label">Def</div><div>49</div></div>
+          <div class="stat-cell"><div class="stat-label">Spd</div><div>45</div></div>
+        </div>
+
+        <!-- Moves -->
+        <div class="screen-section-label">Moves</div>
+        <div style="font-size:11px;color:rgba(240,208,64,0.7);">Vine Whip · Tackle · Growl</div>
+
+        <!-- Placeholder results -->
+        <div class="screen-section-label" style="margin-top:10px;">Results</div>
+        <div style="font-size:11px;color:rgba(240,208,64,0.7);line-height:2;">
+          #0001 — Bulbasaur &nbsp; Grass/Poison<br/>
+          #0002 — Ivysaur &nbsp; Grass/Poison<br/>
+          #0003 — Venusaur &nbsp; Grass/Poison
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTROLS ROW -->
+    <div class="pokedex-controls">
+      <button class="ctrl-power-btn" title="Reset"></button>
+      <div class="ctrl-type-badges">
+        <button class="type-badge" style="background:#63BB5B;color:#1A4A00;">Grass</button>
+        <button class="type-badge" style="background:#AB6AC8;color:#fff;">Poison</button>
+      </div>
+      <div class="ctrl-hamburger">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+
+    <!-- BOTTOM PANELS -->
+    <div class="pokedex-bottom">
+      <div class="pokedex-bottom-photo">
+        <div style="width:90px;height:90px;border-radius:50%;background:#eee;
+                    display:flex;align-items:center;justify-content:center;
+                    font-size:32px;color:#bbb;">?</div>
+        <div class="photo-name">Bulbasaur</div>
+      </div>
+
+      <div class="pokedex-bottom-evolutions">
+        <div class="evo-title">Evolutions</div>
+        <div class="evo-chain">
+          <div class="evo-box">Bulbasaur</div>
+          <div class="evo-arrow">▼ <span class="evo-level">Lv.16</span></div>
+          <div class="evo-box">Ivysaur</div>
+          <div class="evo-arrow">▼ <span class="evo-level">Lv.32</span></div>
+          <div class="evo-box">Venusaur</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Breadbox area below device -->
+  <div style="margin-top:10px;width:380px;max-width:100%;">
+    <p style="font-size:11px;color:#aaa;text-align:center;">
+      [Breadbox + Query Summary go here]
+    </p>
+  </div>
+
+  <script>
+    // Verify hamburger toggle works (pure DOM, no Atomic)
+    document.querySelector('.ctrl-hamburger').addEventListener('click', () => {
+      document.querySelector('.facets-drawer').classList.toggle('open');
+    });
+    document.querySelector('.facets-close').addEventListener('click', () => {
+      document.querySelector('.facets-drawer').classList.remove('open');
+    });
+  </script>
+</body>
+</html>
