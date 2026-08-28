@@ -39,6 +39,17 @@ def serve_image(filename):
     return send_from_directory(IMAGES_DIR, filename)
 
 
+# ── Coveo token endpoint ──────────────────────────────────────────────────────
+@app.route("/api/coveo-token", methods=["GET"])
+def coveo_token():
+    """
+    Returns the Coveo API key so the browser can initialize Atomic.
+    The key never appears in HTML/JS source — it is fetched at runtime.
+    API keys act as their own search token; no /token exchange needed.
+    """
+    return jsonify({"token": COVEO_TOKEN, "organizationId": COVEO_ORG})
+
+
 # ── Coveo proxy ───────────────────────────────────────────────────────────────
 @app.route("/api/coveo-proxy", methods=["POST"])
 def coveo_proxy():
@@ -75,6 +86,22 @@ def rga():
     context = data.get("context", [])
     answer  = generate_rga_answer(query, context)
     return jsonify({"answer": answer})
+
+
+# ── Pokémon detail lookup (name → CSV stats) ─────────────────────────────────
+@app.route("/api/pokemon-detail", methods=["GET"])
+def pokemon_detail():
+    """
+    Query param: ?name=Garchomp
+    Returns structured stats from the local CSV so the UI stats panel
+    can be populated even though the Coveo source is raw HTML.
+    """
+    from pokedex_tools import get_pokemon_detail
+    name   = request.args.get("name", "").strip()
+    result = get_pokemon_detail(name)
+    if result is None:
+        return jsonify({"error": "not found"}), 404
+    return jsonify(result)
 
 
 # ── Original agentic ask ──────────────────────────────────────────────────────

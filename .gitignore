@@ -1,0 +1,15 @@
+# Local secrets — never commit
+.env
+
+# Generated image assets
+pokemon_images/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+
+# Bob internal
+.bob/
+.superpowers/

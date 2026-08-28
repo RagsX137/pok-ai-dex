@@ -1,23 +1,13 @@
 import { TYPE_COLORS } from './type-colors.js';
 
 // ────────────────────────────────────────────────────────────
-// 1.  Bootstrap Coveo Atomic through the Flask proxy
-//     (no Coveo token in the browser — all auth is server-side)
+// 1.  Fetch Coveo credentials from Flask
+//     API keys ARE the access token — no /token exchange needed.
+//     The key is never in HTML source; fetched at runtime from Flask.
 // ────────────────────────────────────────────────────────────
-async function getSearchToken() {
-  // The proxy endpoint signs requests with COVEO_ACCESS_TOKEN server-side.
-  // For headless init we need a search token; request one from the proxy.
-  const resp = await fetch('/api/coveo-proxy', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      method: 'POST',
-      path: '/rest/search/v2/token',
-      body: { userIds: [{ name: 'pokedex-user', type: 'User' }] },
-    }),
-  });
-  const data = await resp.json();
-  return data.token;  // Coveo search token scoped to this user
+async function getCoveoCredentials() {
+  const resp = await fetch('/api/coveo-token');
+  return await resp.json();  // { token, organizationId }
 }
 
 // ────────────────────────────────────────────────────────────
@@ -27,14 +17,13 @@ async function initAtomic() {
   const searchInterface = document.querySelector('atomic-search-interface');
   if (!searchInterface) return;
 
-  const token = await getSearchToken();
-  const orgId = document.body.dataset.coveoOrg;  // injected via data attr in HTML
+  const { token, organizationId } = await getCoveoCredentials();
 
   await searchInterface.initialize({
     accessToken: token,
-    organizationId: orgId,
+    organizationId: organizationId,
     search: {
-      pipeline:  'PokedexPipeline',
+      pipeline:  'default',
       searchHub: 'PokedexUI',
     },
   });
@@ -60,35 +49,56 @@ async function initAtomic() {
 //     When user clicks a result, populate the bottom panel
 // ────────────────────────────────────────────────────────────
 function wireResultClicks() {
-  document.addEventListener('atomic/result/select', (e) => {
+  document.addEventListener('atomic/result/select', async (e) => {
     const result = e.detail?.result;
     if (!result) return;
 
-    const name     = result.title ?? result.raw?.pokemon ?? '';
-    const imageUrl = result.raw?.image_url ?? `/images/${name.toLowerCase()}_image.jpg`;
-    const type1    = result.raw?.type1 ?? '';
-    const type2    = result.raw?.type2 ?? '';
-    const evo      = result.raw?.evolutions ?? [];
+    // The Coveo source is raw HTML — it has no structured fields like hp/type1.
+    // Extract the Pokémon name from the page title and look it up in our CSV
+    // via the Flask /api/pokemon-detail endpoint.
+    //
+    // Title format examples:
+    //   "Garchomp Pokédex: stats, moves, evolution & locations | Pokémon Database"
+    //   "Dragon type Pokémon | Pokémon Database"
+    const rawTitle = result.title ?? '';
+    const pokemonName = rawTitle.split(/\s+Pokédex/i)[0].trim()
+                     || rawTitle.split(' | ')[0].trim();
 
-    // Photo panel
-    const sprite = document.querySelector('.photo-sprite');
-    if (sprite) sprite.src = imageUrl;
+    // Show the name immediately while we fetch stats
     const nameEl = document.querySelector('.photo-name');
-    if (nameEl) nameEl.textContent = name;
+    if (nameEl) nameEl.textContent = pokemonName;
 
-    // Type badges in control row
-    renderTypeBadges([type1, type2].filter(Boolean));
+    // Fetch structured stats from CSV via Flask
+    try {
+      const resp = await fetch(`/api/pokemon-detail?name=${encodeURIComponent(pokemonName)}`);
+      if (resp.ok) {
+        const data = await resp.json();
 
-    // Stats row in screen
-    renderStatsRow({
-      hp:      result.raw?.hp,
-      attack:  result.raw?.attack,
-      defense: result.raw?.defense,
-      speed:   result.raw?.speed,
-    });
+        // Photo panel
+        const sprite = document.querySelector('.photo-sprite');
+        if (sprite) sprite.src = data.image_url ?? `/images/${pokemonName.toLowerCase()}_image.jpg`;
 
-    // Evolutions panel
-    renderEvolutionChain(evo);
+        // Type badges in control row
+        renderTypeBadges([data.type1, data.type2].filter(Boolean));
+
+        // Stats row in screen
+        renderStatsRow({
+          hp:      data.hp,
+          attack:  data.attack,
+          defense: data.defense,
+          speed:   data.speed,
+        });
+      } else {
+        // Page is a type/category page, not a specific Pokémon — clear panels
+        renderTypeBadges([]);
+        renderStatsRow({ hp: null, attack: null, defense: null, speed: null });
+      }
+    } catch (_) {
+      // Network error — silently leave panels as-is
+    }
+
+    // Evolutions: not in CSV, leave empty for now
+    renderEvolutionChain([]);
   });
 }
 
