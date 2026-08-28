@@ -1,0 +1,2057 @@
+[
+  {
+    "query": "What type is Pikachu?",
+    "reference": "Pikachu is an Electric-type Pokémon.",
+    "category": "type"
+  },
+  {
+    "query": "What are Charizard's types?",
+    "reference": "Charizard is a Fire and Flying type Pokémon.",
+    "category": "type"
+  },
+  {
+    "query": "How does Eevee evolve into Jolteon?",
+    "reference": "Eevee evolves into Jolteon when exposed to a Thunder Stone.",
+    "category": "evolution"
+  },
+  {
+    "query": "What is Mewtwo's primary type?",
+    "reference": "Mewtwo is a Psychic-type Pokémon.",
+    "category": "type"
+  },
+  {
+    "query": "What is Snorlax known for?",
+    "reference": "Snorlax is known for sleeping and eating. It has very high HP.",
+    "category": "lore"
+  },
+  {
+    "query": "What type is Garchomp?",
+    "reference": "Garchomp is a Dragon and Ground type Pokémon.",
+    "category": "type"
+  },
+  {
+    "query": "What is the base HP of Blissey?",
+    "reference": "Blissey has a base HP of 255, the highest of any Pokémon.",
+    "category": "stats"
+  },
+  {
+    "query": "What types is Gengar?",
+    "reference": "Gengar is a Ghost and Poison type Pokémon.",
+    "category": "type"
+  },
+  {
+    "query": "How does Magikarp evolve?",
+    "reference": "Magikarp evolves into Gyarados at level 20.",
+    "category": "evolution"
+  },
+  {
+    "query": "What is special about Ditto?",
+    "reference": "Ditto can transform into any Pokémon it sees.",
+    "category": "lore"
+  },
+  {
+    "query": "What type is Bulbasaur?",
+    "reference": "Bulbasaur is a Grass and Poison type Pokémon.",
+    "category": "type"
+  },
+  {
+    "query": "What is Pikachu's base speed stat?",
+    "reference": "Pikachu has a base speed stat of 90.",
+    "category": "stats"
+  },
+  {
+    "query": "What is the base attack stat of Machamp?",
+    "reference": "Machamp has a base attack stat of 130.",
+    "category": "stats"
+  },
+  {
+    "query": "How does Slowpoke evolve into Slowbro?",
+    "reference": "Slowpoke evolves into Slowbro at level 37.",
+    "category": "evolution"
+  },
+  {
+    "query": "How does Onix evolve?",
+    "reference": "Onix evolves into Steelix when traded holding a Metal Coat.",
+    "category": "evolution"
+  },
+  {
+    "query": "How does Haunter evolve?",
+    "reference": "Haunter evolves into Gengar when traded.",
+    "category": "evolution"
+  },
+  {
+    "query": "How does Feebas evolve?",
+    "reference": "Feebas evolves into Milotic when its Beauty condition is maxed or when traded holding a Prism Scale.",
+    "category": "evolution"
+  },
+  {
+    "query": "What is Dragonite's type?",
+    "reference": "Dragonite is a Dragon and Flying type Pokémon.",
+    "category": "type"
+  },
+  {
+    "query": "What type is Lucario?",
+    "reference": "Lucario is a Fighting and Steel type Pokémon.",
+    "category": "type"
+  },
+  {
+    "query": "What type is Scizor?",
+    "reference": "Scizor is a Bug and Steel type Pokémon.",
+    "category": "type"
+  },
+  {
+    "query": "What is Gyarados's type?",
+    "reference": "Gyarados is a Water and Flying type Pokémon.",
+    "category": "type"
+  },
+  {
+    "query": "What is Alakazam's base special attack?",
+    "reference": "Alakazam has a base special attack of 135.",
+    "category": "stats"
+  },
+  {
+    "query": "What is Shuckle's highest base stat?",
+    "reference": "Shuckle's highest base stats are Defense and Special Defense, both 230.",
+    "category": "stats"
+  },
+  {
+    "query": "What is Arceus's type?",
+    "reference": "Arceus is a Normal type Pokémon by default, but changes type based on the Plate it holds.",
+    "category": "lore"
+  },
+  {
+    "query": "What legendary Pokémon created the universe?",
+    "reference": "Arceus is said to have created the Pokémon universe.",
+    "category": "lore"
+  },
+  {
+    "query": "What is the signature move of Pikachu?",
+    "reference": "Pikachu's signature move is Thunderbolt.",
+    "category": "moves"
+  },
+  {
+    "query": "What move does Mewtwo use to attack with psychic power?",
+    "reference": "Mewtwo commonly uses Psychic as its main attacking move.",
+    "category": "moves"
+  },
+  {
+    "query": "What is the most powerful Normal type move?",
+    "reference": "Hyper Beam is one of the most powerful Normal type moves with 150 base power.",
+    "category": "moves"
+  },
+  {
+    "query": "What Pokémon has the highest base stat total?",
+    "reference": "Arceus has the highest base stat total among non-Mega, non-Dynamax Pokémon at 720.",
+    "category": "stats"
+  },
+  {
+    "query": "Which Pokémon is known as the Genetic Pokémon?",
+    "reference": "Mewtwo is known as the Genetic Pokémon.",
+    "category": "lore"
+  },
+  {
+    "query": "What is the signature ability of Mimikyu?",
+    "reference": "Mimikyu's signature ability is Disguise, which allows it to avoid damage from one attack.",
+    "category": "ability"
+  },
+  {
+    "query": "Which Pokémon has the lowest base stat total?",
+    "reference": "Sunkern has the lowest base stat total, at 180.",
+    "category": "stats"
+  },
+  {
+    "query": "What is Regieleki's base speed stat?",
+    "reference": "Regieleki has a base speed stat of 200, the highest of any Pokémon.",
+    "category": "stats"
+  },
+  {
+    "query": "What type is Hisuian Zoroark?",
+    "reference": "Hisuian Zoroark is Normal and Ghost type.",
+    "category": "regional_form"
+  },
+  {
+    "query": "What non-Mega Pokémon has the highest base Attack stat?",
+    "reference": "Kartana has the highest non-Mega base Attack stat at 181.",
+    "category": "stats"
+  },
+  {
+    "query": "Which Pokémon is known as the 'DNA Pokémon'?",
+    "reference": "Deoxys is known as the DNA Pokémon.",
+    "category": "lore"
+  },
+  {
+    "query": "What item is needed to evolve Applin into Flapple?",
+    "reference": "Applin evolves into Flapple when exposed to a Tart Apple.",
+    "category": "evolution"
+  },
+  {
+    "query": "What is the signature move of Rayquaza?",
+    "reference": "Rayquaza's signature move is Dragon Ascent.",
+    "category": "moves"
+  },
+  {
+    "query": "What type is Galarian Corsola?",
+    "reference": "Galarian Corsola is a pure Ghost-type Pokémon.",
+    "category": "regional_form"
+  },
+  {
+    "query": "How does Eevee evolve into Sylveon?",
+    "reference": "Eevee evolves into Sylveon when it levels up with high friendship while knowing a Fairy-type move.",
+    "category": "evolution"
+  },
+  {
+    "query": "What is the effect of the move Stealth Rock?",
+    "reference": "Stealth Rock damages opposing Pokémon when they switch into battle, based on their type effectiveness against Rock.",
+    "category": "moves"
+  },
+  {
+    "query": "What is Shedinja's base HP?",
+    "reference": "Shedinja has a base HP of 1, which cannot be increased by EVs or IVs.",
+    "category": "stats"
+  },
+  {
+    "query": "What type is Rotom in its base form?",
+    "reference": "Rotom is an Electric and Ghost type Pokémon in its base form.",
+    "category": "type"
+  },
+  {
+    "query": "What does the ability Intimidate do?",
+    "reference": "Intimidate lowers the Attack of opposing Pokémon when the user enters battle.",
+    "category": "ability"
+  },
+  {
+    "query": "What is the only type that is completely immune to Electric-type moves?",
+    "reference": "Ground-type Pokémon are completely immune to Electric-type moves.",
+    "category": "weakness"
+  },
+  {
+    "query": "What does the Lum Berry do when held by a Pokémon?",
+    "reference": "The Lum Berry cures any major status condition or confusion when held by a Pokémon.",
+    "category": "item"
+  },
+  {
+    "query": "In which generation was the Fairy type introduced?",
+    "reference": "The Fairy type was introduced in Generation 6.",
+    "category": "generation"
+  },
+  {
+    "query": "What is the name of the region where Pokémon Black and White take place?",
+    "reference": "Pokémon Black and White take place in the Unova region.",
+    "category": "lore"
+  },
+  {
+    "query": "What is the signature ability of Slaking?",
+    "reference": "Slaking's signature ability is Truant, which causes it to loaf around and skip every other turn.",
+    "category": "ability"
+  },
+  {
+    "query": "What types is a pure Steel-type Pokémon weak to?",
+    "reference": "A pure Steel-type Pokémon is weak to Fire, Fighting, and Ground-type moves.",
+    "category": "weakness"
+  },
+  {
+    "query": "How does Milcery evolve into Alcremie?",
+    "reference": "Milcery evolves into Alcremie when leveled up while holding a Sweet item and the player is spinning.",
+    "category": "evolution"
+  },
+  {
+    "query": "What type of move is Shadow Ball?",
+    "reference": "Shadow Ball is a Ghost-type special move.",
+    "category": "moves"
+  },
+  {
+    "query": "In which generation were Mega Evolutions introduced?",
+    "reference": "Mega Evolutions were introduced in Generation 6.",
+    "category": "generation"
+  },
+  {
+    "query": "What type is Spiritomb?",
+    "reference": "Spiritomb is a Ghost and Dark type Pokémon.",
+    "category": "type"
+  },
+  {
+    "query": "What is the National Pokédex number of Bulbasaur?",
+    "reference": "Bulbasaur is National Pokédex number 1.",
+    "category": "pokedex_number"
+  },
+  {
+    "query": "What item is required to evolve Scyther into Scizor?",
+    "reference": "Scyther evolves into Scizor when traded while holding a Metal Coat.",
+    "category": "evolution"
+  },
+  {
+    "query": "What type is immune to Poison-type moves alongside Poison?",
+    "reference": "Steel-type Pokémon are immune to Poison-type moves.",
+    "category": "weakness"
+  },
+  {
+    "query": "How does Riolu evolve into Lucario?",
+    "reference": "Riolu evolves into Lucario when its friendship is high enough during the daytime.",
+    "category": "evolution"
+  },
+  {
+    "query": "What is the base power of the move Earthquake?",
+    "reference": "Earthquake has a base power of 100.",
+    "category": "moves"
+  },
+  {
+    "query": "What is the base Special Defense stat of Shuckle?",
+    "reference": "Shuckle has a base Special Defense stat of 230, tied for the highest in the game.",
+    "category": "stats"
+  },
+  {
+    "query": "What type is Alolan Vulpix?",
+    "reference": "Alolan Vulpix is a pure Ice-type Pokémon.",
+    "category": "regional_form"
+  },
+  {
+    "query": "Which Pokémon is known as the 'Sea Basin Pokémon'?",
+    "reference": "Kyogre is known as the Sea Basin Pokémon and is said to have expanded the seas.",
+    "category": "lore"
+  },
+  {
+    "query": "What held item restores a small amount of HP at the end of each turn?",
+    "reference": "Leftovers restores 1/16th of a Pokémon's maximum HP at the end of each turn.",
+    "category": "item"
+  },
+  {
+    "query": "How does Eevee evolve into Leafeon in modern games?",
+    "reference": "Eevee evolves into Leafeon when exposed to a Leaf Stone, or historically by leveling up near a Moss Rock.",
+    "category": "evolution"
+  },
+  {
+    "query": "What type is Eternatus?",
+    "reference": "Eternatus is a Poison and Dragon type Pokémon.",
+    "category": "type"
+  },
+  {
+    "query": "What is the National Pokédex number of Arceus?",
+    "reference": "Arceus is National Pokédex number 493.",
+    "category": "pokedex_number"
+  },
+  {
+    "query": "Which Pokémon is known as the 'Tiny Turtle Pokémon'?",
+    "reference": "Squirtle is known as the Tiny Turtle Pokémon.",
+    "category": "lore"
+  },
+  {
+    "query": "What is the effect of the move Spore?",
+    "reference": "Spore is a Grass-type move that reliably puts the target to sleep with 100% accuracy.",
+    "category": "moves"
+  },
+  {
+    "query": "What is the base HP stat of Wobbuffet?",
+    "reference": "Wobbuffet has a base HP stat of 190.",
+    "category": "stats"
+  },
+  {
+    "query": "What does the ability Levitate do?",
+    "reference": "Levitate makes the Pokémon immune to Ground-type moves, Spikes, and Toxic Spikes.",
+    "category": "ability"
+  },
+  {
+    "query": "What ability does Pikachu have?",
+    "reference": "Pikachu's abilities are Static and, as a hidden ability, Lightning Rod.",
+    "category": "abilities"
+  },
+  {
+    "query": "What is Charizard's hidden ability?",
+    "reference": "Charizard's hidden ability is Solar Power, which raises Special Attack in harsh sunlight but costs HP each turn.",
+    "category": "abilities"
+  },
+  {
+    "query": "What abilities can Gengar have?",
+    "reference": "Gengar has the ability Cursed Body.",
+    "category": "abilities"
+  },
+  {
+    "query": "What is Lucario's hidden ability?",
+    "reference": "Lucario's hidden ability is Justified, which raises Attack when hit by Dark-type moves.",
+    "category": "abilities"
+  },
+  {
+    "query": "Which Pokémon has the ability Intimidate among Gyarados and Magikarp?",
+    "reference": "Gyarados has the ability Intimidate; Magikarp does not.",
+    "category": "comparison"
+  },
+  {
+    "query": "What ability prevents Shedinja from taking damage except from super-effective attacks?",
+    "reference": "Wonder Guard is Shedinja's ability and prevents damage from moves that are not super effective.",
+    "category": "abilities"
+  },
+  {
+    "query": "What ability does Ditto have?",
+    "reference": "Ditto has the ability Imposter as its hidden ability, in addition to Limber.",
+    "category": "abilities"
+  },
+  {
+    "query": "What ability makes Slaking unable to act every other turn?",
+    "reference": "Truant causes Slaking to be unable to act every other turn.",
+    "category": "abilities"
+  },
+  {
+    "query": "What type is Tyranitar?",
+    "reference": "Tyranitar is a Rock and Dark type Pokémon.",
+    "category": "type"
+  },
+  {
+    "query": "What types does Metagross have?",
+    "reference": "Metagross is a Steel and Psychic type Pokémon.",
+    "category": "type"
+  },
+  {
+    "query": "Is Lapras Water type?",
+    "reference": "Yes. Lapras is a Water and Ice type Pokémon.",
+    "category": "type"
+  },
+  {
+    "query": "Which types make up Swampert?",
+    "reference": "Swampert is a Water and Ground type Pokémon.",
+    "category": "type"
+  },
+  {
+    "query": "What is the typing of Umbreon?",
+    "reference": "Umbreon is a Dark type Pokémon.",
+    "category": "type"
+  },
+  {
+    "query": "What are Sceptile's types?",
+    "reference": "Sceptile is a Grass type Pokémon.",
+    "category": "type"
+  },
+  {
+    "query": "What type combination does Aegislash have?",
+    "reference": "Aegislash is a Steel and Ghost type Pokémon.",
+    "category": "type"
+  },
+  {
+    "query": "Which Pokémon is both Water and Dark type: Greninja or Blastoise?",
+    "reference": "Greninja is Water and Dark type, while Blastoise is Water type.",
+    "category": "comparison"
+  },
+  {
+    "query": "What types is Flygon?",
+    "reference": "Flygon is a Ground and Dragon type Pokémon.",
+    "category": "type"
+  },
+  {
+    "query": "What type is Mimikyu?",
+    "reference": "Mimikyu is a Ghost and Fairy type Pokémon.",
+    "category": "type"
+  },
+  {
+    "query": "What is the base HP of Chansey?",
+    "reference": "Chansey has a base HP of 250.",
+    "category": "stats"
+  },
+  {
+    "query": "How much base Attack does Dragonite have?",
+    "reference": "Dragonite has a base Attack stat of 134.",
+    "category": "stats"
+  },
+  {
+    "query": "What is Tyranitar's base Defense?",
+    "reference": "Tyranitar has a base Defense stat of 110.",
+    "category": "stats"
+  },
+  {
+    "query": "What is Garchomp's base Speed?",
+    "reference": "Garchomp has a base Speed stat of 102.",
+    "category": "stats"
+  },
+  {
+    "query": "What is Greninja's base Special Attack?",
+    "reference": "Greninja has a base Special Attack stat of 103.",
+    "category": "stats"
+  },
+  {
+    "query": "What is the base stat total of Pikachu?",
+    "reference": "Pikachu has a base stat total of 320.",
+    "category": "stats"
+  },
+  {
+    "query": "Which has higher base HP, Blissey or Snorlax?",
+    "reference": "Blissey has the higher base HP: 255 compared with Snorlax's 160.",
+    "category": "comparison"
+  },
+  {
+    "query": "Which has higher base Attack, Machamp or Alakazam?",
+    "reference": "Machamp has the higher base Attack, with 130 compared with Alakazam's 50.",
+    "category": "comparison"
+  },
+  {
+    "query": "Which Pokémon has the higher base Speed, Gengar or Snorlax?",
+    "reference": "Gengar has the higher base Speed, with 110 compared with Snorlax's 30.",
+    "category": "comparison"
+  },
+  {
+    "query": "What is Mewtwo's base Special Attack?",
+    "reference": "Mewtwo has a base Special Attack stat of 154.",
+    "category": "stats"
+  },
+  {
+    "query": "What are Lugia's base defensive stats?",
+    "reference": "Lugia has a base Defense of 106 and base Special Defense of 154.",
+    "category": "stats"
+  },
+  {
+    "query": "What is the total of Pikachu's six base stats?",
+    "reference": "Pikachu's base stat total is 320.",
+    "category": "stats"
+  },
+  {
+    "query": "At what level does Charmander evolve into Charmeleon?",
+    "reference": "Charmander evolves into Charmeleon at level 16.",
+    "category": "evolution"
+  },
+  {
+    "query": "At what level does Charmeleon become Charizard?",
+    "reference": "Charmeleon evolves into Charizard at level 36.",
+    "category": "evolution"
+  },
+  {
+    "query": "At what level does Squirtle evolve?",
+    "reference": "Squirtle evolves into Wartortle at level 16.",
+    "category": "evolution"
+  },
+  {
+    "query": "When does Wartortle evolve into Blastoise?",
+    "reference": "Wartortle evolves into Blastoise at level 36.",
+    "category": "evolution"
+  },
+  {
+    "query": "How can you evolve Togepi?",
+    "reference": "Togepi evolves into Togetic when its friendship is high enough.",
+    "category": "evolution"
+  },
+  {
+    "query": "How does Togetic evolve into Togekiss?",
+    "reference": "Togetic evolves into Togekiss when exposed to a Shiny Stone.",
+    "category": "evolution"
+  },
+  {
+    "query": "How does Pichu evolve into Pikachu?",
+    "reference": "Pichu evolves into Pikachu when its friendship is high enough.",
+    "category": "evolution"
+  },
+  {
+    "query": "What item evolves Poliwhirl into Politoed?",
+    "reference": "Poliwhirl evolves into Politoed when traded while holding a King's Rock.",
+    "category": "evolution"
+  },
+  {
+    "query": "How does Kadabra evolve into Alakazam?",
+    "reference": "Kadabra evolves into Alakazam when traded.",
+    "category": "evolution"
+  },
+  {
+    "query": "How does Porygon evolve into Porygon2?",
+    "reference": "Porygon evolves into Porygon2 when traded while holding an Up-Grade.",
+    "category": "evolution"
+  },
+  {
+    "query": "What item is needed to evolve Porygon2 into Porygon-Z?",
+    "reference": "Porygon2 evolves into Porygon-Z when traded while holding a Dubious Disc.",
+    "category": "evolution"
+  },
+  {
+    "query": "How does Sneasel evolve into Weavile?",
+    "reference": "Sneasel evolves into Weavile when leveled up while holding a Razor Claw at night.",
+    "category": "evolution"
+  },
+  {
+    "query": "How does Murkrow evolve?",
+    "reference": "Murkrow evolves into Honchkrow when exposed to a Dusk Stone.",
+    "category": "evolution"
+  },
+  {
+    "query": "How does Vulpix evolve?",
+    "reference": "Vulpix evolves into Ninetales when exposed to a Fire Stone.",
+    "category": "evolution"
+  },
+  {
+    "query": "How does Alolan Vulpix evolve?",
+    "reference": "Alolan Vulpix evolves into Alolan Ninetales when exposed to an Ice Stone.",
+    "category": "regional_forms"
+  },
+  {
+    "query": "What is Pikachu's signature move?",
+    "reference": "Pikachu's signature move is Thunderbolt.",
+    "category": "moves"
+  },
+  {
+    "query": "What is Charizard's signature move?",
+    "reference": "Charizard's signature moves include Blast Burn as a powerful Fire-type move associated with its evolutionary line.",
+    "category": "moves"
+  },
+  {
+    "query": "What type of move is Flamethrower?",
+    "reference": "Flamethrower is a Fire-type move.",
+    "category": "moves"
+  },
+  {
+    "query": "What is the base power of Earthquake?",
+    "reference": "Earthquake has a base power of 100.",
+    "category": "moves"
+  },
+  {
+    "query": "What is the accuracy of Thunderbolt?",
+    "reference": "Thunderbolt has 100% accuracy.",
+    "category": "moves"
+  },
+  {
+    "query": "What type of move is Psychic?",
+    "reference": "Psychic is a Psychic-type move.",
+    "category": "moves"
+  },
+  {
+    "query": "How much base power does Ice Beam have?",
+    "reference": "Ice Beam has a base power of 90.",
+    "category": "moves"
+  },
+  {
+    "query": "What is the accuracy of Hydro Pump?",
+    "reference": "Hydro Pump has 80% accuracy.",
+    "category": "moves"
+  },
+  {
+    "query": "Does Protect deal damage?",
+    "reference": "No. Protect is a non-damaging move that protects the user from attacks for that turn.",
+    "category": "moves"
+  },
+  {
+    "query": "What does Swords Dance do?",
+    "reference": "Swords Dance sharply raises the user's Attack stat.",
+    "category": "moves"
+  },
+  {
+    "query": "What does Recover do?",
+    "reference": "Recover restores up to half of the user's maximum HP.",
+    "category": "moves"
+  },
+  {
+    "query": "Which Pokémon can learn Earthquake: Pikachu or Garchomp?",
+    "reference": "Both Pikachu and Garchomp can learn Earthquake in games where the move is available to them.",
+    "category": "moves"
+  },
+  {
+    "query": "Which move has greater base power, Thunderbolt or Thunder?",
+    "reference": "Thunder has greater base power: 110 compared with Thunderbolt's 90.",
+    "category": "comparison"
+  },
+  {
+    "query": "What type is the move Shadow Ball?",
+    "reference": "Shadow Ball is a Ghost-type move.",
+    "category": "moves"
+  },
+  {
+    "query": "What type is the move Close Combat?",
+    "reference": "Close Combat is a Fighting-type move.",
+    "category": "moves"
+  },
+  {
+    "query": "What are Charizard's weaknesses?",
+    "reference": "Charizard is weak to Electric- and Water-type attacks and is especially weak to Rock-type attacks because of its Fire/Flying typing.",
+    "category": "type_effectiveness"
+  },
+  {
+    "query": "What types are super effective against Garchomp?",
+    "reference": "Garchomp is weak to Ice, Dragon, and Fairy-type attacks, with Ice being especially effective because of its 4× weakness.",
+    "category": "type_effectiveness"
+  },
+  {
+    "query": "What is Gengar weak against?",
+    "reference": "Gengar is weak to Ground, Psychic, Ghost, and Dark-type attacks.",
+    "category": "type_effectiveness"
+  },
+  {
+    "query": "What is Scizor's major type weakness?",
+    "reference": "Scizor has a 4× weakness to Fire-type attacks.",
+    "category": "type_effectiveness"
+  },
+  {
+    "query": "What types resist Gyarados?",
+    "reference": "Gyarados's Water/Flying typing gives it resistances to Fire, Water, Fighting, Bug, and Steel-type attacks.",
+    "category": "type_effectiveness"
+  },
+  {
+    "query": "Is Dragonite weak to Ice?",
+    "reference": "Yes. Dragonite's Dragon/Flying typing gives it a 4× weakness to Ice-type attacks.",
+    "category": "type_effectiveness"
+  },
+  {
+    "query": "What types are super effective against Lucario?",
+    "reference": "Lucario is weak to Fire, Fighting, and Ground-type attacks.",
+    "category": "type_effectiveness"
+  },
+  {
+    "query": "Does Normal-type damage affect Ghost-type Pokémon?",
+    "reference": "No. Normal-type moves have no effect on Ghost-type Pokémon.",
+    "category": "type_effectiveness"
+  },
+  {
+    "query": "Can Fighting-type moves hit Ghost-type Pokémon?",
+    "reference": "No. Fighting-type moves have no effect on Ghost-type Pokémon.",
+    "category": "type_effectiveness"
+  },
+  {
+    "query": "What types are immune to Electric-type moves?",
+    "reference": "Ground-type Pokémon are immune to Electric-type moves.",
+    "category": "type_effectiveness"
+  },
+  {
+    "query": "What item does Eevee need to evolve into Vaporeon?",
+    "reference": "Eevee evolves into Vaporeon when exposed to a Water Stone.",
+    "category": "items"
+  },
+  {
+    "query": "Which stone evolves Eevee into Flareon?",
+    "reference": "A Fire Stone evolves Eevee into Flareon.",
+    "category": "items"
+  },
+  {
+    "query": "Which stone evolves Eevee into Leafeon?",
+    "reference": "A Leaf Stone evolves Eevee into Leafeon.",
+    "category": "items"
+  },
+  {
+    "query": "What does a Moon Stone do?",
+    "reference": "A Moon Stone is an evolutionary stone used to evolve certain Pokémon.",
+    "category": "items"
+  },
+  {
+    "query": "What Pokémon evolve with a Thunder Stone?",
+    "reference": "Pokémon that evolve using a Thunder Stone include Pikachu, Eevee, and several others depending on the game.",
+    "category": "items"
+  },
+  {
+    "query": "What item is used to evolve Onix into Steelix?",
+    "reference": "Onix evolves into Steelix when traded while holding a Metal Coat.",
+    "category": "items"
+  },
+  {
+    "query": "What does a Rare Candy do?",
+    "reference": "A Rare Candy raises a Pokémon's level by one.",
+    "category": "items"
+  },
+  {
+    "query": "What does an Everstone do?",
+    "reference": "A Pokémon holding an Everstone does not evolve by leveling up, and the item can also have breeding-related effects.",
+    "category": "items"
+  },
+  {
+    "query": "What is the Master Ball used for?",
+    "reference": "The Master Ball catches a wild Pokémon without fail.",
+    "category": "items"
+  },
+  {
+    "query": "Which item restores a Pokémon's HP completely?",
+    "reference": "A Full Restore completely restores a Pokémon's HP and cures all status conditions.",
+    "category": "items"
+  },
+  {
+    "query": "Which Pokémon is number 001 in the National Pokédex?",
+    "reference": "Bulbasaur is National Pokédex number 001.",
+    "category": "pokedex"
+  },
+  {
+    "query": "What is Pikachu's National Pokédex number?",
+    "reference": "Pikachu is #25 in the National Pokédex.",
+    "category": "pokedex"
+  },
+  {
+    "query": "What is Mewtwo's National Pokédex number?",
+    "reference": "Mewtwo is National Pokédex number 150.",
+    "category": "pokedex"
+  },
+  {
+    "query": "What is Mew's National Pokédex number?",
+    "reference": "Mew is National Pokédex number 151.",
+    "category": "pokedex"
+  },
+  {
+    "query": "Which Pokémon is National Pokédex number 143?",
+    "reference": "Snorlax is National Pokédex number 143.",
+    "category": "pokedex"
+  },
+  {
+    "query": "Which generation introduced Lucario?",
+    "reference": "Lucario was introduced in Generation 4.",
+    "category": "generation"
+  },
+  {
+    "query": "Which generation introduced Gengar?",
+    "reference": "Gengar was introduced in Generation 1.",
+    "category": "generation"
+  },
+  {
+    "query": "Which generation introduced Garchomp?",
+    "reference": "Garchomp was introduced in Generation 4.",
+    "category": "generation"
+  },
+  {
+    "query": "Which generation introduced the Fairy type?",
+    "reference": "The Fairy type was introduced in Generation 6.",
+    "category": "generation"
+  },
+  {
+    "query": "Which Pokémon generation introduced abilities?",
+    "reference": "Abilities were introduced in Generation 3.",
+    "category": "generation"
+  },
+  {
+    "query": "Which Pokémon generation introduced held items?",
+    "reference": "Held items were introduced in Generation 2.",
+    "category": "generation"
+  },
+  {
+    "query": "What region is associated with Generation 1?",
+    "reference": "Generation 1 is associated with the Kanto region.",
+    "category": "regions"
+  },
+  {
+    "query": "What region is associated with Generation 2?",
+    "reference": "Generation 2 is associated primarily with the Johto region.",
+    "category": "regions"
+  },
+  {
+    "query": "Which region is home to Garchomp?",
+    "reference": "Garchomp originated in the Sinnoh region.",
+    "category": "regions"
+  },
+  {
+    "query": "Which region introduced the Pokémon starters Rowlet, Litten, and Popplio?",
+    "reference": "Rowlet, Litten, and Popplio are the starter Pokémon of the Alola region.",
+    "category": "regions"
+  },
+  {
+    "query": "What are the three Kanto starter Pokémon?",
+    "reference": "The three Kanto starters are Bulbasaur, Charmander, and Squirtle.",
+    "category": "starters"
+  },
+  {
+    "query": "What are the three Johto starter Pokémon?",
+    "reference": "The Johto starters are Chikorita, Cyndaquil, and Totodile.",
+    "category": "starters"
+  },
+  {
+    "query": "What are the Hoenn starter Pokémon?",
+    "reference": "The Hoenn starters are Treecko, Torchic, and Mudkip.",
+    "category": "starters"
+  },
+  {
+    "query": "Which starter Pokémon is Fire/Fighting type in Generation 3?",
+    "reference": "Blaziken, the final evolution of Torchic, is a Fire/Fighting type Pokémon.",
+    "category": "starters"
+  },
+  {
+    "query": "Which Kanto starter is Grass/Poison type?",
+    "reference": "Bulbasaur is the Grass/Poison-type Kanto starter.",
+    "category": "starters"
+  },
+  {
+    "query": "Which Pokémon is the final evolution of Squirtle?",
+    "reference": "Blastoise is the final evolution of Squirtle.",
+    "category": "evolution"
+  },
+  {
+    "query": "What Pokémon evolves from Charmander?",
+    "reference": "Charmander evolves into Charmeleon.",
+    "category": "evolution"
+  },
+  {
+    "query": "What Pokémon evolves from Magikarp?",
+    "reference": "Magikarp evolves into Gyarados.",
+    "category": "evolution"
+  },
+  {
+    "query": "What Pokémon evolves from Ralts?",
+    "reference": "Ralts evolves into Kirlia.",
+    "category": "evolution"
+  },
+  {
+    "query": "What Pokémon can Kirlia evolve into?",
+    "reference": "Kirlia can evolve into Gardevoir, or into Gallade under the appropriate conditions for a male Kirlia.",
+    "category": "evolution"
+  },
+  {
+    "query": "Does Eevee have more than one possible evolution?",
+    "reference": "Yes. Eevee has multiple possible evolutions, including Vaporeon, Jolteon, Flareon, Espeon, Umbreon, Leafeon, Glaceon, and Sylveon.",
+    "category": "evolution"
+  },
+  {
+    "query": "Which Eeveelution is Fairy type?",
+    "reference": "Sylveon is the Fairy-type Eeveelution.",
+    "category": "evolution"
+  },
+  {
+    "query": "Which Eeveelutions are purely Water, Electric, and Fire type?",
+    "reference": "Vaporeon is Water type, Jolteon is Electric type, and Flareon is Fire type.",
+    "category": "evolution"
+  },
+  {
+    "query": "Which Pokémon has the highest base HP?",
+    "reference": "Blissey has the highest base HP at 255.",
+    "category": "stats"
+  },
+  {
+    "query": "Which Pokémon has the highest base Defense?",
+    "reference": "Shuckle has the highest base Defense at 230, tied with its base Special Defense.",
+    "category": "stats"
+  },
+  {
+    "query": "Which Pokémon has the highest base Special Defense?",
+    "reference": "Shuckle has the highest base Special Defense at 230, tied with its base Defense.",
+    "category": "stats"
+  },
+  {
+    "query": "Which Pokémon has a base Speed of 150?",
+    "reference": "Among Pokémon with a base Speed of 150 are Mewtwo Mega Evolution forms and Deoxys in Speed Forme, depending on the form being considered.",
+    "category": "stats"
+  },
+  {
+    "query": "Which Pokémon has a base Attack of 190?",
+    "reference": "Deoxys Attack Forme has a base Attack stat of 180, while its Attack Forme is among the Pokémon with exceptionally high Attack.",
+    "category": "stats"
+  },
+  {
+    "query": "What is Deoxys's highest-stat Forme?",
+    "reference": "Deoxys has different Formes specialized toward different stats: Normal, Attack, Defense, and Speed Formes.",
+    "category": "forms"
+  },
+  {
+    "query": "What are the different forms of Deoxys?",
+    "reference": "Deoxys has Normal Forme, Attack Forme, Defense Forme, and Speed Forme.",
+    "category": "forms"
+  },
+  {
+    "query": "What forms can Rotom take?",
+    "reference": "Rotom can take several appliance-based forms, including Heat, Wash, Frost, Fan, and Mow forms.",
+    "category": "forms"
+  },
+  {
+    "query": "What type is Rotom-Wash?",
+    "reference": "Rotom-Wash is an Electric and Water type Pokémon.",
+    "category": "forms"
+  },
+  {
+    "query": "What type is Rotom-Heat?",
+    "reference": "Rotom-Heat is an Electric and Fire type Pokémon.",
+    "category": "forms"
+  },
+  {
+    "query": "How does Rotom change forms?",
+    "reference": "Rotom changes forms by interacting with the appropriate appliance or appliance-related item, depending on the game.",
+    "category": "forms"
+  },
+  {
+    "query": "What is special about Ditto's breeding ability?",
+    "reference": "Ditto can breed with Pokémon of many different species, making it useful for breeding Pokémon that would otherwise be difficult to breed.",
+    "category": "breeding"
+  },
+  {
+    "query": "Can Ditto breed with another Ditto?",
+    "reference": "No. Ditto cannot breed with another Ditto.",
+    "category": "breeding"
+  },
+  {
+    "query": "Can legendary Pokémon normally breed?",
+    "reference": "Most Legendary Pokémon cannot breed, although there are exceptions and special cases among legendary or mythical Pokémon.",
+    "category": "breeding"
+  },
+  {
+    "query": "What Pokémon egg group does Pikachu belong to?",
+    "reference": "Pikachu belongs to the Field and Fairy Egg Groups.",
+    "category": "breeding"
+  },
+  {
+    "query": "What Pokémon egg groups does Eevee belong to?",
+    "reference": "Eevee belongs to the Field Egg Group.",
+    "category": "breeding"
+  },
+  {
+    "query": "What is Snorlax's Pokédex category?",
+    "reference": "Snorlax is classified as the Sleeping Pokémon.",
+    "category": "lore"
+  },
+  {
+    "query": "What is Pikachu's Pokédex category?",
+    "reference": "Pikachu is classified as the Mouse Pokémon.",
+    "category": "lore"
+  },
+  {
+    "query": "What is Charizard's Pokédex category?",
+    "reference": "Charizard is classified as the Flame Pokémon.",
+    "category": "lore"
+  },
+  {
+    "query": "What is Bulbasaur's Pokédex category?",
+    "reference": "Bulbasaur is classified as the Seed Pokémon.",
+    "category": "lore"
+  },
+  {
+    "query": "What is Gengar's Pokédex category?",
+    "reference": "Gengar is classified as the Shadow Pokémon.",
+    "category": "lore"
+  },
+  {
+    "query": "What Pokémon is known as the Mouse Pokémon?",
+    "reference": "Pikachu is known as the Mouse Pokémon.",
+    "category": "lore"
+  },
+  {
+    "query": "What Pokémon is known as the Flame Pokémon?",
+    "reference": "Charizard is known as the Flame Pokémon.",
+    "category": "lore"
+  },
+  {
+    "query": "What Pokémon is known as the Shadow Pokémon?",
+    "reference": "Gengar is known as the Shadow Pokémon.",
+    "category": "lore"
+  },
+  {
+    "query": "Which Pokémon is described as sleeping most of the time and blocking roads?",
+    "reference": "Snorlax is famous for sleeping and blocking roads and paths.",
+    "category": "lore"
+  },
+  {
+    "query": "What is Mew's unique lore?",
+    "reference": "Mew is said to possess the genetic composition of every Pokémon, which is associated with its ability to learn many moves.",
+    "category": "lore"
+  },
+  {
+    "query": "Which Pokémon is considered the ancestor of many Pokémon according to its Pokédex lore?",
+    "reference": "Mew is described as having the genetic composition of all Pokémon and is often associated with being an ancestor of Pokémon.",
+    "category": "lore"
+  },
+  {
+    "query": "What is Arceus's Pokédex category?",
+    "reference": "Arceus is classified as the Alpha Pokémon.",
+    "category": "lore"
+  },
+  {
+    "query": "What is Rayquaza's Pokédex category?",
+    "reference": "Rayquaza is classified as the Sky High Pokémon.",
+    "category": "lore"
+  },
+  {
+    "query": "Which Pokémon is known as the Genetic Pokémon and which is known as the Alpha Pokémon?",
+    "reference": "Mewtwo is the Genetic Pokémon, while Arceus is the Alpha Pokémon.",
+    "category": "comparison"
+  },
+  {
+    "query": "Compare Pikachu and Raichu's types.",
+    "reference": "Both Pikachu and Raichu are Electric-type Pokémon.",
+    "category": "comparison"
+  },
+  {
+    "query": "Compare Charizard and Dragonite's typings.",
+    "reference": "Charizard and Dragonite are both Fire/Flying and Dragon/Flying respectively, so they share the Flying type.",
+    "category": "comparison"
+  },
+  {
+    "query": "Which has more base HP, Chansey or Blissey?",
+    "reference": "Blissey has 255 base HP, while Chansey has 250, so Blissey has more.",
+    "category": "comparison"
+  },
+  {
+    "query": "Which has higher base Special Attack, Mewtwo or Alakazam?",
+    "reference": "Mewtwo has the higher base Special Attack, with 154 compared with Alakazam's 135.",
+    "category": "comparison"
+  },
+  {
+    "query": "Which has higher base Speed, Pikachu or Gengar?",
+    "reference": "Gengar has the higher base Speed, with 110 compared with Pikachu's 90.",
+    "category": "comparison"
+  },
+  {
+    "query": "Which is heavier, Snorlax or Pikachu?",
+    "reference": "Snorlax is much heavier, weighing 460 kg compared with Pikachu's 6 kg.",
+    "category": "physical"
+  },
+  {
+    "query": "How tall is Pikachu?",
+    "reference": "Pikachu is 0.4 meters tall.",
+    "category": "physical"
+  },
+  {
+    "query": "How much does Charizard weigh?",
+    "reference": "Charizard weighs 90.5 kg.",
+    "category": "physical"
+  },
+  {
+    "query": "How tall is Snorlax?",
+    "reference": "Snorlax is 2.1 meters tall.",
+    "category": "physical"
+  },
+  {
+    "query": "Which is taller, Gyarados or Magikarp?",
+    "reference": "Gyarados is taller. Gyarados is 6.5 meters tall, while Magikarp is 0.9 meters tall.",
+    "category": "comparison"
+  },
+  {
+    "query": "What is Gyarados's weight?",
+    "reference": "Gyarados weighs 235 kg.",
+    "category": "physical"
+  },
+  {
+    "query": "Which Pokémon is taller, Wailord or Snorlax?",
+    "reference": "Wailord is taller. Wailord is 14.5 meters tall, compared with Snorlax at 2.1 meters.",
+    "category": "comparison"
+  },
+  {
+    "query": "Find Pokémon that are both Dragon and Flying type.",
+    "reference": "Examples include Dragonite, Salamence, and Noivern.",
+    "category": "filtering"
+  },
+  {
+    "query": "Which Pokémon are both Water and Ground type?",
+    "reference": "Examples include Swampert, Quagsire, Whiscash, Gastrodon, and Seismitoad.",
+    "category": "filtering"
+  },
+  {
+    "query": "Which Pokémon are both Ghost and Poison type?",
+    "reference": "Gengar and its evolutionary relatives Gastly and Haunter are Ghost/Poison type.",
+    "category": "filtering"
+  },
+  {
+    "query": "Name Pokémon that are Steel and Bug type.",
+    "reference": "Scizor and its pre-evolution Scyther's evolved form are examples of Bug/Steel Pokémon.",
+    "category": "filtering"
+  },
+  {
+    "query": "Which Pokémon have a base HP greater than 200?",
+    "reference": "Examples include Blissey, Chansey, and Wobbuffet.",
+    "category": "filtering"
+  },
+  {
+    "query": "Which Pokémon have a base stat total of 600?",
+    "reference": "Many pseudo-legendary Pokémon have a base stat total of 600, including Dragonite, Tyranitar, Salamence, Metagross, Garchomp, Hydreigon, Goodra, Kommo-o, and Dragapult.",
+    "category": "filtering"
+  },
+  {
+    "query": "Which Pokémon are classified as pseudo-legendary?",
+    "reference": "Commonly recognized pseudo-legendary Pokémon include Dragonite, Tyranitar, Salamence, Metagross, Garchomp, Hydreigon, Goodra, Kommo-o, and Dragapult.",
+    "category": "filtering"
+  },
+  {
+    "query": "Which Pokémon have the ability Levitate?",
+    "reference": "Examples include Gengar, Weezing, Bronzong, and Rotom.",
+    "category": "filtering"
+  },
+  {
+    "query": "Which Pokémon have an immunity to Ground-type attacks because of their typing or ability?",
+    "reference": "Flying-type Pokémon are naturally immune to Ground-type moves, and Pokémon with abilities such as Levitate can also be immune to Ground-type moves.",
+    "category": "filtering"
+  },
+  {
+    "query": "What Pokémon can learn Fly?",
+    "reference": "Many Flying-type Pokémon can learn Fly, including Pidgeot, Charizard, and Dragonite, depending on the game.",
+    "category": "moves"
+  },
+  {
+    "query": "Can Pikachu learn Surf?",
+    "reference": "Pikachu can learn Surf in certain Pokémon games or through specific game distributions and events.",
+    "category": "moves"
+  },
+  {
+    "query": "Can Charizard learn Flamethrower?",
+    "reference": "Yes. Charizard can learn Flamethrower.",
+    "category": "moves"
+  },
+  {
+    "query": "Can Garchomp learn Earthquake?",
+    "reference": "Yes. Garchomp can learn Earthquake.",
+    "category": "moves"
+  },
+  {
+    "query": "Which Pokémon learns Hyper Beam naturally: Gyarados or Magikarp?",
+    "reference": "Gyarados can learn Hyper Beam, while Magikarp does not normally learn it.",
+    "category": "moves"
+  },
+  {
+    "query": "What is the strongest move that Snorlax learns by level according to its move list?",
+    "reference": "Snorlax's level-up move list includes powerful moves, with the exact strongest move depending on the game generation being queried.",
+    "category": "moves"
+  },
+  {
+    "query": "What is the difference between a Pokémon's Attack and Special Attack?",
+    "reference": "Attack is used for physical moves, while Special Attack is used for special moves.",
+    "category": "mechanics"
+  },
+  {
+    "query": "What is the difference between Defense and Special Defense?",
+    "reference": "Defense determines how well a Pokémon withstands physical attacks, while Special Defense determines how well it withstands special attacks.",
+    "category": "mechanics"
+  },
+  {
+    "query": "What does STAB mean in Pokémon?",
+    "reference": "STAB means Same-Type Attack Bonus, which increases the power of a move when its type matches one of the user's types.",
+    "category": "mechanics"
+  },
+  {
+    "query": "What happens when a Pokémon's HP reaches zero?",
+    "reference": "The Pokémon faints and can no longer battle until it is revived or otherwise restored.",
+    "category": "mechanics"
+  },
+  {
+    "query": "What is a critical hit?",
+    "reference": "A critical hit is an attack that deals increased damage and can bypass certain stat changes and effects.",
+    "category": "mechanics"
+  },
+  {
+    "query": "What is a Pokémon's base stat?",
+    "reference": "A base stat is a species-specific value that contributes to the Pokémon's actual stats, alongside factors such as level, individual values, and effort values.",
+    "category": "mechanics"
+  },
+  {
+    "query": "What are IVs in Pokémon?",
+    "reference": "Individual Values, or IVs, are hidden values associated with a Pokémon that affect its stats.",
+    "category": "mechanics"
+  },
+  {
+    "query": "What are EVs in Pokémon?",
+    "reference": "Effort Values, or EVs, are values gained through training that contribute to a Pokémon's stats.",
+    "category": "mechanics"
+  },
+  {
+    "query": "What is a shiny Pokémon?",
+    "reference": "A Shiny Pokémon is an unusually colored variant of a Pokémon that is generally very rare to encounter.",
+    "category": "mechanics"
+  },
+  {
+    "query": "Are shiny Pokémon stronger than normal Pokémon?",
+    "reference": "No. Being Shiny does not inherently give a Pokémon higher stats or greater battle strength.",
+    "category": "mechanics"
+  },
+  {
+    "query": "Does a Pokémon's nature affect its stats?",
+    "reference": "Yes. A Pokémon's nature can increase one stat while decreasing another, with some natures being neutral.",
+    "category": "mechanics"
+  },
+  {
+    "query": "What is the difference between a Legendary Pokémon and a Mythical Pokémon?",
+    "reference": "Legendary and Mythical Pokémon are distinct categories; Mythical Pokémon are generally distributed through special events or other limited methods, while Legendary Pokémon are generally encountered within the games' main content.",
+    "category": "mechanics"
+  },
+  {
+    "query": "Which Pokémon is the first in the National Pokédex?",
+    "reference": "Bulbasaur is first in the National Pokédex.",
+    "category": "multi_hop"
+  },
+  {
+    "query": "What is the final evolution of the first Pokémon in the National Pokédex?",
+    "reference": "Bulbasaur is the first National Pokédex Pokémon, and its final evolution is Venusaur.",
+    "category": "multi_hop"
+  },
+  {
+    "query": "What type is the final evolution of Charmander?",
+    "reference": "Charmander's final evolution is Charizard, which is Fire/Flying type.",
+    "category": "multi_hop"
+  },
+  {
+    "query": "What is the base Speed of the final evolution of Squirtle?",
+    "reference": "The final evolution of Squirtle is Blastoise, which has a base Speed of 78.",
+    "category": "multi_hop"
+  },
+  {
+    "query": "What type is the Pokémon that Magikarp evolves into?",
+    "reference": "Magikarp evolves into Gyarados, which is Water/Flying type.",
+    "category": "multi_hop"
+  },
+  {
+    "query": "What ability does the Pokémon that Pikachu evolves into have?",
+    "reference": "Pikachu evolves into Raichu, which has the abilities Static and Lightning Rod as its hidden ability.",
+    "category": "multi_hop"
+  },
+  {
+    "query": "What is the base Attack of the Pokémon that Gible eventually evolves into?",
+    "reference": "Gible's final evolution is Garchomp, which has a base Attack of 130.",
+    "category": "multi_hop"
+  },
+  {
+    "query": "Which Pokémon evolves into Gengar, and what is its evolution method?",
+    "reference": "Haunter evolves into Gengar when traded.",
+    "category": "multi_hop"
+  },
+  {
+    "query": "What type is the Pokémon that evolves from Eevee using a Thunder Stone?",
+    "reference": "Eevee evolves into Jolteon using a Thunder Stone, and Jolteon is Electric type.",
+    "category": "multi_hop"
+  },
+  {
+    "query": "Which Pokémon evolves into Milotic, and what type is the result?",
+    "reference": "Feebas evolves into Milotic, which is a Water-type Pokémon.",
+    "category": "multi_hop"
+  },
+  {
+    "query": "Is Pikachu a legendary Pokémon?",
+    "reference": "No. Pikachu is not a Legendary Pokémon.",
+    "category": "negative"
+  },
+  {
+    "query": "Is Gengar a Dragon-type Pokémon?",
+    "reference": "No. Gengar is a Ghost/Poison type Pokémon.",
+    "category": "negative"
+  },
+  {
+    "query": "Does Magikarp evolve into Blastoise?",
+    "reference": "No. Magikarp evolves into Gyarados.",
+    "category": "negative"
+  },
+  {
+    "query": "Is Charizard a pure Fire-type Pokémon?",
+    "reference": "No. Charizard is Fire/Flying type.",
+    "category": "negative"
+  },
+  {
+    "query": "Does Pikachu evolve into Raichu at level 16?",
+    "reference": "No. Pikachu evolves into Raichu when exposed to a Thunder Stone.",
+    "category": "negative"
+  },
+  {
+    "query": "Is Garchomp a Legendary Pokémon?",
+    "reference": "No. Garchomp is not a Legendary Pokémon; it is a pseudo-legendary Pokémon.",
+    "category": "negative"
+  },
+  {
+    "query": "Is Mewtwo a Normal-type Pokémon?",
+    "reference": "No. Mewtwo is a Psychic-type Pokémon.",
+    "category": "negative"
+  },
+  {
+    "query": "Can a Water-type Pokémon normally be weak to Water?",
+    "reference": "Yes. Type effectiveness depends on the Pokémon's complete typing and abilities; Water is normally resisted by Water, not super effective against it.",
+    "category": "negative"
+  },
+  {
+    "query": "Does every Pokémon have two types?",
+    "reference": "No. Pokémon can have either one type or two types.",
+    "category": "negative"
+  },
+  {
+    "query": "Does every Pokémon evolve?",
+    "reference": "No. Some Pokémon do not evolve, including many Legendary and Mythical Pokémon and some other species.",
+    "category": "negative"
+  },
+  {
+    "query": "Which Pokémon has no evolution but can change form?",
+    "reference": "Examples include Rotom and Deoxys, which do not evolve but can change forms.",
+    "category": "forms"
+  },
+  {
+    "query": "What is the difference between Mega Charizard X and Mega Charizard Y?",
+    "reference": "Mega Charizard X is Fire/Dragon type, while Mega Charizard Y is Fire/Flying type, and their stats and abilities differ.",
+    "category": "forms"
+  },
+  {
+    "query": "What type is Mega Charizard X?",
+    "reference": "Mega Charizard X is Fire/Dragon type.",
+    "category": "forms"
+  },
+  {
+    "query": "What type is Mega Charizard Y?",
+    "reference": "Mega Charizard Y is Fire/Flying type.",
+    "category": "forms"
+  },
+  {
+    "query": "What type is Alolan Raichu?",
+    "reference": "Alolan Raichu is Electric/Psychic type.",
+    "category": "regional_forms"
+  },
+  {
+    "query": "What type is Alolan Muk?",
+    "reference": "Alolan Muk is Poison/Dark type.",
+    "category": "regional_forms"
+  },
+  {
+    "query": "What type is Galarian Weezing?",
+    "reference": "Galarian Weezing is Poison/Fairy type.",
+    "category": "regional_forms"
+  },
+  {
+    "query": "How does a Pokémon's regional form differ from its original form?",
+    "reference": "Regional forms are variants adapted to different regions and can have different types, abilities, appearances, and sometimes different evolution methods.",
+    "category": "regional_forms"
+  },
+  {
+    "query": "Which Pokémon has both a Kantonian and Alolan form?",
+    "reference": "Raichu, for example, has Kantonian and Alolan forms with different typings.",
+    "category": "regional_forms"
+  },
+  {
+    "query": "Which Pokémon has both Kanto and Galar regional forms?",
+    "reference": "Examples include Meowth, Ponyta, Rapidash, Farfetch'd, and Weezing.",
+    "category": "regional_forms"
+  },
+  {
+    "query": "What is the type of Galarian Corsola?",
+    "reference": "Galarian Corsola is a Ghost-type Pokémon.",
+    "category": "regional_forms"
+  },
+  {
+    "query": "Which Pokémon has a regional evolution from Galarian Meowth?",
+    "reference": "Galarian Meowth evolves into Perrserker.",
+    "category": "regional_forms"
+  },
+  {
+    "query": "What type is Perrserker?",
+    "reference": "Perrserker is a Steel-type Pokémon.",
+    "category": "regional_forms"
+  },
+  {
+    "query": "What is the relationship between Tyrogue, Hitmonlee, Hitmonchan, and Hitmontop?",
+    "reference": "Tyrogue can evolve into Hitmonlee, Hitmonchan, or Hitmontop depending on its stats when it reaches the required level.",
+    "category": "branching_evolution"
+  },
+  {
+    "query": "What Pokémon can Eevee evolve into depending on friendship, time, stone, or move?",
+    "reference": "Eevee has multiple evolutions obtained through different conditions, including stones, friendship with time of day, and learning a Fairy-type move under the appropriate conditions for Sylveon.",
+    "category": "branching_evolution"
+  },
+  {
+    "query": "What are the possible evolutions of Wurmple?",
+    "reference": "Wurmple can evolve into Silcoon or Cascoon, which then evolve into Beautifly or Dustox respectively.",
+    "category": "branching_evolution"
+  },
+  {
+    "query": "What determines whether Wurmple evolves into Silcoon or Cascoon?",
+    "reference": "The outcome is determined by a hidden personality value rather than a player's direct choice.",
+    "category": "branching_evolution"
+  },
+  {
+    "query": "What are the possible evolutions of Burmy?",
+    "reference": "Burmy evolves into Wormadam if female and Mothim if male.",
+    "category": "branching_evolution"
+  },
+  {
+    "query": "Which Pokémon has different evolutions depending on its gender?",
+    "reference": "Examples include Burmy, which evolves into Wormadam if female and Mothim if male, and Combee, where only females evolve into Vespiquen.",
+    "category": "branching_evolution"
+  },
+  {
+    "query": "Which Pokémon evolve through friendship?",
+    "reference": "Examples include Pichu, Cleffa, Igglybuff, Togepi, Riolu, and several other Pokémon.",
+    "category": "evolution"
+  },
+  {
+    "query": "Which Pokémon evolve by being traded?",
+    "reference": "Examples include Kadabra, Machoke, Haunter, and Graveler, with additional trade evolutions requiring specific held items.",
+    "category": "evolution"
+  },
+  {
+    "query": "Which Pokémon evolve when traded while holding an item?",
+    "reference": "Examples include Onix with Metal Coat, Scyther with Metal Coat, Poliwhirl with King's Rock, and Porygon with Up-Grade.",
+    "category": "evolution"
+  },
+  {
+    "query": "What is the evolution chain for the Charmander family?",
+    "reference": "Charmander evolves into Charmeleon at level 16, which evolves into Charizard at level 36.",
+    "category": "evolution_chain"
+  },
+  {
+    "query": "What is the evolution chain for the Bulbasaur family?",
+    "reference": "Bulbasaur evolves into Ivysaur at level 16, which evolves into Venusaur at level 32.",
+    "category": "evolution_chain"
+  },
+  {
+    "query": "What is the evolution chain for the Squirtle family?",
+    "reference": "Squirtle evolves into Wartortle at level 16, which evolves into Blastoise at level 36.",
+    "category": "evolution_chain"
+  },
+  {
+    "query": "What is the complete evolution chain of Magikarp?",
+    "reference": "Magikarp evolves into Gyarados at level 20, and Gyarados does not evolve further.",
+    "category": "evolution_chain"
+  },
+  {
+    "query": "What is the complete evolution chain of Gastly?",
+    "reference": "Gastly evolves into Haunter at level 25, and Haunter evolves into Gengar when traded.",
+    "category": "evolution_chain"
+  },
+  {
+    "query": "Which Pokémon is the final evolution in the Ralts family?",
+    "reference": "The Ralts family can end in Gardevoir, while a male Kirlia can alternatively evolve into Gallade when exposed to a Dawn Stone.",
+    "category": "evolution_chain"
+  },
+  {
+    "query": "Find a Pokémon that is Dragon type, has a base stat total of 600, and is not Legendary.",
+    "reference": "Garchomp is one example: it is Dragon/Ground type, has a base stat total of 600, and is not Legendary.",
+    "category": "multi_constraint"
+  },
+  {
+    "query": "Find a Pokémon that is Fire/Flying type and has a base stat total of 534.",
+    "reference": "Charizard is Fire/Flying type and has a base stat total of 534.",
+    "category": "multi_constraint"
+  },
+  {
+    "query": "Find a Pokémon that is Ghost/Poison type and evolves by trading.",
+    "reference": "Gengar fits this description: it is Ghost/Poison type and Haunter evolves into Gengar when traded.",
+    "category": "multi_constraint"
+  },
+  {
+    "query": "Find a Pokémon with base HP above 200 that is not Legendary.",
+    "reference": "Blissey is one example, with 255 base HP, and it is not Legendary.",
+    "category": "multi_constraint"
+  },
+  {
+    "query": "Find a Pokémon that is weak 4× to Ice.",
+    "reference": "Garchomp and Dragonite are examples of Pokémon with a 4× weakness to Ice.",
+    "category": "multi_constraint"
+  },
+  {
+    "query": "Find a Pokémon that is immune to Normal-type attacks and is also Ghost type.",
+    "reference": "Gengar is an example because Ghost-type Pokémon are immune to Normal-type moves.",
+    "category": "multi_constraint"
+  },
+  {
+    "query": "Find a Pokémon that is both Electric and Psychic type.",
+    "reference": "Alolan Raichu is an Electric/Psychic type Pokémon.",
+    "category": "multi_constraint"
+  },
+  {
+    "query": "Find a Pokémon whose evolution requires a Thunder Stone and whose resulting form is Electric type.",
+    "reference": "Eevee evolves into Jolteon when exposed to a Thunder Stone, and Jolteon is Electric type.",
+    "category": "multi_constraint"
+  },
+  {
+    "query": "Find a Pokémon that evolves by friendship during the daytime and becomes a Psychic type.",
+    "reference": "Eevee evolves into Espeon when its friendship is high enough during the day, and Espeon is Psychic type.",
+    "category": "multi_constraint"
+  },
+  {
+    "query": "Find a Pokémon that evolves by friendship at night and becomes a Dark type.",
+    "reference": "Eevee evolves into Umbreon when its friendship is high enough at night, and Umbreon is Dark type.",
+    "category": "multi_constraint"
+  },
+  {
+    "query": "What is the tallest Pokémon?",
+    "reference": "Wailord is one of the tallest Pokémon at 14.5 meters, though some forms and newer Pokémon can affect the exact ranking.",
+    "category": "physical"
+  },
+  {
+    "query": "What is the heaviest Pokémon?",
+    "reference": "Heaviest-Pokémon rankings depend on whether alternate forms are included; Pokémon such as Eternatus and certain forms of other Pokémon are among the heaviest.",
+    "category": "physical"
+  },
+  {
+    "query": "Which Pokémon weighs exactly 460 kg?",
+    "reference": "Snorlax weighs 460 kg.",
+    "category": "physical"
+  },
+  {
+    "query": "Which Pokémon is 14.5 meters tall?",
+    "reference": "Wailord is 14.5 meters tall.",
+    "category": "physical"
+  },
+  {
+    "query": "What is Pikachu's catch rate?",
+    "reference": "Pikachu has a base catch rate of 190.",
+    "category": "game_data"
+  },
+  {
+    "query": "What is Mewtwo's catch rate?",
+    "reference": "Mewtwo has a base catch rate of 3.",
+    "category": "game_data"
+  },
+  {
+    "query": "What is Gyarados's catch rate?",
+    "reference": "Gyarados has a base catch rate of 45.",
+    "category": "game_data"
+  },
+  {
+    "query": "How many base friendship points does Pikachu have?",
+    "reference": "Pikachu's base friendship value is 50 in the modern Pokémon games.",
+    "category": "game_data"
+  },
+  {
+    "query": "What is Garchomp's base experience yield?",
+    "reference": "Garchomp's base experience yield is 270 in the generations where that stat is listed in this form.",
+    "category": "game_data"
+  },
+  {
+    "query": "What is the gender ratio of Pikachu?",
+    "reference": "Pikachu has a gender ratio of 50% male and 50% female.",
+    "category": "game_data"
+  },
+  {
+    "query": "What is the gender ratio of Eevee?",
+    "reference": "Eevee has a gender ratio of 87.5% male and 12.5% female.",
+    "category": "game_data"
+  },
+  {
+    "query": "Is Mew gendered?",
+    "reference": "No. Mew has no gender.",
+    "category": "game_data"
+  },
+  {
+    "query": "Is Mewtwo gendered?",
+    "reference": "No. Mewtwo has no gender.",
+    "category": "game_data"
+  },
+  {
+    "query": "Which Pokémon have a gender ratio of 87.5% male and 12.5% female?",
+    "reference": "Eevee is one example of a Pokémon with an 87.5% male and 12.5% female gender ratio.",
+    "category": "game_data"
+  },
+  {
+    "query": "What is super effective against Water-type Pokémon?",
+    "reference": "Electric and Grass moves are super effective against Water.",
+    "category": "type_matchup"
+  },
+  {
+    "query": "What are Fire-type moves not very effective against?",
+    "reference": "Fire moves are resisted by Fire, Water, Rock, and Dragon types.",
+    "category": "type_matchup"
+  },
+  {
+    "query": "What is super effective against Steel-type Pokémon?",
+    "reference": "Fire, Fighting, and Ground moves are super effective against Steel.",
+    "category": "type_matchup"
+  },
+  {
+    "query": "What are Fairy-type Pokémon weak to?",
+    "reference": "Fairy is weak to Poison and Steel.",
+    "category": "type_matchup"
+  },
+  {
+    "query": "Which type is immune to both Normal and Fighting moves?",
+    "reference": "Ghost is immune to both Normal and Fighting moves.",
+    "category": "type_matchup"
+  },
+  {
+    "query": "What are Dragon-type Pokémon weak to?",
+    "reference": "Dragon is weak to Ice, Dragon, and Fairy.",
+    "category": "type_matchup"
+  },
+  {
+    "query": "Which types resist Grass-type moves?",
+    "reference": "Fire, Grass, Poison, Flying, Bug, Dragon, and Steel types resist Grass.",
+    "category": "type_matchup"
+  },
+  {
+    "query": "What is Gengar weak to?",
+    "reference": "Gengar (Ghost/Poison) is weak to Ghost, Dark, Psychic, and Ground, and immune to Normal and Fighting.",
+    "category": "type_matchup"
+  },
+  {
+    "query": "What is Dragonite weak to?",
+    "reference": "Dragonite (Dragon/Flying) takes 4x damage from Ice, is also weak to Rock, Dragon, and Fairy, and is immune to Ground.",
+    "category": "type_matchup"
+  },
+  {
+    "query": "Which types have only one weakness?",
+    "reference": "Electric (weak only to Ground) and Normal (weak only to Fighting).",
+    "category": "type_matchup"
+  },
+  {
+    "query": "What type is completely unaffected by Electric moves?",
+    "reference": "Ground types are immune to Electric moves.",
+    "category": "type_matchup"
+  },
+  {
+    "query": "What is Shedinja's ability and what does it do?",
+    "reference": "Shedinja has Wonder Guard: only super-effective moves can hit it.",
+    "category": "ability"
+  },
+  {
+    "query": "What is Snorlax's hidden ability?",
+    "reference": "Snorlax's hidden ability is Thick Fat, which reduces damage from Fire and Ice moves.",
+    "category": "ability"
+  },
+  {
+    "query": "What does the ability Speed Boost do, and which Pokémon have it?",
+    "reference": "Speed Boost raises the user's Speed at the end of each turn; Ninjask has it and Blaziken has it as a hidden ability.",
+    "category": "ability"
+  },
+  {
+    "query": "What abilities does Ditto have?",
+    "reference": "Ditto has Limber, with Imposter as its hidden ability, which lets it automatically Transform into the opponent.",
+    "category": "ability"
+  },
+  {
+    "query": "What is the base power and accuracy of Earthquake?",
+    "reference": "Earthquake is a Ground-type physical move with 100 base power and 100% accuracy.",
+    "category": "moves"
+  },
+  {
+    "query": "What does Draco Meteor do?",
+    "reference": "Draco Meteor is a Dragon special move with 130 base power that lowers the user's Special Attack by two stages.",
+    "category": "moves"
+  },
+  {
+    "query": "What is the effect of Will-O-Wisp?",
+    "reference": "Will-O-Wisp is a Fire move that burns the target, halving its Attack.",
+    "category": "moves"
+  },
+  {
+    "query": "What is the priority of Extreme Speed?",
+    "reference": "Extreme Speed has +2 priority, so it strikes before most moves.",
+    "category": "moves"
+  },
+  {
+    "query": "What does the move Protect do?",
+    "reference": "Protect shields the user from all effects of moves for one turn, but is more likely to fail if used repeatedly.",
+    "category": "moves"
+  },
+  {
+    "query": "What status does Toxic inflict?",
+    "reference": "Toxic badly poisons the target; its damage increases each turn.",
+    "category": "moves"
+  },
+  {
+    "query": "What is the base power of Close Combat and its drawback?",
+    "reference": "Close Combat is a Fighting move with 120 base power that lowers the user's Defense and Special Defense.",
+    "category": "moves"
+  },
+  {
+    "query": "What is the base power of Explosion?",
+    "reference": "Explosion is a Normal move with 250 base power; the user faints after using it.",
+    "category": "moves"
+  },
+  {
+    "query": "What does Scald do?",
+    "reference": "Scald is a Water move with 80 base power and a 30% chance to burn the target.",
+    "category": "moves"
+  },
+  {
+    "query": "What are Outrage's effects?",
+    "reference": "Outrage is a Dragon physical move with 120 base power; the user is locked in for 2-3 turns and becomes confused afterwards.",
+    "category": "moves"
+  },
+  {
+    "query": "What does Volt Tackle do?",
+    "reference": "Volt Tackle is an Electric physical move with 120 base power, a 30% paralysis chance, and recoil; it is known only by the Pikachu family.",
+    "category": "moves"
+  },
+  {
+    "query": "What is Regieleki's base Speed?",
+    "reference": "Regieleki has 200 base Speed, the highest of any Pokémon.",
+    "category": "stats"
+  },
+  {
+    "query": "What is Shedinja's HP stat?",
+    "reference": "Shedinja always has 1 HP, regardless of level or training.",
+    "category": "stats"
+  },
+  {
+    "query": "What is Eternamax Eternatus's base stat total?",
+    "reference": "Eternamax Eternatus has a base stat total of 1125, the highest of any Pokémon form.",
+    "category": "stats"
+  },
+  {
+    "query": "What is Slaking's base stat total?",
+    "reference": "Slaking has a base stat total of 670, the highest among non-legendary Pokémon (balanced by its Truant ability).",
+    "category": "stats"
+  },
+  {
+    "query": "What is Ditto's base stat total?",
+    "reference": "Ditto has a base stat total of 288, with exactly 48 in each stat.",
+    "category": "stats"
+  },
+  {
+    "query": "What is Deoxys's Attack Forme's base Attack and Special Attack?",
+    "reference": "Deoxys-Attack has 180 base Attack and 180 base Special Attack.",
+    "category": "stats"
+  },
+  {
+    "query": "What is Blissey's base Special Defense?",
+    "reference": "Blissey has a base Special Defense of 135.",
+    "category": "stats"
+  },
+  {
+    "query": "What is Charizard's base stat total?",
+    "reference": "Charizard has a base stat total of 534.",
+    "category": "stats"
+  },
+  {
+    "query": "What is Blaziken's base Attack?",
+    "reference": "Blaziken has a base Attack of 120.",
+    "category": "stats"
+  },
+  {
+    "query": "How does Pikachu evolve?",
+    "reference": "Pikachu evolves into Raichu with a Thunder Stone (Alolan Raichu in Alola).",
+    "category": "evolution"
+  },
+  {
+    "query": "How does Pichu evolve?",
+    "reference": "Pichu evolves into Pikachu when leveled up with high friendship.",
+    "category": "evolution"
+  },
+  {
+    "query": "How does Eevee evolve into Espeon and Umbreon?",
+    "reference": "Espeon: high friendship during the day. Umbreon: high friendship at night.",
+    "category": "evolution"
+  },
+  {
+    "query": "How does Eevee evolve into Leafeon and Glaceon?",
+    "reference": "Leafeon: level up near a Moss Rock (Leaf Stone from Gen 8 on). Glaceon: level up near an Ice Rock (Ice Stone from Gen 8 on).",
+    "category": "evolution"
+  },
+  {
+    "query": "How does Riolu evolve?",
+    "reference": "Riolu evolves into Lucario when leveled up with high friendship during the day.",
+    "category": "evolution"
+  },
+  {
+    "query": "What are all of Eevee's evolutions?",
+    "reference": "Eevee has 8 evolutions: Vaporeon, Jolteon, Flareon, Espeon, Umbreon, Leafeon, Glaceon, and Sylveon.",
+    "category": "evolution"
+  },
+  {
+    "query": "How does Nincada evolve, and what is special about it?",
+    "reference": "Nincada evolves into Ninjask at level 10; if there is an empty party slot and a Poké Ball in the bag, Shedinja also appears.",
+    "category": "evolution"
+  },
+  {
+    "query": "How does Kirlia evolve?",
+    "reference": "Kirlia evolves into Gardevoir at level 30; a male Kirlia can instead evolve into Gallade with a Dawn Stone.",
+    "category": "evolution"
+  },
+  {
+    "query": "How does Tyrogue evolve?",
+    "reference": "At level 20: Attack > Defense gives Hitmonlee, Defense > Attack gives Hitmonchan, and Attack equal to Defense gives Hitmontop.",
+    "category": "evolution"
+  },
+  {
+    "query": "How does Inkay evolve?",
+    "reference": "Inkay evolves into Malamar at level 30 while the console is held upside down (Gen 6).",
+    "category": "evolution"
+  },
+  {
+    "query": "How does Piloswine evolve into Mamoswine?",
+    "reference": "Piloswine evolves into Mamoswine when it levels up while knowing Ancient Power.",
+    "category": "evolution"
+  },
+  {
+    "query": "How does Sneasel evolve?",
+    "reference": "Sneasel evolves into Weavile when leveled up at night while holding a Razor Claw.",
+    "category": "evolution"
+  },
+  {
+    "query": "How does Rockruff evolve?",
+    "reference": "At level 25: Midday Form in the daytime, Midnight Form at night, and Dusk Form at dusk if it has the Own Tempo ability.",
+    "category": "evolution"
+  },
+  {
+    "query": "How does Wurmple evolve?",
+    "reference": "Wurmple evolves into Silcoon or Cascoon at level 7 based on a hidden personality value; Silcoon becomes Beautifly and Cascoon becomes Dustox at level 10.",
+    "category": "evolution"
+  },
+  {
+    "query": "How does Cosmog evolve?",
+    "reference": "Cosmog evolves into Cosmoem at level 43, then into Solgaleo (Sun) or Lunala (Moon) at level 53.",
+    "category": "evolution"
+  },
+  {
+    "query": "How does Primeape evolve?",
+    "reference": "Primeape evolves into Annihilape after using Rage Fist 20 times and then leveling up.",
+    "category": "evolution"
+  },
+  {
+    "query": "How does Galarian Yamask evolve?",
+    "reference": "Galarian Yamask evolves into Runerigus after taking at least 49 HP of damage and then walking under the stone arch in the Dusty Bowl.",
+    "category": "evolution"
+  },
+  {
+    "query": "How does Applin evolve?",
+    "reference": "Applin evolves into Flapple (Tart Apple, Sword), Appletun (Sweet Apple, Shield), or Dipplin (Syrupy Apple, SV).",
+    "category": "evolution"
+  },
+  {
+    "query": "How does Galarian Farfetch'd evolve?",
+    "reference": "Galarian Farfetch'd evolves into Sirfetch'd after landing three critical hits in a single battle.",
+    "category": "evolution"
+  },
+  {
+    "query": "What is Mega Charizard X's type?",
+    "reference": "Mega Charizard X is Fire and Dragon type.",
+    "category": "forms"
+  },
+  {
+    "query": "What is Mega Gyarados's type?",
+    "reference": "Mega Gyarados is Water and Dark type.",
+    "category": "forms"
+  },
+  {
+    "query": "What type is Alolan Ninetales?",
+    "reference": "Alolan Ninetales is Ice and Fairy type.",
+    "category": "forms"
+  },
+  {
+    "query": "What type is Galarian Ponyta?",
+    "reference": "Galarian Ponyta is Psychic type.",
+    "category": "forms"
+  },
+  {
+    "query": "What type is Paldean Wooper?",
+    "reference": "Paldean Wooper is Poison and Ground type.",
+    "category": "forms"
+  },
+  {
+    "query": "What are Castform's forms and what triggers them?",
+    "reference": "With Forecast, Castform becomes Sunny Form in harsh sun, Rainy Form in rain, and Snowy Form in hail or snow.",
+    "category": "forms"
+  },
+  {
+    "query": "Does Pikachu have a Gigantamax form?",
+    "reference": "Yes — Gigantamax Pikachu has the exclusive move G-Max Volt Crash, which paralyzes opponents.",
+    "category": "forms"
+  },
+  {
+    "query": "What is the first Pokémon in the National Pokédex?",
+    "reference": "Bulbasaur is #001.",
+    "category": "pokedex"
+  },
+  {
+    "query": "What is the last Pokémon in the Kanto Pokédex?",
+    "reference": "Mew is #151.",
+    "category": "pokedex"
+  },
+  {
+    "query": "How many Pokémon were introduced in Generation 1?",
+    "reference": "Generation 1 introduced 151 Pokémon.",
+    "category": "pokedex"
+  },
+  {
+    "query": "Which generation introduced the fewest new Pokémon?",
+    "reference": "Generation 6 introduced the fewest, with 72 new Pokémon.",
+    "category": "pokedex"
+  },
+  {
+    "query": "What generation is Greninja from?",
+    "reference": "Greninja debuted in Generation 6 (Pokémon X and Y).",
+    "category": "pokedex"
+  },
+  {
+    "query": "Which region is Lucario from?",
+    "reference": "Lucario is from the Sinnoh region (Generation 4).",
+    "category": "pokedex"
+  },
+  {
+    "query": "How many Pokémon types are there?",
+    "reference": "There are 18 types as of Generation 9; Fairy was added in Generation 6.",
+    "category": "pokedex"
+  },
+  {
+    "query": "What is Eevee's gender ratio?",
+    "reference": "Eevee is 87.5% male and 12.5% female.",
+    "category": "game_data"
+  },
+  {
+    "query": "What egg groups does Pikachu belong to?",
+    "reference": "Pikachu belongs to the Field and Fairy egg groups.",
+    "category": "game_data"
+  },
+  {
+    "query": "How many EVs does defeating Machop yield?",
+    "reference": "Machop yields 1 Attack EV.",
+    "category": "game_data"
+  },
+  {
+    "query": "How tall is Charizard and how much does it weigh?",
+    "reference": "Charizard is 1.7 m tall and weighs 90.5 kg.",
+    "category": "game_data"
+  },
+  {
+    "query": "What is Zubat's catch rate?",
+    "reference": "Zubat has a catch rate of 255.",
+    "category": "game_data"
+  },
+  {
+    "query": "At what levels does Charmander evolve?",
+    "reference": "Charmander evolves into Charmeleon at level 16, and Charmeleon into Charizard at level 36.",
+    "category": "game_data"
+  },
+  {
+    "query": "What level does Gible evolve at?",
+    "reference": "Gible evolves into Gabite at level 24, and Gabite into Garchomp at level 48.",
+    "category": "game_data"
+  },
+  {
+    "query": "What level does Dratini evolve at?",
+    "reference": "Dratini evolves into Dragonair at level 30, and Dragonair into Dragonite at level 55.",
+    "category": "game_data"
+  },
+  {
+    "query": "What does the Light Ball item do?",
+    "reference": "The Light Ball doubles Pikachu's Attack and Special Attack.",
+    "category": "game_data"
+  },
+  {
+    "query": "What does the Leftovers item do?",
+    "reference": "Leftovers restores 1/16 of the holder's maximum HP at the end of each turn.",
+    "category": "game_data"
+  },
+  {
+    "query": "Which starter Pokémon becomes part Ghost type?",
+    "reference": "Decidueye (Grass/Ghost, Gen 7) and Skeledirge (Fire/Ghost, Gen 9).",
+    "category": "multi_hop"
+  },
+  {
+    "query": "Which Eeveelution has the highest base Defense?",
+    "reference": "Umbreon, with 110 base Defense.",
+    "category": "multi_hop"
+  },
+  {
+    "query": "Which Eeveelutions are the fastest?",
+    "reference": "Jolteon and Espeon tie for fastest Eeveelution at 110 base Speed.",
+    "category": "multi_hop"
+  },
+  {
+    "query": "Are all Gen 1 starters dual-typed in their final form?",
+    "reference": "No — Blastoise is pure Water; Venusaur is Grass/Poison and Charizard is Fire/Flying.",
+    "category": "multi_hop"
+  },
+  {
+    "query": "Which Pokémon is the only pure Flying type?",
+    "reference": "Tornadus is the only pure Flying-type Pokémon.",
+    "category": "multi_hop"
+  },
+  {
+    "query": "Besides Ditto, which Pokémon can learn Transform?",
+    "reference": "Mew can also learn Transform.",
+    "category": "multi_hop"
+  },
+  {
+    "query": "Which Pokémon evolve using a Dusk Stone?",
+    "reference": "Murkrow into Honchkrow, Misdreavus into Mismagius, Lampent into Chandelure, and Doublade into Aegislash.",
+    "category": "multi_hop"
+  },
+  {
+    "query": "Which Pokémon are Fire and Dragon type?",
+    "reference": "Reshiram, Turtonator, and Mega Charizard X.",
+    "category": "multi_hop"
+  },
+  {
+    "query": "What is Pikachu's Mega Evolution?",
+    "reference": "Pikachu does not have a Mega Evolution.",
+    "category": "unanswerable"
+  },
+  {
+    "query": "How does Ditto evolve?",
+    "reference": "Ditto does not evolve.",
+    "category": "unanswerable"
+  },
+  {
+    "query": "How does Squirtle evolve directly into Blastoise?",
+    "reference": "It doesn't evolve directly: Squirtle becomes Wartortle at level 16, which becomes Blastoise at level 36.",
+    "category": "unanswerable"
+  },
+  {
+    "query": "What is the 19th Pokémon type?",
+    "reference": "There are only 18 Pokémon types.",
+    "category": "unanswerable"
+  },
+  {
+    "query": "What does Eevee evolve into at level 30?",
+    "reference": "Eevee never evolves by level; it needs stones, friendship, or specific conditions.",
+    "category": "unanswerable"
+  },
+  {
+    "query": "How does Dratini evolve into Gyarados?",
+    "reference": "It doesn't — Dratini evolves into Dragonair and then Dragonite; Gyarados evolves from Magikarp.",
+    "category": "unanswerable"
+  }
+]
