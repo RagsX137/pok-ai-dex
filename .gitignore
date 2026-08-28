@@ -3,7 +3,7 @@
 
 # Generated image assets
 pokemon_images/
-
+keep_active.py
 # Python
 __pycache__/
 *.pyc
