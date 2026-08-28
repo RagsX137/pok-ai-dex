@@ -101,7 +101,7 @@ body {
 .pokedex-screen {
   background: var(--screen-bg);
   border-radius: 6px;
-  min-height: 320px;
+  height: 420px;
   padding: 12px;
   color: var(--screen-text);
   font-family: "Courier New", monospace;
