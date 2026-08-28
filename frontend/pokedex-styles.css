@@ -33,7 +33,8 @@ body {
   box-shadow: 4px 6px 0 var(--device-dark-red), 0 12px 32px rgba(0,0,0,0.6);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  /* overflow:hidden was removed — it clips the atomic-search-box suggestions dropdown */
+  overflow: visible;
 }
 
 /* ── Top bar: camera lens + LEDs + model selector ── */
@@ -105,6 +106,7 @@ body {
   color: var(--screen-text);
   font-family: "Courier New", monospace;
   overflow-y: auto;
+  overflow-x: visible; /* allow search suggestions to extend beyond screen bounds */
   position: relative;
 }
 
@@ -114,10 +116,40 @@ body {
 }
 atomic-search-box {
   flex: 1;
-  --atomic-primary-color: #f0d040;
-  --atomic-neutral-dark-900: #f0d040;
+  /* Atomic design-token overrides — dark Pokédex screen palette */
+  --atomic-primary-color:    #f0d040;
+  --atomic-on-primary:       #1a1f3a;
+  --atomic-background:       #0f1228;
+  --atomic-on-background:    #f0d040;
   --atomic-background-color: #0f1228;
-  --atomic-font-family: "Courier New", monospace;
+  --atomic-neutral:          rgba(240,208,64,0.25);
+  --atomic-neutral-dark:     rgba(240,208,64,0.5);
+  --atomic-neutral-dark-900: #f0d040;
+  --atomic-font-family:      "Courier New", monospace;
+  --atomic-ring-color:       rgba(240,208,64,0.6);
+}
+
+/* Input field (shadow ::part) */
+atomic-search-box::part(input) {
+  background:    #0f1228;
+  color:         #f0d040;
+  border:        1px solid rgba(240,208,64,0.4);
+  border-radius: 5px;
+  caret-color:   #f0d040;
+  font-family:   "Courier New", monospace;
+  font-size:     13px;
+}
+atomic-search-box::part(input):focus {
+  border-color: #f0d040;
+  outline:      none;
+  box-shadow:   0 0 0 2px rgba(240,208,64,0.2);
+}
+
+/* Submit / clear icon buttons */
+atomic-search-box::part(submit-button),
+atomic-search-box::part(clear-button) {
+  color:      #f0d040;
+  background: transparent;
 }
 
 /* RGA answer panel */
@@ -272,6 +304,15 @@ atomic-result-list {
 /* ── Query Suggest dropdown ── */
 atomic-search-box::part(suggestions-wrapper) {
   background: #0f1228;
-  border: 1px solid rgba(240,208,64,0.3);
-  color: #f0d040;
+  border:     1px solid rgba(240,208,64,0.3);
+  color:      #f0d040;
+}
+atomic-search-box::part(suggestion) {
+  color:       #f0d040;
+  font-family: "Courier New", monospace;
+  font-size:   12px;
+}
+atomic-search-box::part(suggestion):hover,
+atomic-search-box::part(active-suggestion) {
+  background: rgba(240,208,64,0.12);
 }

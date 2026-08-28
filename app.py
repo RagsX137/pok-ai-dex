@@ -143,4 +143,5 @@ def list_models():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    # macOS Monterey+ reserves port 5000 for AirPlay; use 5001 instead
+    app.run(debug=True, port=5003)

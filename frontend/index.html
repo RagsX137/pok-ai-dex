@@ -86,19 +86,19 @@
     <!-- ── SCREEN: all Atomic components live here ── -->
     <div class="pokedex-screen">
 
-      <!-- Search bar with Query Suggest -->
+      <!-- RGA / Ollama answer panel -->
+      <div class="rga-label">Pokédex AI</div>
+      <div class="rga-panel" id="rga-panel">
+        Ask me anything about Pokémon…
+      </div>
+
+      <!-- Search bar with Query Suggest — sits below the AI panel -->
       <div class="screen-search-row">
         <atomic-search-box
           number-of-queries="5"
           minimum-query-length="1"
           clear-filters="false">
         </atomic-search-box>
-      </div>
-
-      <!-- RGA / Ollama answer panel -->
-      <div class="rga-label">Pokédex AI</div>
-      <div class="rga-panel" id="rga-panel">
-        Ask me anything about Pokémon…
       </div>
 
       <!-- Quick stat row (populated on result click) -->
