@@ -29,6 +29,12 @@ def index():
     return render_template_string(html, COVEO_ORGANIZATION_ID=COVEO_ORG)
 
 
+@app.route("/dashboard")
+def dashboard():
+    html = (FRONTEND_DIR / "dashboard.html").read_text()
+    return render_template_string(html, COVEO_ORGANIZATION_ID=COVEO_ORG)
+
+
 @app.route("/frontend/<path:filename>")
 def frontend_static(filename):
     return send_from_directory(FRONTEND_DIR, filename)

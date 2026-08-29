@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pokédex — Dashboard</title>
+  <link rel="stylesheet" href="/frontend/dashboard.css" />
+
+  <!-- Coveo Atomic -->
+  <script type="module" src="https://static.cloud.coveo.com/atomic/v3/atomic.esm.js"></script>
+  <link rel="stylesheet" href="https://static.cloud.coveo.com/atomic/v3/themes/coveo.css" />
+</head>
+
+<body data-coveo-org="{{ COVEO_ORGANIZATION_ID }}">
+
+<atomic-search-interface id="atomic-search-interface">
+
+<div class="vtag">▶ Pokédex — Dark Dashboard</div>
+<div class="sub">Coveo-powered search · Generative Answering · PokéAPI live data</div>
+
+<div class="dash">
+
+  <!-- ══════════════ LEFT SIDEBAR ══════════════ -->
+  <div class="sidebar">
+    <div class="sb-head">
+      <div class="sb-lens"></div>
+      <div>
+        <div class="sb-title">Pokédex</div>
+        <div class="sb-sub">Agentic Edition</div>
+      </div>
+    </div>
+
+    <!-- Type filter chips -->
+    <div>
+      <div class="fac-label">Type</div>
+      <div class="type-grid" id="type-grid">
+        <!-- Populated by dashboard.js from TYPE_COLORS -->
+      </div>
+    </div>
+
+    <!-- Generation filter list -->
+    <div>
+      <div class="fac-label">Generation</div>
+      <div class="gen-list" id="gen-list">
+        <div class="gen-item on" data-gen="I"><div class="gdot" style="background:#ff4444"></div>Gen I — Kanto</div>
+        <div class="gen-item" data-gen="II"><div class="gdot" style="background:#ffcc00"></div>Gen II — Johto</div>
+        <div class="gen-item" data-gen="III"><div class="gdot" style="background:#44dd44"></div>Gen III — Hoenn</div>
+        <div class="gen-item" data-gen="IV"><div class="gdot" style="background:#4fc3f7"></div>Gen IV — Sinnoh</div>
+        <div class="gen-item" data-gen="V"><div class="gdot" style="background:#ec8fe6"></div>Gen V — Unova</div>
+        <div class="gen-item" data-gen="VI"><div class="gdot" style="background:#ff9c54"></div>Gen VI — Kalos</div>
+        <div class="gen-item" data-gen="VII"><div class="gdot" style="background:#63bb5b"></div>Gen VII — Alola</div>
+        <div class="gen-item" data-gen="VIII"><div class="gdot" style="background:#6f35fc"></div>Gen VIII — Galar</div>
+        <div class="gen-item" data-gen="IX"><div class="gdot" style="background:#5a8ea1"></div>Gen IX — Paldea</div>
+      </div>
+    </div>
+
+    <!-- Map / habitat card -->
+    <div class="map-card" id="map-card">
+      <div class="map-grid-bg"></div>
+      <div class="map-title">📍 Map Location</div>
+      <div class="gen-toggles" id="map-gen-toggles">
+        <div class="gtbtn on" data-mapgen="1">Gen I</div>
+        <div class="gtbtn" data-mapgen="2">Gen II</div>
+        <div class="gtbtn" data-mapgen="3">Gen III</div>
+        <div class="gtbtn" data-mapgen="go">GO</div>
+      </div>
+      <div class="map-pills" id="map-pills">
+        <span class="mpill">—</span>
+      </div>
+      <div class="map-sub">Select a Pokémon to see habitat</div>
+    </div>
+  </div>
+
+  <!-- ══════════════ CENTER COLUMN ══════════════ -->
+  <div class="center">
+
+    <!-- Top bar: LEDs + model selector -->
+    <div class="c-topbar">
+      <div class="leds">
+        <div class="led lr"></div>
+        <div class="led ly"></div>
+        <div class="led lg"></div>
+      </div>
+      <div class="model-pill">
+        <span class="model-arrow">▼</span>
+        <select id="model-select" title="Select AI model">
+          <optgroup label="Coveo">
+            <option value="coveo-rga">Professor-Oak (Coveo)</option>
+          </optgroup>
+          <optgroup label="Ollama (local)">
+            <option value="llama3">llama3</option>
+            <option value="llama3.1">llama3.1</option>
+            <option value="mistral">mistral</option>
+            <option value="gemma3">gemma3</option>
+            <option value="phi4">phi4</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+
+    <!-- Search bar + AI answer -->
+    <div class="search-card">
+      <div class="srow">
+        <input id="search-input" class="sinput"
+               placeholder="Ask me anything about Pokémon…"
+               autocomplete="off" spellcheck="false" />
+        <button class="sbtn" id="search-btn" title="Search">⌕</button>
+      </div>
+      <div class="ai-ans" id="ai-answer" style="display:none;"></div>
+    </div>
+
+    <!-- Hidden Atomic search-box for headless engine access -->
+    <atomic-search-box
+      id="atomic-search-box-hidden"
+      number-of-queries="5"
+      minimum-query-length="1"
+      clear-filters="false"
+      style="display:none;">
+    </atomic-search-box>
+
+    <!-- Pokémon photo card -->
+    <div class="photo-card" id="photo-card">
+      <div class="photo-glow" id="photo-glow"></div>
+      <img class="psprite" id="psprite"
+           src="/images/placeholder.png"
+           alt="Pokémon sprite"
+           onerror="this.style.display='none'" />
+      <div class="photo-overlay">
+        <span id="photo-name">—</span>
+        <span class="photo-num" id="photo-num"></span>
+      </div>
+    </div>
+
+    <!-- Search results list -->
+    <div class="results-card">
+      <div class="rhead">
+        <span>Search Results</span>
+        <span class="rcount" id="result-count">—</span>
+      </div>
+      <div class="results-scroll" id="results-list">
+        <div class="ritem" style="color:#555;font-size:11px;padding:10px 12px;">
+          Search to see results…
+        </div>
+      </div>
+    </div>
+
+    <!-- Similar Pokémon -->
+    <div class="similar-section">
+      <div class="similar-header">Similar Pokémon</div>
+      <div class="similar-grid" id="similar-grid">
+        <div class="sim-placeholder">Search for a Pokémon to see similar ones</div>
+      </div>
+    </div>
+
+  </div><!-- /.center -->
+
+  <!-- ══════════════ RIGHT PANEL ══════════════ -->
+  <div class="right">
+    <div class="rp-head">
+      <div class="rp-name" id="rp-name">—</div>
+      <div class="rp-tags" id="rp-tags"></div>
+    </div>
+
+    <div class="rp-body">
+
+      <!-- Base stats -->
+      <div id="stats-section">
+        <div class="sec">Base Stats</div>
+        <div id="stat-bars">
+          <!-- Rendered by JS -->
+          <div style="color:#555;font-size:11px;">Select a Pokémon…</div>
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <!-- Moves learned table -->
+      <div>
+        <div class="sec">Moves Learned</div>
+        <div class="moves-scroll">
+          <table class="moves-table">
+            <thead>
+              <tr>
+                <th>LV</th>
+                <th>MOVE</th>
+                <th style="text-align:right">TYPE</th>
+              </tr>
+            </thead>
+            <tbody id="moves-tbody">
+              <tr><td colspan="3" style="color:#555;font-size:11px;text-align:center;padding:10px;">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <!-- Type effectiveness -->
+      <div>
+        <div class="sec">Type Effectiveness</div>
+        <div class="eff-grid" id="eff-grid">
+          <div>
+            <div class="eff-title">Weak To</div>
+            <div class="eff-chips" id="weak-chips"><span style="color:#555;font-size:11px;">—</span></div>
+          </div>
+          <div>
+            <div class="eff-title">Strong Against</div>
+            <div class="eff-chips" id="strong-chips"><span style="color:#555;font-size:11px;">—</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <!-- AI recommendation card -->
+      <div class="ai-card" id="ai-card">
+        <div class="ai-head">
+          <div class="ai-dot"></div>
+          <span class="ai-lbl">Professor Oak Recommends</span>
+        </div>
+        <div class="ai-txt" id="ai-rec-txt">Ask a question to get a recommendation…</div>
+        <div class="ai-pair-row" id="ai-pair-row" style="display:none;">
+          <span class="ai-pair-lbl">Pair with:</span>
+        </div>
+      </div>
+
+    </div><!-- /.rp-body -->
+  </div><!-- /.right -->
+
+</div><!-- /.dash -->
+
+</atomic-search-interface>
+
+<script type="module" src="/frontend/dashboard.js"></script>
+</body>
+</html>
