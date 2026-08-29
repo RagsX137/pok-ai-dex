@@ -97,12 +97,24 @@ body {
   padding: 3px 5px; border-radius: 4px;
   font-size: 9px; font-weight: 700;
   cursor: pointer; text-align: center;
-  opacity: .72; transition: opacity .15s;
+  opacity: .72; transition: opacity .15s, filter .15s;
   border: 1.5px solid transparent;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .tchip:hover { opacity: 1; }
-.tchip.on { opacity: 1; border-color: #fff; }
+.tchip.on    { opacity: 1; border-color: #fff; }
+/* Active-pokemon highlight: matching type is bright + outlined */
+.tchip.active {
+  opacity: 1;
+  border-color: rgba(255,255,255,.85);
+  box-shadow: 0 0 6px rgba(255,255,255,.25);
+  filter: none;
+}
+/* Dimmed: other types recede */
+.tchip.dimmed {
+  opacity: .22;
+  filter: grayscale(60%);
+}
 
 /* Generation list */
 .gen-list { display: flex; flex-direction: column; gap: 2px; }
@@ -110,11 +122,20 @@ body {
   display: flex; align-items: center; gap: 7px;
   padding: 4px 7px; border-radius: 6px;
   cursor: pointer; font-size: 11px; font-weight: 600;
-  color: #888; transition: background .15s;
+  color: #888; transition: background .15s, opacity .15s, color .15s;
   white-space: nowrap;
 }
 .gen-item:hover { background: #2a2a40; color: #fff; }
-.gen-item.on    { background: #1e2a4a; color: #4fc3f7; }
+.gen-item.on     { background: #1e2a4a; color: #4fc3f7; }
+/* Active-pokemon highlight: the Pokémon's generation lights up */
+.gen-item.active {
+  background: #1a3a2a;
+  color: #44dd88;
+  border-left: 3px solid #44dd44;
+  padding-left: 4px;
+}
+/* Dimmed: other generations recede */
+.gen-item.dimmed { opacity: .35; }
 .gdot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
 /* Map card */
