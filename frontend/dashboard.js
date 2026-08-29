@@ -39,7 +39,40 @@ const GEN_MAP = {
 };
 
 // ─────────────────────────────────────────────────────────────
-// PokéAPI cache
+// PokéDB artwork helpers
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Return the pokemondb.net high-res artwork URL for a given name.
+ * Falls back through Coveo-indexed image_url → local file.
+ * PokeAPI is NOT used for the artwork image.
+ *
+ * @param {string} name      - Pokémon name (any case)
+ * @param {object} [raw]     - Coveo result.raw (may contain image_url)
+ * @returns {string}
+ */
+function pokemonDbArtworkUrl(name, raw) {
+  const slug = name.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-');
+  // Prefer the URL Coveo already indexed from pokemondb.net
+  if (raw?.image_url) return raw.image_url;
+  // Derive directly from pokemondb CDN (large artwork)
+  return `https://img.pokemondb.net/artwork/large/${slug}.jpg`;
+}
+
+/**
+ * Return the pokemondb.net sprite URL (used for the sidebar header icon — V2).
+ * These are the "home" normal sprites which are small and load fast.
+ *
+ * @param {string} name - Pokémon name
+ * @returns {string}
+ */
+function pokemonDbSpriteUrl(name) {
+  const slug = name.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-');
+  return `https://img.pokemondb.net/sprites/home/normal/${slug}.png`;
+}
+
+// ─────────────────────────────────────────────────────────────
+// PokéAPI cache  (still used for stats, moves, types, location)
 // ─────────────────────────────────────────────────────────────
 const _cache = {};
 
@@ -369,12 +402,26 @@ async function selectResult(result, autoSelect) {
   setPhotoName(name, null);
   setRightPanelName(name, [], null);
 
+  // ── Artwork from pokemondb.net (Coveo-indexed or CDN-derived) ──
+  // PokeAPI is NOT used for the main artwork image.
+  const artworkUrl = pokemonDbArtworkUrl(name, result.raw);
+  updatePhotoCard(artworkUrl, name, null, result.raw?.type1 ?? '');
+
+  // ── PokéAPI for stats / moves / types / location ──
   const poke = await fetchPokeData(name);
   if (!poke) return;
 
-  // Photo card
+  // Photo card — refresh number + glow once we have the id
   setPhotoName(name, poke.id);
-  updatePhotoCard(poke.sprite, name, poke.id, poke.types[0]);
+  updatePhotoCard(artworkUrl, name, poke.id, poke.types[0]);
+
+  // V2: update the sidebar header sprite with the PokeAPI sprite
+  const headerSprite = document.getElementById('header-sprite');
+  if (headerSprite) {
+    headerSprite.src = poke.sprite || pokemonDbSpriteUrl(name);
+    headerSprite.style.display = '';
+    headerSprite.title = name;
+  }
 
   // Right panel
   setRightPanelName(name, poke.types, poke.id);
@@ -393,10 +440,11 @@ async function selectResult(result, autoSelect) {
 // ─────────────────────────────────────────────────────────────
 // 10. Photo card updater
 // ─────────────────────────────────────────────────────────────
-function updatePhotoCard(spriteUrl, name, pokeId, primaryType) {
+function updatePhotoCard(artworkUrl, name, pokeId, primaryType) {
   const img = document.getElementById('psprite');
   if (img) {
-    img.src = spriteUrl || `/images/${name.toLowerCase()}_image.jpg`;
+    // artworkUrl comes from pokemondb.net — NOT PokeAPI
+    img.src = artworkUrl || `/images/${name.toLowerCase()}_image.jpg`;
     img.style.display = '';
   }
 
