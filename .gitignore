@@ -14,3 +14,9 @@ __pycache__/
 .bob/
 .superpowers/
 mlruns/
+
+# Evaluation harness: accumulated run data (regenerable, and large)
+eval_data/*.db
+eval_data/*.db-wal
+eval_data/*.db-shm
+eval_data/exports/
