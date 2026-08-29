@@ -71,12 +71,16 @@ body {
   /* V2: allows the header-sprite img to be sized inside the circle */
   position: relative; overflow: hidden;
 }
-/* V2: once the sprite loads it sits over the blue gradient background */
+/* V2: sprite sits over the blue gradient; hidden until src resolves */
 #header-sprite {
   position: absolute; inset: 0;
   width: 100%; height: 100%;
   object-fit: contain; border-radius: 50%;
-  transition: opacity .25s;
+  opacity: 0;
+  transition: opacity .3s;
+}
+#header-sprite[src]:not([src=""]) {
+  opacity: 1;
 }
 .sb-title { font-size: 13px; font-weight: 800; color: #f0d040; }
 .sb-sub   { font-size: 10px; color: #555; }
