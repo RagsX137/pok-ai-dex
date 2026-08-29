@@ -764,4 +764,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   await initAtomic();
   wireEngineSubscription();
+
+  // Default search: show Bulbasaur on load instead of whatever Coveo returns first
+  dispatchSearch('bulbasaur');
 });
