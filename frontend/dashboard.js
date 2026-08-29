@@ -407,6 +407,18 @@ async function selectResult(result, autoSelect) {
   const artworkUrl = pokemonDbArtworkUrl(name, result.raw);
   updatePhotoCard(artworkUrl, name, null, result.raw?.type1 ?? '');
 
+  // V2: set the header circle sprite immediately from pokemondb.
+  // This runs unconditionally — before PokeAPI — so it works even
+  // for Pokémon PokeAPI doesn't know about yet (e.g. new Gen IX entries).
+  const headerSprite = document.getElementById('header-sprite');
+  if (headerSprite) {
+    const spriteUrl = pokemonDbSpriteUrl(name);
+    headerSprite.alt = name;
+    headerSprite.onload  = () => { headerSprite.style.opacity = '1'; };
+    headerSprite.onerror = () => { headerSprite.style.opacity = '0'; };
+    headerSprite.src = spriteUrl;
+  }
+
   // ── PokéAPI for stats / moves / types / location ──
   const poke = await fetchPokeData(name);
   if (!poke) return;
@@ -415,14 +427,11 @@ async function selectResult(result, autoSelect) {
   setPhotoName(name, poke.id);
   updatePhotoCard(artworkUrl, name, poke.id, poke.types[0]);
 
-  // V2: swap the blue circle for the PokeAPI sprite
-  const headerSprite = document.getElementById('header-sprite');
-  if (headerSprite) {
-    const spriteUrl = poke.sprite || pokemonDbSpriteUrl(name);
-    headerSprite.alt = name;
-    headerSprite.onload = () => { headerSprite.style.opacity = '1'; };
-    headerSprite.onerror = () => { headerSprite.style.opacity = '0'; };
-    headerSprite.src = spriteUrl;
+  // If PokeAPI has a sprite, upgrade the header circle to it
+  if (headerSprite && poke.sprite) {
+    headerSprite.onload  = () => { headerSprite.style.opacity = '1'; };
+    headerSprite.onerror = () => { /* keep pokemondb sprite already showing */ };
+    headerSprite.src = poke.sprite;
   }
 
   // Right panel
