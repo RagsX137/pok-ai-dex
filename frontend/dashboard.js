@@ -252,7 +252,9 @@ async function initAtomic() {
     },
   });
 
-  si.executeFirstSearch();
+  // Force Bulbasaur as the default on load — drives the full panel population
+  // via the engine subscription (stats, moves, photo, etc.)
+  dispatchSearch('bulbasaur');
 
   // Populate live Ollama models
   try {
@@ -298,7 +300,7 @@ function wireEngineSubscription() {
   const si = document.querySelector('atomic-search-interface');
   if (!si) return;
 
-  let lastLoading = true;
+  let lastLoading = null;   // null = unknown; first state snapshot sets the baseline
   let lastQuery   = null;
 
   const trySubscribe = () => {
@@ -312,6 +314,9 @@ function wireEngineSubscription() {
       const loading = state?.search?.isLoading ?? false;
       const total   = state?.search?.response?.totalCountFiltered ?? results.length;
 
+      // Treat the very first snapshot as a baseline (don't fire yet);
+      // fire on every true → false loading transition after that.
+      if (lastLoading === null) { lastLoading = loading; return; }
       const justFinished = lastLoading === true && loading === false;
       lastLoading = loading;
 
@@ -762,9 +767,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   wireSearchBar();
   wireModelSelector();
 
-  await initAtomic();
+  // Wire subscription BEFORE initAtomic so the trySubscribe loop can catch
+  // the engine as soon as it exists, and picks up the executeFirstSearch result.
   wireEngineSubscription();
-
-  // Default search: show Bulbasaur on load instead of whatever Coveo returns first
-  dispatchSearch('bulbasaur');
+  await initAtomic();
 });
