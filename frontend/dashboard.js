@@ -128,17 +128,15 @@ function buildTypeGrid() {
 }
 
 function toggleTypeFilter(chip, type) {
+  // Clear any active-pokemon type highlighting when the user manually filters
+  clearTypeHighlight();
+  clearGenHighlight();
+
   const wasOn = chip.classList.toggle('on');
   // Drive Coveo facet via the engine
   const si = document.querySelector('atomic-search-interface');
   const engine = si?.engine;
   if (!engine) return;
-
-  const state = engine.state;
-  // Use headless facet — find the facet for type1
-  // Simplest reliable approach: submit a new search with aq override
-  const currentAq = (state?.query?.aq ?? '');
-  const typeExpr = `@type1=="${type}" OR @type2=="${type}"`;
 
   if (wasOn) {
     const allOn = [...document.querySelectorAll('.tchip.on')]
@@ -149,6 +147,66 @@ function toggleTypeFilter(chip, type) {
       .map(c => `(@type1=="${c.dataset.type}" OR @type2=="${c.dataset.type}")`);
     updateAdvancedQuery(allOn.length ? allOn.join(' OR ') : '');
   }
+}
+
+/**
+ * Highlight the type chips that match the active Pokémon's types.
+ * All other chips are dimmed. Resets when user manually clicks a chip.
+ * @param {string[]} types  - e.g. ['fire', 'flying']
+ */
+function highlightActiveTypes(types) {
+  const typeSet = new Set(types.map(t => t.toLowerCase()));
+  document.querySelectorAll('.tchip').forEach(chip => {
+    const t = chip.dataset.type.toLowerCase();
+    if (typeSet.has(t)) {
+      chip.classList.add('active');
+      chip.classList.remove('dimmed');
+    } else {
+      chip.classList.add('dimmed');
+      chip.classList.remove('active');
+    }
+  });
+}
+
+function clearTypeHighlight() {
+  document.querySelectorAll('.tchip').forEach(chip => {
+    chip.classList.remove('active', 'dimmed');
+  });
+}
+
+/**
+ * Highlight generation rows that match the active Pokémon's generation(s).
+ * The Coveo `generation` field is a string like "gen-i" or comma-separated.
+ * @param {string|string[]} genField - raw.generation value from Coveo result
+ */
+function highlightActiveGenerations(genField) {
+  if (!genField) { clearGenHighlight(); return; }
+
+  // Normalise: Coveo may return a string or array; split on commas/spaces
+  const raw = Array.isArray(genField) ? genField : [genField];
+  const genSet = new Set(
+    raw.flatMap(v => v.split(/[,\s]+/))
+       .map(v => v.toLowerCase().trim())
+       .filter(Boolean)
+  );
+
+  // Build a reverse lookup: GEN_MAP key → Coveo gen value  (e.g. 'I' → 'gen-i')
+  document.querySelectorAll('.gen-item').forEach(item => {
+    const coveoVal = GEN_MAP[item.dataset.gen] ?? '';
+    if (genSet.has(coveoVal)) {
+      item.classList.add('active');
+      item.classList.remove('dimmed');
+    } else {
+      item.classList.add('dimmed');
+      item.classList.remove('active');
+    }
+  });
+}
+
+function clearGenHighlight() {
+  document.querySelectorAll('.gen-item').forEach(item => {
+    item.classList.remove('active', 'dimmed');
+  });
 }
 
 function updateAdvancedQuery(aq) {
@@ -444,6 +502,10 @@ async function selectResult(result, autoSelect) {
   renderStatBars(poke.stats);
   renderMovesTable(poke.moves, poke.types);
   renderTypeEffectiveness(poke.types);
+
+  // Sidebar highlights — show which types & generation(s) belong to this Pokémon
+  highlightActiveTypes(poke.types);
+  highlightActiveGenerations(result.raw?.generation ?? null);
 
   // Map location
   const locations = await fetchLocationAreas(poke.id);
