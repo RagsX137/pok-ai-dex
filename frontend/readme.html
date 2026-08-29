@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agentic Pokédex — README</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0d0d1a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 28px 16px 48px;
+      font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+      color: #e0e0e0;
+      gap: 10px;
+    }
+
+    .vtag {
+      color: #4fc3f7;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      align-self: flex-start;
+      max-width: 860px;
+      width: 100%;
+    }
+    .sub {
+      color: #555;
+      font-size: 12px;
+      align-self: flex-start;
+      max-width: 860px;
+      width: 100%;
+      margin-bottom: 6px;
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: 860px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* ── Hero card ── */
+    .hero {
+      background: linear-gradient(145deg, #1a1f3a, #0f1228);
+      border: 1px solid #2a2a40;
+      border-radius: 12px;
+      padding: 28px 28px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, #4fc3f7 1px, transparent 1px);
+      background-size: 20px 20px;
+      opacity: .03;
+      pointer-events: none;
+    }
+    .hero-head {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .lens {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #81d4fa, #0288d1);
+      border: 3px solid rgba(255,255,255,.25);
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+    }
+    .hero-title {
+      font-size: 26px;
+      font-weight: 900;
+      color: #f0d040;
+      font-family: "Comic Sans MS", "Chalkboard SE", cursive;
+      line-height: 1.1;
+    }
+    .hero-edition {
+      font-size: 12px;
+      color: #4fc3f7;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+    .hero-desc {
+      font-size: 14px;
+      color: rgba(224,224,224,.85);
+      line-height: 1.7;
+      max-width: 640px;
+    }
+    .badge-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+    .badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 5px;
+      letter-spacing: .04em;
+    }
+    .b-blue   { background: rgba(79,195,247,.15);  color: #4fc3f7; border: 1px solid rgba(79,195,247,.3); }
+    .b-gold   { background: rgba(240,208,64,.12);  color: #f0d040; border: 1px solid rgba(240,208,64,.25); }
+    .b-green  { background: rgba(68,221,68,.1);    color: #66dd66; border: 1px solid rgba(68,221,68,.25); }
+    .b-purple { background: rgba(111,53,252,.15);  color: #b09aff; border: 1px solid rgba(111,53,252,.3); }
+    .b-red    { background: rgba(255,68,68,.1);    color: #ff8888; border: 1px solid rgba(255,68,68,.2); }
+
+    /* ── Section cards ── */
+    .card {
+      background: #161626;
+      border: 1px solid #2a2a40;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .card-head {
+      background: #1e1e32;
+      border-bottom: 1px solid #2a2a40;
+      padding: 9px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title {
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: #4fc3f7;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+    }
+    .card-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #2a2a40;
+    }
+    .card-body { padding: 16px 18px; }
+
+    /* ── Two-col layout ── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 600px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* ── Architecture grid ── */
+    .arch-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      padding: 16px 18px;
+    }
+    @media (max-width: 600px) { .arch-grid { grid-template-columns: 1fr 1fr; } }
+    .arch-tile {
+      background: #1e1e32;
+      border: 1px solid #2a2a40;
+      border-radius: 8px;
+      padding: 12px 14px;
+    }
+    .arch-tile-icon  { font-size: 18px; margin-bottom: 6px; }
+    .arch-tile-name  { font-size: 11px; font-weight: 800; color: #f0d040; }
+    .arch-tile-desc  { font-size: 10px; color: #888; margin-top: 4px; line-height: 1.5; }
+
+    /* ── Tables (shared) ── */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .data-table thead tr { background: #1a1a2e; }
+    .data-table th {
+      font-size: 9px; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .1em;
+      color: #555; padding: 8px 12px;
+      text-align: left; border-bottom: 1px solid #2a2a40;
+    }
+    .data-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid rgba(42,42,64,.6);
+      vertical-align: top;
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: rgba(79,195,247,.04); }
+
+    .fname { font-family: "Courier New", monospace; font-size: 11px; color: #4fc3f7; white-space: nowrap; }
+    .fdesc { color: #aaa; }
+    .rpath { font-family: "Courier New", monospace; font-size: 11px; color: #4fc3f7; }
+
+    .method {
+      font-size: 9px; font-weight: 800;
+      padding: 2px 8px; border-radius: 4px;
+      font-family: monospace; white-space: nowrap;
+    }
+    .m-get  { background: rgba(68,221,68,.12);  color: #66dd66; border: 1px solid rgba(68,221,68,.2); }
+    .m-post { background: rgba(240,208,64,.12); color: #f0d040; border: 1px solid rgba(240,208,64,.2); }
+
+    /* ── Env vars ── */
+    .env-list { display: flex; flex-direction: column; gap: 6px; }
+    .env-row {
+      display: flex; align-items: baseline; gap: 10px;
+      background: #1e1e32; border: 1px solid #2a2a40;
+      border-radius: 6px; padding: 8px 12px;
+    }
+    .env-key {
+      font-family: "Courier New", monospace; font-size: 11px;
+      color: #f0d040; flex-shrink: 0; min-width: 210px;
+    }
+    .env-val { font-size: 11px; color: #888; }
+
+    /* ── Setup steps ── */
+    .step-list { display: flex; flex-direction: column; gap: 8px; }
+    .step {
+      display: flex; gap: 12px;
+      background: #1e1e32; border: 1px solid #2a2a40;
+      border-radius: 8px; padding: 12px 14px;
+    }
+    .step-num {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: rgba(79,195,247,.15); border: 1px solid rgba(79,195,247,.3);
+      color: #4fc3f7; font-size: 10px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .step-body { flex: 1; }
+    .step-title  { font-size: 12px; font-weight: 700; color: #e0e0e0; margin-bottom: 4px; }
+    .step-detail { font-size: 11px; color: #888; line-height: 1.6; }
+
+    code {
+      font-family: "Courier New", monospace;
+      background: rgba(240,208,64,.08); color: #f0d040;
+      padding: 1px 5px; border-radius: 3px; font-size: .95em;
+    }
+
+    /* ── Feature list ── */
+    .feature-list { display: flex; flex-direction: column; gap: 6px; }
+    .fitem {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 8px 12px; background: #1e1e32;
+      border: 1px solid #2a2a40; border-radius: 6px;
+    }
+    .fdot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+    .fitem-name  { font-size: 12px; font-weight: 700; color: #e0e0e0; }
+    .fitem-desc  { font-size: 11px; color: #888; margin-top: 2px; line-height: 1.5; }
+
+    /* ── AI card ── */
+    .ai-card {
+      background: linear-gradient(135deg, #1a1f3a, #2d2060);
+      border: 1px solid rgba(240,208,64,.2);
+      border-radius: 8px; padding: 14px 16px;
+    }
+    .ai-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .ai-dot  { width: 8px; height: 8px; border-radius: 50%; background: #f0d040; box-shadow: 0 0 6px #f0d040; }
+    .ai-lbl  { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .12em; color: #f0d040; }
+    .ai-txt  { font-size: 12px; color: rgba(240,208,64,.8); font-family: "Courier New", monospace; line-height: 1.7; }
+
+    /* ── LEDs ── */
+    .leds { display: flex; gap: 7px; }
+    .led  { width: 11px; height: 11px; border-radius: 50%; }
+    .lr   { background: #ff4444; box-shadow: 0 0 5px #ff4444; }
+    .ly   { background: #ffcc00; box-shadow: 0 0 5px #ffcc00; }
+    .lg   { background: #44dd44; box-shadow: 0 0 5px #44dd44; }
+
+    /* ── Type chip strip ── */
+    .type-strip { display: flex; flex-wrap: wrap; gap: 4px; padding: 14px 18px; }
+    .tchip { padding: 3px 9px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+
+    /* ── Model pills ── */
+    .model-pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: #f9e400; border: 2px solid #333; border-radius: 6px;
+      padding: 3px 12px; font-size: 11px; font-weight: 800; color: #1a1a1a;
+    }
+
+    /* ── Note box ── */
+    .note {
+      background: rgba(79,195,247,.06); border: 1px solid rgba(79,195,247,.2);
+      border-radius: 6px; padding: 10px 14px;
+      font-size: 11px; color: rgba(79,195,247,.8); line-height: 1.6;
+    }
+
+    p { font-size: 13px; color: #aaa; line-height: 1.7; }
+
+    footer {
+      margin-top: 24px; border-top: 1px solid #2a2a40;
+      padding-top: 10px; text-align: center;
+      font-size: 11px; color: #444;
+      width: 100%; max-width: 860px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="vtag">▶ Pokédex — Agentic Edition</div>
+<div class="sub">README · Coveo-powered search · Generative Answering · Ollama local LLM</div>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-head">
+      <div class="lens">📡</div>
+      <div>
+        <div class="hero-title">Agentic Pokédex</div>
+        <div class="hero-edition">Agentic Edition — Dark Dashboard</div>
+      </div>
+    </div>
+    <p class="hero-desc">
+      A full-stack Pokédex powered by <strong style="color:#4fc3f7">Coveo Atomic</strong> for enterprise-grade search
+      and a local <strong style="color:#f0d040">Ollama LLM</strong> for on-device generative answers —
+      all wrapped in a slick dark 3-column dashboard. Search any Pokémon by name, type, ability, or natural language;
+      get AI-generated insights from Professor Oak; explore habitats on regional maps; and compare similar Pokémon
+      side-by-side. No build step. No external LLM calls in the hot path. Just Flask + Coveo + local inference.
+    </p>
+    <div class="badge-row">
+      <span class="badge b-blue">Flask 2.x</span>
+      <span class="badge b-gold">Coveo Atomic v3</span>
+      <span class="badge b-green">Ollama</span>
+      <span class="badge b-purple">PokéAPI</span>
+      <span class="badge b-red">Python 3.11+</span>
+      <span class="badge b-blue">Vanilla JS (ESM)</span>
+    </div>
+  </div>
+
+  <!-- ARCHITECTURE -->
+  <div class="card">
+    <div class="card-head">
+      <span class="card-title">Architecture</span>
+      <div class="leds"><div class="led lr"></div><div class="led ly"></div><div class="led lg"></div></div>
+    </div>
+    <div class="arch-grid">
+      <div class="arch-tile">
+        <div class="arch-tile-icon">🔍</div>
+        <div class="arch-tile-name">Coveo Atomic</div>
+        <div class="arch-tile-desc">Web component search engine. Headless engine proxied through Flask — API keys never reach the browser.</div>
+      </div>
+      <div class="arch-tile">
+        <div class="arch-tile-icon">🤖</div>
+        <div class="arch-tile-name">Ollama (local LLM)</div>
+        <div class="arch-tile-desc">llama3, mistral, gemma3, phi4 — any pulled model. Generates grounded RGA answers from Coveo search context.</div>
+      </div>
+      <div class="arch-tile">
+        <div class="arch-tile-icon">🎓</div>
+        <div class="arch-tile-name">Coveo CRGA</div>
+        <div class="arch-tile-desc">Coveo's Relevance Generative Answering (Professor Oak). SSE stream consumed server-side, returned as JSON.</div>
+      </div>
+      <div class="arch-tile">
+        <div class="arch-tile-icon">🗄️</div>
+        <div class="arch-tile-name">Flask API</div>
+        <div class="arch-tile-desc">Thin Python backend. Proxies Coveo REST, streams CRGA, serves the Ollama agent loop, and injects credentials.</div>
+      </div>
+      <div class="arch-tile">
+        <div class="arch-tile-icon">🗺️</div>
+        <div class="arch-tile-name">PokéAPI + Serebii</div>
+        <div class="arch-tile-desc">Stats, moves, types, and encounter locations fetched from PokéAPI. Region maps sourced from Serebii Pokéarth.</div>
+      </div>
+      <div class="arch-tile">
+        <div class="arch-tile-icon">🖼️</div>
+        <div class="arch-tile-name">PokémonDB Artwork</div>
+        <div class="arch-tile-desc">High-res Pokémon artwork from pokemondb.net CDN. Sprite fallback in the sidebar lens and similar-Pokémon grid.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <div class="card">
+    <div class="card-head"><span class="card-title">Features</span></div>
+    <div class="card-body">
+      <div class="feature-list">
+        <div class="fitem">
+          <div class="fdot" style="background:#4fc3f7"></div>
+          <div>
+            <div class="fitem-name">3-Column Dark Dashboard</div>
+            <div class="fitem-desc">Left sidebar (type chips + generation filter + map card), scrollable center column (search, photo, results, similar Pokémon), and a sticky right panel (stats, moves, type effectiveness, AI rec).</div>
+          </div>
+        </div>
+        <div class="fitem">
+          <div class="fdot" style="background:#f0d040"></div>
+          <div>
+            <div class="fitem-name">Natural Language Search</div>
+            <div class="fitem-desc">Ask anything — "fastest fire type", "best water starter", "which Pokémon evolves from Eevee using a fire stone" — powered by Coveo's semantic index with a custom Semantic-PokEncoder KNN ranking function.</div>
+          </div>
+        </div>
+        <div class="fitem">
+          <div class="fdot" style="background:#44dd44"></div>
+          <div>
+            <div class="fitem-name">Dual Generative Answer Modes</div>
+            <div class="fitem-desc">Switch between <strong style="color:#f0d040">Professor Oak (Coveo CRGA)</strong> for cloud-backed answers and any <strong style="color:#4fc3f7">Ollama local model</strong> for fully offline inference. Model selector always visible in the top bar.</div>
+          </div>
+        </div>
+        <div class="fitem">
+          <div class="fdot" style="background:#ec8fe6"></div>
+          <div>
+            <div class="fitem-name">Type &amp; Generation Filters</div>
+            <div class="fitem-desc">Click type chips or generation rows in the sidebar to drive Coveo facets. Selecting a result automatically highlights the Pokémon's types and dims all others.</div>
+          </div>
+        </div>
+        <div class="fitem">
+          <div class="fdot" style="background:#ff9c54"></div>
+          <div>
+            <div class="fitem-name">Habitat Map Card</div>
+            <div class="fitem-desc">After selecting a Pokémon, the sidebar map card shows all game encounter locations grouped by generation and region, with a live Serebii Pokéarth region image and PokéMaps deep-links where available.</div>
+          </div>
+        </div>
+        <div class="fitem">
+          <div class="fdot" style="background:#6f35fc"></div>
+          <div>
+            <div class="fitem-name">Similar Pokémon Grid</div>
+            <div class="fitem-desc">Coveo's "More Like This" returns semantically similar Pokémon. Displayed as 3-column sprite cards below the search results. Click any to instantly pivot the entire dashboard.</div>
+          </div>
+        </div>
+        <div class="fitem">
+          <div class="fdot" style="background:#5a8ea1"></div>
+          <div>
+            <div class="fitem-name">Base Stats · Moves · Type Effectiveness</div>
+            <div class="fitem-desc">Right panel renders animated stat bars (HP/Atk/Def/SpA/SpD/Spe), a scrollable level-up moves table, and a 2-column type matchup grid (Weak To / Strong Against).</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILE MAP -->
+  <div class="card">
+    <div class="card-head"><span class="card-title">File Map</span></div>
+    <div style="overflow-x:auto;">
+      <table class="data-table">
+        <thead><tr><th>File</th><th>Responsibility</th></tr></thead>
+        <tbody>
+          <tr><td class="fname">app.py</td><td class="fdesc">Flask server — all routes, Coveo proxy, CRGA stream handler, Ollama RGA, model selector.</td></tr>
+          <tr><td class="fname">agent.py</td><td class="fdesc">Agentic loop — <code>_coveo_search()</code> retrieves context, <code>generate_rga_answer()</code> asks Ollama, <code>run_agent()</code> orchestrates.</td></tr>
+          <tr><td class="fname">frontend/dashboard.html</td><td class="fdesc">3-column dashboard shell. Atomic search interface + hidden search box. Jinja2 template for org ID injection.</td></tr>
+          <tr><td class="fname">frontend/dashboard.css</td><td class="fdesc">Dark dashboard design system — grid, sidebar, type chips, generation list, map card, photo card, stats, moves, AI card.</td></tr>
+          <tr><td class="fname">frontend/dashboard.js</td><td class="fdesc">Main dashboard controller — Coveo engine init, search orchestration, PokéAPI fetches, type/gen highlight logic, map card, similar Pokémon.</td></tr>
+          <tr><td class="fname">frontend/type-colors.js</td><td class="fdesc">Exported <code>TYPE_COLORS</code> map — canonical Pokémon type → <code>{bg, text}</code> colour pairs.</td></tr>
+          <tr><td class="fname">frontend/index.html</td><td class="fdesc">Original Pokédex-device-shaped UI (red chrome, screen bezel, control row).</td></tr>
+          <tr><td class="fname">frontend/pokedex-atomic.js</td><td class="fdesc">Atomic engine init and Flask proxy bridge for the original device UI.</td></tr>
+          <tr><td class="fname">frontend/pokedex-styles.css</td><td class="fdesc">CSS device chrome for the original Pokédex-shaped UI.</td></tr>
+          <tr><td class="fname">frontend/result-template.js</td><td class="fdesc">Coveo Atomic result template for Pokémon cards.</td></tr>
+          <tr><td class="fname">.env.example</td><td class="fdesc">Template for all required environment variables — copy to <code>.env</code> before running.</td></tr>
+          <tr><td class="fname">eval_cases.json</td><td class="fdesc">Ground-truth query → expected Pokémon pairs for search quality evaluation.</td></tr>
+          <tr><td class="fname">eval_llm_comparison.py</td><td class="fdesc">Head-to-head eval: Coveo CRGA vs Ollama answer quality across eval cases.</td></tr>
+          <tr><td class="fname">tune_cosine_threshold.py</td><td class="fdesc">Threshold tuner for the Semantic-PokEncoder cosine similarity KNN ranking function.</td></tr>
+          <tr><td class="fname">test_e2e_pokedex.py</td><td class="fdesc">End-to-end integration tests against a live Coveo org.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- API ROUTES -->
+  <div class="card">
+    <div class="card-head"><span class="card-title">API Routes</span></div>
+    <div style="overflow-x:auto;">
+      <table class="data-table">
+        <thead><tr><th>Method</th><th>Route</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><span class="method m-get">GET</span></td><td class="rpath">/</td><td class="fdesc">Serves the original Pokédex device UI (<code>index.html</code>).</td></tr>
+          <tr><td><span class="method m-get">GET</span></td><td class="rpath">/dashboard</td><td class="fdesc">Serves the dark 3-column dashboard (<code>dashboard.html</code>). Main app entry point.</td></tr>
+          <tr><td><span class="method m-get">GET</span></td><td class="rpath">/readme</td><td class="fdesc">This page — styled HTML README.</td></tr>
+          <tr><td><span class="method m-get">GET</span></td><td class="rpath">/api/coveo-token</td><td class="fdesc">Returns <code>{token, organizationId}</code>. API key injected server-side — never exposed in HTML/JS.</td></tr>
+          <tr><td><span class="method m-post">POST</span></td><td class="rpath">/api/coveo-proxy</td><td class="fdesc">Proxies Coveo REST calls. Body: <code>{method, path, body}</code>. Injects auth header server-side.</td></tr>
+          <tr><td><span class="method m-post">POST</span></td><td class="rpath">/api/rga</td><td class="fdesc">Ollama RGA. Body: <code>{query, context[]}</code>. Returns <code>{answer}</code>.</td></tr>
+          <tr><td><span class="method m-post">POST</span></td><td class="rpath">/api/rga-coveo</td><td class="fdesc">Coveo CRGA (Professor Oak). Returns <code>{answer, citations}</code>.</td></tr>
+          <tr><td><span class="method m-post">POST</span></td><td class="rpath">/api/ask</td><td class="fdesc">Full agentic loop. Body: <code>{query}</code>. Returns <code>{message, pokemon_list}</code>.</td></tr>
+          <tr><td><span class="method m-post">POST</span></td><td class="rpath">/api/set-model</td><td class="fdesc">Hot-swaps the active Ollama model at runtime. Body: <code>{model}</code>.</td></tr>
+          <tr><td><span class="method m-get">GET</span></td><td class="rpath">/api/models</td><td class="fdesc">Lists all locally pulled Ollama models.</td></tr>
+          <tr><td><span class="method m-get">GET</span></td><td class="rpath">/images/&lt;filename&gt;</td><td class="fdesc">Serves artwork from local <code>pokemon_images/</code> directory.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SETUP + ENV VARS -->
+  <div class="two-col">
+    <div class="card">
+      <div class="card-head"><span class="card-title">Environment Variables</span></div>
+      <div class="card-body">
+        <div class="env-list">
+          <div class="env-row"><span class="env-key">COVEO_ACCESS_TOKEN</span><span class="env-val">Coveo API key (search + CRGA)</span></div>
+          <div class="env-row"><span class="env-key">COVEO_ORGANIZATION_ID</span><span class="env-val">Coveo org ID</span></div>
+          <div class="env-row"><span class="env-key">COVEO_PIPELINE</span><span class="env-val">Query pipeline (default: <code>default</code>)</span></div>
+          <div class="env-row"><span class="env-key">COVEO_RGA_PIPELINE</span><span class="env-val">RGA-enabled pipeline (default: <code>default</code>)</span></div>
+          <div class="env-row"><span class="env-key">COVEO_SEARCH_HUB</span><span class="env-val">Search hub (default: <code>PokedexUI</code>)</span></div>
+          <div class="env-row"><span class="env-key">OLLAMA_MODEL</span><span class="env-val">Default model (e.g. <code>llama3</code>)</span></div>
+          <div class="env-row"><span class="env-key">OLLAMA_BASE_URL</span><span class="env-val">Ollama host (default: <code>http://localhost:11434</code>)</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-title">Quick Start</span></div>
+      <div class="card-body">
+        <div class="step-list">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <div class="step-title">Clone &amp; create virtualenv</div>
+              <div class="step-detail"><code>git clone &lt;repo&gt; &amp;&amp; cd pokedex</code><br/><code>python -m venv .venv &amp;&amp; source .venv/bin/activate</code></div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-body">
+              <div class="step-title">Install dependencies</div>
+              <div class="step-detail"><code>pip install flask flask-cors python-dotenv requests ollama</code></div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-body">
+              <div class="step-title">Configure environment</div>
+              <div class="step-detail">Copy <code>.env.example</code> → <code>.env</code> and fill in your Coveo credentials.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-body">
+              <div class="step-title">Pull an Ollama model</div>
+              <div class="step-detail"><code>ollama pull llama3</code></div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">5</div>
+            <div class="step-body">
+              <div class="step-title">Run</div>
+              <div class="step-detail"><code>python app.py</code> — open <code>http://127.0.0.1:5003/dashboard</code></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TYPE PALETTE -->
+  <div class="card">
+    <div class="card-head"><span class="card-title">Type Colour Palette</span></div>
+    <div class="type-strip">
+      <span class="tchip" style="background:#FF9C54;color:#7C1F00">Fire</span>
+      <span class="tchip" style="background:#4FC1FF;color:#003A7C">Water</span>
+      <span class="tchip" style="background:#63BB5B;color:#1A4A00">Grass</span>
+      <span class="tchip" style="background:#F3D23B;color:#5A3E00">Electric</span>
+      <span class="tchip" style="background:#FF6B81;color:#5A0020">Psychic</span>
+      <span class="tchip" style="background:#74CEC0;color:#003A38">Ice</span>
+      <span class="tchip" style="background:#6F35FC;color:#EDE9FF">Dragon</span>
+      <span class="tchip" style="background:#5A5365;color:#EDE9FF">Dark</span>
+      <span class="tchip" style="background:#EC8FE6;color:#5A005A">Fairy</span>
+      <span class="tchip" style="background:#CE4069;color:#fff">Fighting</span>
+      <span class="tchip" style="background:#AB6AC8;color:#fff">Poison</span>
+      <span class="tchip" style="background:#D97845;color:#fff">Ground</span>
+      <span class="tchip" style="background:#C9B78B;color:#3A2800">Rock</span>
+      <span class="tchip" style="background:#90C12C;color:#213800">Bug</span>
+      <span class="tchip" style="background:#5269AC;color:#fff">Ghost</span>
+      <span class="tchip" style="background:#5A8EA1;color:#fff">Steel</span>
+      <span class="tchip" style="background:#9099A1;color:#fff">Normal</span>
+      <span class="tchip" style="background:#89AAE3;color:#001A5A">Flying</span>
+    </div>
+  </div>
+
+  <!-- MODELS -->
+  <div class="card">
+    <div class="card-head"><span class="card-title">Supported Models</span></div>
+    <div class="card-body" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+      <div class="model-pill">▼ Professor-Oak (Coveo)</div>
+      <div class="model-pill">▼ llama3</div>
+      <div class="model-pill">▼ llama3.1</div>
+      <div class="model-pill">▼ mistral</div>
+      <div class="model-pill">▼ gemma3</div>
+      <div class="model-pill">▼ phi4</div>
+      <p style="font-size:11px;color:#555;margin-top:4px;width:100%;">Any model available in your local Ollama instance will also appear. Use <code>ollama pull &lt;model&gt;</code> to add more.</p>
+    </div>
+  </div>
+
+  <!-- AI NOTE -->
+  <div class="ai-card">
+    <div class="ai-head"><div class="ai-dot"></div><span class="ai-lbl">Professor Oak's Note</span></div>
+    <div class="ai-txt">
+      The AI answer pipeline selects the model based on the dropdown at the top of the dashboard.
+      Choose <strong>Professor-Oak (Coveo)</strong> for cloud-backed CRGA answers with inline citations,
+      or any local Ollama model for fully offline, grounded RAG using Coveo search results as context.
+      The server-side agent loop in <code>agent.py</code> always retrieves real Pokémon data from the
+      Coveo index before generating — it never hallucinates from weights alone.
+    </div>
+  </div>
+
+  <!-- SECURITY NOTE -->
+  <div class="note">
+    <strong>Security:</strong> Coveo API keys are never exposed to the browser. The <code>/api/coveo-proxy</code> and
+    <code>/api/rga-coveo</code> routes inject the <code>COVEO_ACCESS_TOKEN</code> header server-side for every request.
+    The <code>/api/coveo-token</code> endpoint returns only what Coveo Atomic needs to initialise its headless engine.
+  </div>
+
+</div><!-- /.wrap -->
+
+<footer style="margin-top:24px;border-top:1px solid #2a2a40;padding-top:10px;text-align:center;font-size:11px;color:#444;width:100%;max-width:860px;">
+  Agentic Pokédex · Coveo + Ollama + Flask
+</footer>
+
+</body>
+</html>

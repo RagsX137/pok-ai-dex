@@ -35,6 +35,11 @@ def dashboard():
     return render_template_string(html, COVEO_ORGANIZATION_ID=COVEO_ORG)
 
 
+@app.route("/readme")
+def readme():
+    return send_from_directory(FRONTEND_DIR, "readme.html")
+
+
 @app.route("/frontend/<path:filename>")
 def frontend_static(filename):
     return send_from_directory(FRONTEND_DIR, filename)
