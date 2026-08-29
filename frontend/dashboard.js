@@ -415,11 +415,14 @@ async function selectResult(result, autoSelect) {
   setPhotoName(name, poke.id);
   updatePhotoCard(artworkUrl, name, poke.id, poke.types[0]);
 
-  // V2: update the sidebar circle with the PokeAPI sprite (fades in over the blue gradient)
+  // V2: swap the blue circle for the PokeAPI sprite
   const headerSprite = document.getElementById('header-sprite');
   if (headerSprite) {
-    headerSprite.src = poke.sprite || pokemonDbSpriteUrl(name);
+    const spriteUrl = poke.sprite || pokemonDbSpriteUrl(name);
     headerSprite.alt = name;
+    headerSprite.onload = () => { headerSprite.style.opacity = '1'; };
+    headerSprite.onerror = () => { headerSprite.style.opacity = '0'; };
+    headerSprite.src = spriteUrl;
   }
 
   // Right panel
