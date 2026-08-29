@@ -16,14 +16,21 @@
 <atomic-search-interface id="atomic-search-interface">
 
 <div class="vtag">▶ Pokédex — Dark Dashboard</div>
-<div class="sub">Coveo-powered search · Generative Answering · PokéAPI live data</div>
+<div class="sub">Coveo-powered search · Generative Answering · artwork from pokemondb.net</div>
 
 <div class="dash">
 
   <!-- ══════════════ LEFT SIDEBAR ══════════════ -->
   <div class="sidebar">
     <div class="sb-head">
-      <div class="sb-lens"></div>
+      <!-- sb-lens wraps both the default blue circle AND the V2 sprite overlay -->
+      <div class="sb-lens" id="sb-lens-wrap">
+        <img id="header-sprite"
+             src=""
+             alt=""
+             style="display:none;width:100%;height:100%;object-fit:contain;border-radius:50%;"
+             onerror="this.style.display='none'" />
+      </div>
       <div>
         <div class="sb-title">Pokédex</div>
         <div class="sb-sub">Agentic Edition</div>
