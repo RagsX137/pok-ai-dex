@@ -60,17 +60,22 @@
     <!-- Map / habitat card -->
     <div class="map-card" id="map-card">
       <div class="map-grid-bg"></div>
-      <div class="map-title">📍 Map Location</div>
+      <!-- header: label + external link -->
+      <div class="map-header">
+        <span class="map-title">Map Location</span>
+        <span id="map-sub"></span><!-- filled by JS with anchor tag -->
+      </div>
+      <!-- gen × region toggle buttons (scrollable row) -->
       <div class="gen-toggles" id="map-gen-toggles">
-        <div class="gtbtn on" data-mapgen="1">Gen I</div>
-        <div class="gtbtn" data-mapgen="2">Gen II</div>
-        <div class="gtbtn" data-mapgen="3">Gen III</div>
-        <div class="gtbtn" data-mapgen="go">GO</div>
+        <!-- Dynamically populated by dashboard.js -->
       </div>
-      <div class="map-pills" id="map-pills">
-        <span class="mpill">—</span>
+      <!-- region map image -->
+      <div class="map-region-wrap" id="map-region-wrap" style="display:none;">
+        <img id="map-region-img" class="map-region-img" alt="Region map" onerror="this.style.display='none'" />
+        <div class="map-region-label" id="map-region-label"></div>
       </div>
-      <div class="map-sub">Select a Pokémon to see habitat</div>
+      <!-- location pills -->
+      <div class="map-pills" id="map-pills"></div>
     </div>
   </div>
 

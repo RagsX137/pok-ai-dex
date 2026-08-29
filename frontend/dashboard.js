@@ -39,6 +39,100 @@ const GEN_MAP = {
 };
 
 // ─────────────────────────────────────────────────────────────
+// PokéAPI game version → { gen (number 1–9), region label }
+// Used to group encounter locations by generation for the map card.
+// ─────────────────────────────────────────────────────────────
+// PokéAPI version name → { gen, region }
+// Rules:
+//  - Remakes are filed under their ORIGINAL generation so e.g. HGSS Johto
+//    encounters appear as "Gen II · Johto" not "Gen IV · Johto".
+//  - FRLG / BDSP / ORAS / LGPE are likewise under their source gen.
+//  - This means a toggle button for "Gen II · Johto" correctly aggregates
+//    both original GSC encounters AND HGSS encounter data.
+const VERSION_GEN = {
+  // Gen I — Kanto
+  'red':              { gen: 1, region: 'Kanto' },
+  'blue':             { gen: 1, region: 'Kanto' },
+  'yellow':           { gen: 1, region: 'Kanto' },
+  'red-japan':        { gen: 1, region: 'Kanto' },
+  'green-japan':      { gen: 1, region: 'Kanto' },
+  'firered':          { gen: 1, region: 'Kanto' },   // FRLG = Kanto remake
+  'leafgreen':        { gen: 1, region: 'Kanto' },
+  'lets-go-pikachu':  { gen: 1, region: 'Kanto' },   // LGPE = Kanto remake
+  'lets-go-eevee':    { gen: 1, region: 'Kanto' },
+  // Gen II — Johto
+  'gold':             { gen: 2, region: 'Johto' },
+  'silver':           { gen: 2, region: 'Johto' },
+  'crystal':          { gen: 2, region: 'Johto' },
+  'heartgold':        { gen: 2, region: 'Johto' },   // HGSS = Johto remake
+  'soulsilver':       { gen: 2, region: 'Johto' },
+  // Gen III — Hoenn
+  'ruby':             { gen: 3, region: 'Hoenn' },
+  'sapphire':         { gen: 3, region: 'Hoenn' },
+  'emerald':          { gen: 3, region: 'Hoenn' },
+  'omega-ruby':       { gen: 3, region: 'Hoenn' },   // ORAS = Hoenn remake
+  'alpha-sapphire':   { gen: 3, region: 'Hoenn' },
+  // Gen IV — Sinnoh
+  'diamond':          { gen: 4, region: 'Sinnoh' },
+  'pearl':            { gen: 4, region: 'Sinnoh' },
+  'platinum':         { gen: 4, region: 'Sinnoh' },
+  'brilliant-diamond':{ gen: 4, region: 'Sinnoh' },  // BDSP = Sinnoh remake
+  'shining-pearl':    { gen: 4, region: 'Sinnoh' },
+  // Gen V — Unova
+  'black':            { gen: 5, region: 'Unova' },
+  'white':            { gen: 5, region: 'Unova' },
+  'black-2':          { gen: 5, region: 'Unova' },
+  'white-2':          { gen: 5, region: 'Unova' },
+  // Gen VI — Kalos / Hoenn (ORAS)
+  'x':                { gen: 6, region: 'Kalos' },
+  'y':                { gen: 6, region: 'Kalos' },
+  // Gen VII — Alola
+  'sun':              { gen: 7, region: 'Alola' },
+  'moon':             { gen: 7, region: 'Alola' },
+  'ultra-sun':        { gen: 7, region: 'Alola' },
+  'ultra-moon':       { gen: 7, region: 'Alola' },
+  // Gen VIII — Galar / Hisui
+  'sword':            { gen: 8, region: 'Galar' },
+  'shield':           { gen: 8, region: 'Galar' },
+  'legends-arceus':   { gen: 8, region: 'Hisui' },
+  // Gen IX — Paldea
+  'scarlet':          { gen: 9, region: 'Paldea' },
+  'violet':           { gen: 9, region: 'Paldea' },
+};
+
+// Region → best available map image (Bulbapedia archives — confirmed live)
+// Preference: newest high-quality remake > original, artwork > schematic map
+const REGION_MAP_IMG = {
+  'Kanto':  'https://archives.bulbagarden.net/media/upload/d/d4/FRLG_Kanto.png',
+  'Johto':  'https://archives.bulbagarden.net/media/upload/c/c2/HGSS_JohtoKanto.jpg',
+  'Hoenn':  'https://archives.bulbagarden.net/media/upload/8/80/Hoenn_ORAS_Map.png',
+  'Sinnoh': 'https://archives.bulbagarden.net/media/upload/0/08/Sinnoh_BDSP_artwork.png',
+  'Unova':  'https://archives.bulbagarden.net/media/upload/0/01/Unova_B2W2.png',
+  'Kalos':  'https://archives.bulbagarden.net/media/upload/b/b1/Kalos_Pok%C3%A9dex_map.png',
+  'Alola':  'https://archives.bulbagarden.net/media/upload/0/0b/Alola_USUM_artwork.png',
+  'Galar':  'https://archives.bulbagarden.net/media/upload/c/ce/Galar_artwork.png',
+  'Hisui':  'https://archives.bulbagarden.net/media/upload/2/22/Legends_Arceus_Hisui.png',
+  'Paldea': 'https://archives.bulbagarden.net/media/upload/f/fd/Paldea_artwork.png',
+};
+
+// Regions that have an interactive PokéMaps page (pokemaps.net)
+// Deep-link: https://pokemaps.net/pokemon/{pokemonName}
+const POKEMAPS_REGIONS = new Set(['Kanto', 'Johto', 'Hoenn', 'Paldea']);
+
+// Gen number → label shown on toggle buttons
+const GEN_LABEL = {
+  1: 'Gen I', 2: 'Gen II', 3: 'Gen III', 4: 'Gen IV', 5: 'Gen V',
+  6: 'Gen VI', 7: 'Gen VII', 8: 'Gen VIII', 9: 'Gen IX',
+};
+
+// Pokémon's origin generation (from Coveo `generation` field like "gen-i")
+// → number, for defaulting the map toggle
+const ORIGIN_GEN_NUM = {
+  'gen-i': 1, 'gen-ii': 2, 'gen-iii': 3, 'gen-iv': 4,
+  'gen-v': 5, 'gen-vi': 6, 'gen-vii': 7, 'gen-viii': 8, 'gen-ix': 9,
+};
+
+// ─────────────────────────────────────────────────────────────
 // PokéDB artwork helpers
 // ─────────────────────────────────────────────────────────────
 
@@ -250,31 +344,233 @@ function wireGenList() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// 3. Map card — gen toggle buttons (UI only, updates map pills)
+// 3. Map card — encounters grouped by gen, dynamic toggle buttons
 // ─────────────────────────────────────────────────────────────
-function wireMapToggles() {
-  document.querySelectorAll('.gtbtn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.gtbtn').forEach(b => b.classList.remove('on'));
-      btn.classList.add('on');
-    });
-  });
+
+// Region name → location-area prefix(es) that belong to it.
+// PokéAPI area names are prefixed by region (e.g. "kanto-route-2-...",
+// "johto-route-30-..."). A handful of areas use different conventions.
+const REGION_AREA_PREFIXES = {
+  'Kanto':  ['kanto-', 'viridian-', 'pallet-', 'pewter-', 'cerulean-', 'vermilion-',
+             'lavender-', 'celadon-', 'fuchsia-', 'saffron-', 'cinnabar-', 'one-island-',
+             'two-island-', 'three-island-', 'four-island-', 'five-island-', 'six-island-',
+             'seven-island-', 'berry-forest-', 'bond-bridge-', 'pattern-bush-',
+             'mt-ember-', 'lost-cave-', 'memorial-pillar-'],
+  'Johto':  ['johto-', 'new-bark-', 'cherrygrove-', 'violet-city-', 'azalea-', 'goldenrod-',
+             'ecruteak-', 'olivine-', 'cianwood-', 'mahogany-', 'blackthorn-', 'safari-zone-johto',
+             'ilex-forest-', 'national-park-', 'mt-mortar-', 'lake-of-rage-', 'mt-silver-',
+             'bell-tower-', 'burned-tower-', 'tin-tower-', 'whirl-islands-', 'slowpoke-well-',
+             'union-cave-', 'ruins-of-alph-', 'dark-cave-', 'ice-path-', 'dragons-den-',
+             'mt-moon-johto', 'unknown-all-bugs-'],
+  'Hoenn':  ['hoenn-', 'littleroot-', 'oldale-', 'petalburg-', 'rustboro-', 'dewford-',
+             'slateport-', 'mauville-', 'verdanturf-', 'fallarbor-', 'lavaridge-', 'fortree-',
+             'lilycove-', 'mossdeep-', 'sootopolis-', 'ever-grande-', 'battle-frontier-hoenn',
+             'sky-pillar-', 'cave-of-origin-', 'seafloor-cavern-', 'mt-chimney-',
+             'fiery-path-', 'meteor-falls-', 'rusturf-tunnel-', 'granite-cave-',
+             'desert-ruins-', 'island-cave-', 'ancient-tomb-', 'shoal-cave-',
+             'new-mauville-', 'abandoned-ship-', 'sea-mauville-', 'mirage-'],
+  'Sinnoh': ['sinnoh-', 'twinleaf-', 'sandgem-', 'jubilife-', 'oreburgh-', 'floaroma-',
+             'eterna-', 'hearthome-', 'solaceon-', 'veilstone-', 'pastoria-', 'celestic-',
+             'canalave-', 'snowpoint-', 'sunyshore-', 'pokemon-league-sinnoh',
+             'lake-verity-', 'lake-valor-', 'lake-acuity-', 'mt-coronet-',
+             'great-marsh-', 'fuego-ironworks-', 'old-chateau-', 'iron-island-',
+             'snowpoint-temple-', 'stark-mountain-', 'sendoff-spring-', 'turnback-cave-',
+             'wayward-cave-', 'ravaged-path-', 'oreburgh-mine-', 'valley-windworks-'],
+  'Unova':  ['unova-', 'nuvema-', 'accumula-', 'striaton-', 'nacrene-', 'castelia-',
+             'nimbasa-', 'driftveil-', 'mistralton-', 'icirrus-', 'opelucid-', 'lacunosa-',
+             'undella-', 'black-city-', 'white-forest-', 'anville-', 'floccesy-',
+             'aspertia-', 'virbank-', 'humilau-', 'lentimas-', 'reversal-mountain-',
+             'relic-castle-', 'twist-mountain-', 'dragonspiral-tower-', 'moor-of-icirrus-',
+             'giant-chasm-', 'victory-road-unova', 'abundant-shrine-', 'nature-preserve-'],
+  'Kalos':  ['kalos-', 'vaniville-', 'aquacorde-', 'santalune-', 'lumiose-', 'camphrier-',
+             'ambrette-', 'cyllage-', 'geosenge-', 'shalour-', 'azure-bay-', 'coumarine-',
+             'laverre-', 'dendemille-', 'anistar-', 'couriway-', 'snowbelle-',
+             'pokemon-village-', 'victory-road-kalos', 'kiloude-', 'terminus-cave-'],
+  'Alola':  ['alola-', 'melemele-', 'akala-', 'ula-ula-', 'poni-', 'lush-jungle-',
+             'vast-poni-canyon-', 'resolution-cave-', 'ruins-of-conflict-',
+             'ruins-of-life-', 'ruins-of-abundance-', 'ruins-of-hope-',
+             'mount-hokulani-', 'po-town-', 'aether-'],
+  'Galar':  ['galar-', 'postwick-', 'wedgehurst-', 'motostoke-', 'turffield-',
+             'hulbury-', 'hammerlocke-', 'stow-on-side-', 'ballonlea-', 'circhester-',
+             'spikemuth-', 'wyndon-', 'wild-area-', 'rolling-fields-', 'dappled-grove-',
+             'watchtower-ruins-', 'east-lake-axewell-', 'west-lake-axewell-',
+             'axew-s-eye-', 'south-lake-miloch-', 'motostoke-riverbank-',
+             'bridge-field-', 'stony-wilderness-', 'dusty-bowl-', 'giant-s-mirror-',
+             'hammerlocke-hills-', 'giant-s-cap-', 'lake-of-outrage-',
+             'isle-of-armor-', 'crown-tundra-'],
+  'Hisui':  ['hisui-', 'jubilife-village-', 'obsidian-fieldlands-', 'crimson-mirelands-',
+             'cobalt-coastlands-', 'coronet-highlands-', 'alabaster-icelands-'],
+  'Paldea': ['paldea-', 'cabo-poco-', 'los-platos-', 'mesagoza-', 'artazon-',
+             'levincia-', 'cascarrafa-', 'medali-', 'montenevera-', 'alfornada-',
+             'glaseado-', 'area-zero-'],
+};
+
+/**
+ * Return true if a PokéAPI location-area name belongs to the given region.
+ * Falls back to permissive (true) so unknown areas are never silently dropped.
+ */
+function areaMatchesRegion(areaName, region) {
+  const prefixes = REGION_AREA_PREFIXES[region];
+  if (!prefixes) return true;  // unknown region → show everything
+  const lower = areaName.toLowerCase();
+  return prefixes.some(p => lower.startsWith(p));
 }
 
-function updateMapCard(locationAreas) {
-  const pills = document.getElementById('map-pills');
-  if (!pills) return;
-  if (!locationAreas || locationAreas.length === 0) {
-    pills.innerHTML = '<span class="mpill">Unknown</span>';
+/**
+ * Fetch encounters from PokéAPI and group by (gen, region) pairs.
+ *
+ * Key insight: a game version maps to exactly one gen+region. HGSS → gen 2 Johto.
+ * Within that bucket, we only include location areas whose name actually belongs
+ * to that region (e.g. johto-route-* yes, kanto-route-* no — even though the
+ * game lets you visit both, the encounter belongs to its region's geography).
+ *
+ * Returns: Map<"gen:region", { gen, region, locations: string[] }>
+ *   sorted by gen asc, then region alphabetically.
+ */
+async function fetchLocationsByGen(pokemonId) {
+  try {
+    const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonId}/encounters`);
+    if (!r.ok) return new Map();
+    const data = await r.json();
+
+    // group: "gen:region" → Set of matching location area names
+    const grouped = new Map();
+    for (const entry of data) {
+      const areaName = entry.location_area?.name ?? '';
+      if (!areaName) continue;
+      for (const vd of entry.version_details) {
+        const vInfo = VERSION_GEN[vd.version.name];
+        if (!vInfo) continue;
+        // Only add this area if it actually belongs to this region
+        if (!areaMatchesRegion(areaName, vInfo.region)) continue;
+        const key = `${vInfo.gen}:${vInfo.region}`;
+        if (!grouped.has(key)) grouped.set(key, { gen: vInfo.gen, region: vInfo.region, locs: new Set() });
+        grouped.get(key).locs.add(areaName);
+      }
+    }
+
+    // Sort: gen asc, then region name asc within same gen
+    const sorted = [...grouped.entries()].sort(([, a], [, b]) =>
+      a.gen !== b.gen ? a.gen - b.gen : a.region.localeCompare(b.region)
+    );
+
+    const result = new Map();
+    for (const [key, { gen, region, locs }] of sorted) {
+      result.set(key, {
+        gen,
+        region,
+        locations: [...locs].map(n =>
+          n.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+        ).sort(),
+      });
+    }
+    return result;
+  } catch { return new Map(); }
+}
+
+// Module-level state: encounter slots + Pokémon name for the active selection
+let _currentEncountersByGen = new Map();   // Map<"gen:region", {...}>
+let _currentPokemonName = '';
+
+/**
+ * Build the gen toggle buttons from encounter data and wire their clicks.
+ * Default: prefer the Pokémon's origin gen (lowest region key for that gen),
+ * else the first entry overall.
+ */
+function buildMapToggles(encountersByGen, originGen) {
+  const togglesEl = document.getElementById('map-gen-toggles');
+  if (!togglesEl) return;
+
+  const entries = [...encountersByGen.keys()];  // already sorted
+
+  if (!entries.length) {
+    togglesEl.innerHTML = '<span class="gtbtn-none">No wild encounter data</span>';
+    renderMapForKey(null);
     return;
   }
-  pills.innerHTML = locationAreas.slice(0, 4).map(loc => {
-    const name = loc.location_area?.name ?? loc.name ?? '?';
-    const label = name.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-    return `<span class="mpill">${label}</span>`;
+
+  // Pick which key to activate: first key whose gen matches originGen, else first
+  const defaultKey = entries.find(k => encountersByGen.get(k).gen === originGen) ?? entries[0];
+
+  togglesEl.innerHTML = entries.map(key => {
+    const { gen, region } = encountersByGen.get(key);
+    return `<div class="gtbtn${key === defaultKey ? ' on' : ''}" data-mapkey="${key}">`
+         + `<span class="gtbtn-gen">${GEN_LABEL[gen] ?? `Gen ${gen}`}</span>`
+         + `<span class="gtbtn-region">${region}</span>`
+         + `</div>`;
   }).join('');
+
+  togglesEl.querySelectorAll('.gtbtn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      togglesEl.querySelectorAll('.gtbtn').forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+      renderMapForKey(btn.dataset.mapkey);
+    });
+  });
+
+  renderMapForKey(defaultKey);
 }
 
+/**
+ * Render the map image + location pills for the given "gen:region" key.
+ */
+function renderMapForKey(key) {
+  const data   = key ? _currentEncountersByGen.get(key) : null;
+  const pills  = document.getElementById('map-pills');
+  const wrap   = document.getElementById('map-region-wrap');
+  const img    = document.getElementById('map-region-img');
+  const label  = document.getElementById('map-region-label');
+  const subEl  = document.getElementById('map-sub');
+
+  if (!data) {
+    if (pills) pills.innerHTML = '<span class="mpill">No encounter data</span>';
+    if (wrap)  wrap.style.display = 'none';
+    if (subEl) subEl.innerHTML = '';
+    return;
+  }
+
+  const { gen, region, locations } = data;
+
+  // Region map image — Bulbapedia high-res
+  const mapUrl = REGION_MAP_IMG[region];
+  if (wrap && img && mapUrl) {
+    // Only reload if the source changed (avoids flicker on pill-only updates)
+    if (img.dataset.region !== region) {
+      img.src = mapUrl;
+      img.dataset.region = region;
+      // Reset pan position when the region changes
+      img.style.transform = 'translate(0px, 0px)';
+      img.dataset.panX = '0';
+      img.dataset.panY = '0';
+    }
+    img.style.display = '';
+    if (label) label.textContent = region;
+    wrap.style.display = '';
+  } else if (wrap) {
+    wrap.style.display = 'none';
+  }
+
+  // Location pills — cap at 5 to keep the card compact
+  if (pills) {
+    const shown = locations.slice(0, 5);
+    const extra = locations.length - shown.length;
+    pills.innerHTML = shown.map(loc => `<span class="mpill">${loc}</span>`).join('')
+      + (extra > 0 ? `<span class="mpill mpill-more">+${extra} more</span>` : '');
+  }
+
+  // Sub-label with external link
+  if (subEl) {
+    const slug = _currentPokemonName.toLowerCase();
+    const href = POKEMAPS_REGIONS.has(region) && slug
+      ? `https://pokemaps.net/pokemon/${slug}`
+      : `https://www.serebii.net/pokearth/${region.toLowerCase()}/`;
+    const linkText = POKEMAPS_REGIONS.has(region) ? 'PokéMaps ↗' : 'Pokéarth ↗';
+    subEl.innerHTML = `<a class="map-ext-link" href="${href}" target="_blank" rel="noopener">${linkText}</a>`;
+  }
+}
+
+// Keep fetchLocationAreas as a thin shim (no longer called internally,
+// but kept to avoid breaking any future callers)
 async function fetchLocationAreas(pokemonId) {
   try {
     const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonId}/encounters`);
@@ -354,6 +650,12 @@ function wireSearchBar() {
 // ─────────────────────────────────────────────────────────────
 // 7. Subscribe to Coveo engine state → render results list
 // ─────────────────────────────────────────────────────────────
+// Tracks the result index the user has explicitly selected (or 0 for the
+// auto-selected first result on a fresh search).  Used by both the engine
+// subscription and renderResultsList so they always agree on which row is
+// active and never clobber a user-chosen selection.
+let _selectedIndex = 0;
+
 function wireEngineSubscription() {
   const si = document.querySelector('atomic-search-interface');
   if (!si) return;
@@ -380,17 +682,28 @@ function wireEngineSubscription() {
 
       if (!justFinished) return;
 
-      // Render results list
-      renderResultsList(results, total);
+      const queryChanged = query !== lastQuery;
 
-      // Auto-select the top result
-      if (results.length > 0) {
-        selectResult(results[0], true);
+      // New text query → reset selection to the top result.
+      // Filter/facet update (same query) → keep whatever index the user chose.
+      if (queryChanged) {
+        _selectedIndex = 0;
+        lastQuery = query;
       }
 
-      // Fire RGA when query changed
-      if (query && query !== lastQuery) {
-        lastQuery = query;
+      // Render results list, honouring the current selection index.
+      renderResultsList(results, total);
+
+      // Auto-select top result on a fresh search; on a filter update just
+      // re-select whatever _selectedIndex already points at so the panel
+      // stays in sync if the result set shifted.
+      if (results.length > 0) {
+        const idx = Math.min(_selectedIndex, results.length - 1);
+        selectResult(results[idx], !queryChanged);
+      }
+
+      // Fire RGA only on new text searches
+      if (queryChanged && query) {
         const q = document.getElementById('search-input');
         if (q && !q.value) q.value = query;
         fetchRGA(query, results);
@@ -416,25 +729,30 @@ function renderResultsList(results, total) {
     return;
   }
 
+  // Use _selectedIndex as source of truth for which row is highlighted,
+  // rather than always stamping index 0 as selected.
+  const activeSel = Math.min(_selectedIndex, results.length - 1);
+
   list.innerHTML = results.map((r, i) => {
     const name  = extractPokemonName(r.title);
     const type1 = r.raw?.type1 ?? '';
     const type2 = r.raw?.type2 ?? '';
     return `
-      <div class="ritem${i === 0 ? ' sel' : ''}" data-index="${i}">
+      <div class="ritem${i === activeSel ? ' sel' : ''}" data-index="${i}">
         <span class="rname">${name}</span>
         ${typeBadgeHtml(type1)}
         ${type2 ? typeBadgeHtml(type2) : ''}
       </div>`;
   }).join('');
 
-  // Wire click handlers
+  // Wire click handlers — update _selectedIndex so the subscription
+  // knows the user's choice if a subsequent filter update arrives.
   list.querySelectorAll('.ritem').forEach(item => {
     item.addEventListener('click', () => {
       list.querySelectorAll('.ritem').forEach(i => i.classList.remove('sel'));
       item.classList.add('sel');
-      const idx = parseInt(item.dataset.index, 10);
-      selectResult(results[idx], false);
+      _selectedIndex = parseInt(item.dataset.index, 10);
+      selectResult(results[_selectedIndex], false);
     });
   });
 }
@@ -507,9 +825,16 @@ async function selectResult(result, autoSelect) {
   highlightActiveTypes(poke.types);
   highlightActiveGenerations(result.raw?.generation ?? null);
 
-  // Map location
-  const locations = await fetchLocationAreas(poke.id);
-  updateMapCard(locations);
+  // Map location — fetch grouped by gen, then build dynamic toggles
+  const originGenNum = ORIGIN_GEN_NUM[
+    (Array.isArray(result.raw?.generation)
+      ? result.raw.generation[0]
+      : result.raw?.generation ?? ''
+    ).toLowerCase().trim()
+  ] ?? null;
+  _currentPokemonName = name;
+  _currentEncountersByGen = await fetchLocationsByGen(poke.id);
+  buildMapToggles(_currentEncountersByGen, originGenNum);
 
   // Similar Pokémon (same primary type)
   renderSimilarPokemon(poke.types[0], name);
@@ -820,14 +1145,82 @@ function wireModelSelector() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// 18. Boot
+// 18. Map drag-to-pan
+// Mouse and touch drag inside the map-region-wrap container.
+// The image is larger than the container; overflow is hidden in CSS.
+// ─────────────────────────────────────────────────────────────
+function wireMapPan() {
+  const wrap = document.getElementById('map-region-wrap');
+  const img  = document.getElementById('map-region-img');
+  if (!wrap || !img) return;
+
+  let dragging = false;
+  let startX = 0, startY = 0;
+  let originX = 0, originY = 0;
+
+  function clamp(val, min, max) { return Math.max(min, Math.min(max, val)); }
+
+  function panTo(x, y) {
+    // img is rendered at 180% width via CSS; measure the actual rendered size
+    const imgRect  = img.getBoundingClientRect();
+    const wrapRect = wrap.getBoundingClientRect();
+    const overX = Math.max(0, imgRect.width  - wrapRect.width)  / 2;
+    const overY = Math.max(0, imgRect.height - wrapRect.height) / 2;
+    const cx = clamp(x, -overX, overX);
+    const cy = clamp(y, -overY, overY);
+    img.style.transform = `translate(${cx}px, ${cy}px)`;
+    img.dataset.panX = String(cx);
+    img.dataset.panY = String(cy);
+  }
+
+  // Mouse
+  wrap.addEventListener('mousedown', e => {
+    dragging = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    originX = parseFloat(img.dataset.panX) || 0;
+    originY = parseFloat(img.dataset.panY) || 0;
+    wrap.style.cursor = 'grabbing';
+    e.preventDefault();
+  });
+  window.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    panTo(originX + (e.clientX - startX), originY + (e.clientY - startY));
+  });
+  window.addEventListener('mouseup', () => {
+    if (!dragging) return;
+    dragging = false;
+    wrap.style.cursor = 'grab';
+  });
+
+  // Touch
+  wrap.addEventListener('touchstart', e => {
+    const t = e.touches[0];
+    dragging = true;
+    startX = t.clientX;
+    startY = t.clientY;
+    originX = parseFloat(img.dataset.panX) || 0;
+    originY = parseFloat(img.dataset.panY) || 0;
+    e.preventDefault();
+  }, { passive: false });
+  wrap.addEventListener('touchmove', e => {
+    if (!dragging) return;
+    const t = e.touches[0];
+    panTo(originX + (t.clientX - startX), originY + (t.clientY - startY));
+    e.preventDefault();
+  }, { passive: false });
+  wrap.addEventListener('touchend', () => { dragging = false; });
+}
+
+// ─────────────────────────────────────────────────────────────
+// 19. Boot
 // ─────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
   buildTypeGrid();
   wireGenList();
-  wireMapToggles();
   wireSearchBar();
   wireModelSelector();
+  wireMapPan();
 
   // Wire subscription BEFORE initAtomic so the trySubscribe loop can catch
   // the engine as soon as it exists, and picks up the executeFirstSearch result.
