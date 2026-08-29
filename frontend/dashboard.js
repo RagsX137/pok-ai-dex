@@ -752,7 +752,12 @@ function renderResultsList(results, total) {
       list.querySelectorAll('.ritem').forEach(i => i.classList.remove('sel'));
       item.classList.add('sel');
       _selectedIndex = parseInt(item.dataset.index, 10);
-      selectResult(results[_selectedIndex], false);
+      const selected = results[_selectedIndex];
+      selectResult(selected, false);
+      // RGA is normally triggered by a new text search; when the user picks
+      // a different result from the list we need to fire it explicitly with
+      // the chosen Pokémon's name so the Professor Oak panel updates too.
+      fetchRGA(extractPokemonName(selected.title), results);
     });
   });
 }
