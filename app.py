@@ -1,4 +1,5 @@
 import os
+import re
 from pathlib import Path
 
 import requests as req_lib
@@ -10,7 +11,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+# Scope CORS to this app's own origins. Reflecting any Origin let *any* website
+# read /api/coveo-token — i.e. the live Coveo API key — from a visitor's browser.
+CORS(app, origins=[
+    "http://127.0.0.1:5003", "http://localhost:5003",
+])
 
 IMAGES_DIR   = Path(__file__).parent / "pokemon_images"
 FRONTEND_DIR = Path(__file__).parent / "frontend"
@@ -61,6 +66,10 @@ def coveo_token():
     return jsonify({"token": COVEO_TOKEN, "organizationId": COVEO_ORG})
 
 
+# Only the search endpoints are proxyable. Anchored, no "..", no userinfo "@".
+_ALLOWED_PATH = re.compile(r"^/rest/search/v2(/[A-Za-z0-9_-]+)*$")
+
+
 # ── Coveo proxy ───────────────────────────────────────────────────────────────
 @app.route("/api/coveo-proxy", methods=["POST"])
 def coveo_proxy():
@@ -73,6 +82,15 @@ def coveo_proxy():
     method = data.get("method", "POST").upper()
     path   = data.get("path", "/rest/search/v2")
     body   = data.get("body", {})
+
+    # The Authorization header is attached unconditionally below, so `path`
+    # must not be able to steer the request at another host. A leading "@"
+    # turned the intended host into URL userinfo and relocated the request
+    # (https://org.org.coveo.com@evil.example/…), leaking the bearer token.
+    if not isinstance(path, str) or not _ALLOWED_PATH.match(path):
+        return jsonify({"error": "path not allowed"}), 400
+    if method not in ("GET", "POST"):
+        return jsonify({"error": "method not allowed"}), 405
 
     url  = f"{COVEO_BASE}{path}?organizationId={COVEO_ORG}"
     hdrs = {
@@ -262,8 +280,22 @@ def ask():
 def set_model():
     """Body: { "model": str } — updates the active Ollama model at runtime."""
     global _active_model
-    data = request.get_json(force=True)
-    _active_model = data.get("model", _active_model)
+    data  = request.get_json(force=True)
+    model = data.get("model", _active_model)
+
+    # Validate against the models actually pulled locally. This endpoint writes
+    # process-wide state that every request then uses, so it must not accept
+    # arbitrary strings from any caller.
+    if not isinstance(model, str) or not model.strip():
+        return jsonify({"error": "model must be a non-empty string"}), 400
+    allowed = set(list_models().get_json().get("models", []))
+    if allowed and model not in allowed:
+        return jsonify({
+            "error": f"unknown model {model!r}",
+            "available": sorted(allowed),
+        }), 400
+
+    _active_model = model
     os.environ["OLLAMA_MODEL"] = _active_model
     return jsonify({"model": _active_model})
 
@@ -274,13 +306,27 @@ def list_models():
     import ollama as ol
     client = ol.Client(host=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"))
     try:
-        models = client.list()
-        names  = [m["name"] for m in models.get("models", [])]
-    except Exception:
+        resp = client.list()
+        # ollama >= 0.4 returns a pydantic ListResponse whose entries expose
+        # `.model`; older versions returned {"models": [{"name": ...}]}. The
+        # old dict access raised KeyError('name') and was silently swallowed,
+        # so the UI fell back to five hardcoded models, none of them installed.
+        raw = getattr(resp, "models", None)
+        if raw is None and isinstance(resp, dict):
+            raw = resp.get("models", [])
+        names = [
+            getattr(m, "model", None) or (m.get("model") or m.get("name"))
+            for m in (raw or [])
+        ]
+        names = [n for n in names if n]
+    except Exception as exc:
+        app.logger.warning("ollama list failed: %s", exc)
         names = []
     return jsonify({"models": names})
 
 
 if __name__ == "__main__":
-    # macOS Monterey+ reserves port 5000 for AirPlay; use 5001 instead
-    app.run(debug=True, port=5003)
+    # macOS Monterey+ reserves port 5000 for AirPlay, so this app uses 5003.
+    # debug=True exposes the Werkzeug interactive debugger and full tracebacks
+    # in HTTP responses — opt in explicitly via FLASK_DEBUG=1 for local work.
+    app.run(debug=os.getenv("FLASK_DEBUG") == "1", port=5003)

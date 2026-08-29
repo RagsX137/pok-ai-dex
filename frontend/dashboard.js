@@ -9,28 +9,57 @@
 import { TYPE_COLORS } from './type-colors.js';
 
 // ─────────────────────────────────────────────────────────────
-// TYPE EFFECTIVENESS DATA  (simplified chart, Gen I–IX standard)
+// TYPE EFFECTIVENESS  (Gen VI+ official chart)
+//
+// TYPE_CHART[attacking][defending] = damage multiplier.
+// Sparse: any pair omitted is neutral (×1). This is the single source of
+// truth for both the defensive panel (what hurts this Pokémon) and the
+// offensive panel (what this Pokémon's STAB moves beat).
 // ─────────────────────────────────────────────────────────────
 const TYPE_CHART = {
-  fire:     { weak: ['water','rock','ground'],       strong: ['grass','bug','steel','ice','fairy'] },
-  water:    { weak: ['electric','grass'],             strong: ['fire','rock','ground'] },
-  grass:    { weak: ['fire','ice','poison','flying','bug'], strong: ['water','rock','ground'] },
-  electric: { weak: ['ground'],                       strong: ['water','flying'] },
-  psychic:  { weak: ['bug','ghost','dark'],           strong: ['fighting','poison'] },
-  ice:      { weak: ['fire','fighting','rock','steel'], strong: ['grass','ground','flying','dragon'] },
-  dragon:   { weak: ['ice','dragon','fairy'],         strong: ['dragon'] },
-  dark:     { weak: ['fighting','bug','fairy'],       strong: ['psychic','ghost'] },
-  fairy:    { weak: ['poison','steel'],               strong: ['fighting','dragon','dark'] },
-  fighting: { weak: ['psychic','flying','fairy'],     strong: ['normal','ice','rock','dark','steel'] },
-  poison:   { weak: ['ground','psychic'],             strong: ['grass','fairy'] },
-  ground:   { weak: ['water','grass','ice'],          strong: ['fire','electric','poison','rock','steel'] },
-  flying:   { weak: ['electric','ice','rock'],        strong: ['grass','fighting','bug'] },
-  ghost:    { weak: ['ghost','dark'],                 strong: ['psychic','ghost'] },
-  rock:     { weak: ['water','grass','fighting','ground','steel'], strong: ['fire','ice','flying','bug'] },
-  bug:      { weak: ['fire','flying','rock'],         strong: ['grass','psychic','dark'] },
-  steel:    { weak: ['fire','fighting','ground'],     strong: ['ice','rock','fairy'] },
-  normal:   { weak: ['fighting'],                     strong: [] },
+  normal:   { rock:.5, ghost:0, steel:.5 },
+  fire:     { fire:.5, water:.5, grass:2, ice:2, bug:2, rock:.5, dragon:.5, steel:2 },
+  water:    { fire:2, water:.5, grass:.5, ground:2, rock:2, dragon:.5 },
+  electric: { water:2, electric:.5, grass:.5, ground:0, flying:2, dragon:.5 },
+  grass:    { fire:.5, water:2, grass:.5, poison:.5, ground:2, flying:.5, bug:.5, rock:2, dragon:.5, steel:.5 },
+  ice:      { fire:.5, water:.5, grass:2, ice:.5, ground:2, flying:2, dragon:2, steel:.5 },
+  fighting: { normal:2, ice:2, poison:.5, flying:.5, psychic:.5, bug:.5, rock:2, ghost:0, dark:2, steel:2, fairy:.5 },
+  poison:   { grass:2, poison:.5, ground:.5, rock:.5, ghost:.5, steel:0, fairy:2 },
+  ground:   { fire:2, electric:2, grass:.5, poison:2, flying:0, bug:.5, rock:2, steel:2 },
+  flying:   { electric:.5, grass:2, fighting:2, bug:2, rock:.5, steel:.5 },
+  psychic:  { fighting:2, poison:2, psychic:.5, dark:0, steel:.5 },
+  bug:      { fire:.5, grass:2, fighting:.5, poison:.5, flying:.5, psychic:2, ghost:.5, dark:2, steel:.5, fairy:.5 },
+  rock:     { fire:2, ice:2, fighting:.5, ground:.5, flying:2, bug:2, steel:.5 },
+  ghost:    { normal:0, psychic:2, ghost:2, dark:.5 },
+  dragon:   { dragon:2, steel:.5, fairy:0 },
+  dark:     { fighting:.5, psychic:2, ghost:2, dark:.5, fairy:.5 },
+  steel:    { fire:.5, water:.5, electric:.5, ice:2, rock:2, steel:.5, fairy:2 },
+  fairy:    { fire:.5, fighting:2, poison:.5, dragon:2, dark:2, steel:.5 },
 };
+
+const ALL_TYPES = Object.keys(TYPE_CHART);
+
+/**
+ * Damage multiplier of one attacking type against a (possibly dual) defender.
+ * @param {string}   atk       attacking type
+ * @param {string[]} defTypes  defender's type(s)
+ * @returns {number} 0, .25, .5, 1, 2 or 4
+ */
+function typeMultiplier(atk, defTypes) {
+  return defTypes.reduce(
+    (m, d) => m * (TYPE_CHART[atk]?.[d.toLowerCase()] ?? 1),
+    1
+  );
+}
+
+/** Format a multiplier for display. */
+function multLabel(m) {
+  if (m === 0)   return '×0';
+  if (m === 0.25) return '×¼';
+  if (m === 0.5)  return '×½';
+  if (m === 4)    return '×4';
+  return '×2';
+}
 
 // Generation → Roman numeral mapping (used for Coveo facet values)
 const GEN_MAP = {
@@ -145,8 +174,48 @@ const ORIGIN_GEN_NUM = {
  * @param {object} [raw]     - Coveo result.raw (may contain image_url)
  * @returns {string}
  */
+/**
+ * Normalise a display name into the slug PokéAPI and pokemondb both expect.
+ * Display names carry apostrophes, spaces, periods, accents and gender symbols
+ * that neither CDN accepts — "Farfetch'd" → farfetchd, "Tapu Koko" → tapu-koko.
+ * Without this the fetch 404s and the panel silently keeps the previous
+ * Pokémon's data.
+ */
+const SLUG_OVERRIDES = {
+  "farfetch'd": 'farfetchd',   "sirfetch'd": 'sirfetchd',
+  'mr. mime': 'mr-mime',       'mr. rime': 'mr-rime',
+  'mime jr.': 'mime-jr',       'type: null': 'type-null',
+  'nidoran♀': 'nidoran-f',     'nidoran♂': 'nidoran-m',
+  'deoxys': 'deoxys-normal',   'wormadam': 'wormadam-plant',
+  'giratina': 'giratina-altered', 'shaymin': 'shaymin-land',
+  'basculin': 'basculin-red-striped', 'darmanitan': 'darmanitan-standard',
+  'tornadus': 'tornadus-incarnate', 'thundurus': 'thundurus-incarnate',
+  'landorus': 'landorus-incarnate', 'keldeo': 'keldeo-ordinary',
+  'meloetta': 'meloetta-aria', 'meowstic': 'meowstic-male',
+  'aegislash': 'aegislash-shield', 'pumpkaboo': 'pumpkaboo-average',
+  'gourgeist': 'gourgeist-average', 'zygarde': 'zygarde-50',
+  'oricorio': 'oricorio-baile', 'lycanroc': 'lycanroc-midday',
+  'wishiwashi': 'wishiwashi-solo', 'minior': 'minior-red-meteor',
+  'toxtricity': 'toxtricity-amped', 'eiscue': 'eiscue-ice',
+  'indeedee': 'indeedee-male', 'urshifu': 'urshifu-single-strike',
+  'basculegion': 'basculegion-male', 'enamorus': 'enamorus-incarnate',
+  'oinkologne': 'oinkologne-male', 'maushold': 'maushold-family-of-four',
+  'squawkabilly': 'squawkabilly-green-plumage', 'palafin': 'palafin-zero',
+  'tatsugiri': 'tatsugiri-curly', 'dudunsparce': 'dudunsparce-two-segment',
+};
+
+function pokeSlug(name) {
+  const key = String(name ?? '').toLowerCase().trim();
+  if (SLUG_OVERRIDES[key]) return SLUG_OVERRIDES[key];
+  return key
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')  // é → e
+    .replace(/['’.:]/g, '')                             // Farfetch'd, Mr. Mime
+    .replace(/[^a-z0-9]+/g, '-')                        // spaces → hyphen
+    .replace(/^-+|-+$/g, '');
+}
+
 function pokemonDbArtworkUrl(name, raw) {
-  const slug = name.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-');
+  const slug = pokeSlug(name);
   // Prefer the URL Coveo already indexed from pokemondb.net
   if (raw?.image_url) return raw.image_url;
   // Derive directly from pokemondb CDN (large artwork)
@@ -161,7 +230,7 @@ function pokemonDbArtworkUrl(name, raw) {
  * @returns {string}
  */
 function pokemonDbSpriteUrl(name) {
-  const slug = name.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-');
+  const slug = pokeSlug(name);
   return `https://img.pokemondb.net/sprites/home/normal/${slug}.png`;
 }
 
@@ -171,7 +240,8 @@ function pokemonDbSpriteUrl(name) {
 const _cache = {};
 
 async function fetchPokeData(name) {
-  const key = name.toLowerCase().trim();
+  const key = pokeSlug(name);
+  if (!key) return null;
   if (_cache[key]) return _cache[key];
   try {
     const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${key}`);
@@ -179,14 +249,22 @@ async function fetchPokeData(name) {
     const d = await r.json();
 
     // Moves: level-up only, sorted by level
-    const levelMoves = d.moves
-      .flatMap(m => m.version_group_details
-        .filter(v => v.move_learn_method.name === 'level-up')
-        .map(v => ({ name: m.move.name, level: v.level_learned_at }))
-      )
-      .sort((a, b) => a.level - b.level)
-      // Deduplicate (same move appears across version groups)
-      .filter((m, i, arr) => arr.findIndex(x => x.name === m.name) === i);
+    // Keep the HIGHEST level each move is learned at, then sort descending.
+    // Sorting ascending showed a fully-evolved Charizard's level-1 baby moves
+    // (Scratch, Growl, Ember) — useless for judging what it can hit you with.
+    const byName = new Map();
+    for (const m of d.moves) {
+      for (const v of m.version_group_details) {
+        if (v.move_learn_method.name !== 'level-up') continue;
+        const prev = byName.get(m.move.name);
+        if (prev === undefined || v.level_learned_at > prev) {
+          byName.set(m.move.name, v.level_learned_at);
+        }
+      }
+    }
+    const levelMoves = [...byName.entries()]
+      .map(([name, level]) => ({ name, level }))
+      .sort((a, b) => b.level - a.level);
 
     const data = {
       id:       d.id,
@@ -224,23 +302,13 @@ function buildTypeGrid() {
 function toggleTypeFilter(chip, type) {
   // Clear any active-pokemon type highlighting when the user manually filters
   clearTypeHighlight();
-  clearGenHighlight();
 
-  const wasOn = chip.classList.toggle('on');
-  // Drive Coveo facet via the engine
-  const si = document.querySelector('atomic-search-interface');
-  const engine = si?.engine;
-  if (!engine) return;
+  const on = chip.classList.toggle('on');
+  if (on) _activeTypes.add(type.toLowerCase());
+  else    _activeTypes.delete(type.toLowerCase());
 
-  if (wasOn) {
-    const allOn = [...document.querySelectorAll('.tchip.on')]
-      .map(c => `(@type1=="${c.dataset.type}" OR @type2=="${c.dataset.type}")`);
-    updateAdvancedQuery(allOn.length ? allOn.join(' OR ') : '');
-  } else {
-    const allOn = [...document.querySelectorAll('.tchip.on')]
-      .map(c => `(@type1=="${c.dataset.type}" OR @type2=="${c.dataset.type}")`);
-    updateAdvancedQuery(allOn.length ? allOn.join(' OR ') : '');
-  }
+  _selectedIndex = 0;
+  renderFiltered({ autoSelect: true });
 }
 
 /**
@@ -269,31 +337,28 @@ function clearTypeHighlight() {
 }
 
 /**
- * Highlight generation rows that match the active Pokémon's generation(s).
- * The Coveo `generation` field is a string like "gen-i" or comma-separated.
- * @param {string|string[]} genField - raw.generation value from Coveo result
+ * Generation number for a national-dex id. The Coveo index has no `generation`
+ * field, so the sidebar used to fall back to the hardcoded "Gen I" row for
+ * every Pokémon — Miraidon included. Deriving it from the dex number is exact.
  */
-function highlightActiveGenerations(genField) {
-  if (!genField) { clearGenHighlight(); return; }
+function genNumberFromId(id) {
+  const bounds = [151, 251, 386, 493, 649, 721, 809, 905, 1025];
+  for (let i = 0; i < bounds.length; i++) if (id <= bounds[i]) return i + 1;
+  return null;
+}
 
-  // Normalise: Coveo may return a string or array; split on commas/spaces
-  const raw = Array.isArray(genField) ? genField : [genField];
-  const genSet = new Set(
-    raw.flatMap(v => v.split(/[,\s]+/))
-       .map(v => v.toLowerCase().trim())
-       .filter(Boolean)
-  );
+const GEN_ROMAN = ['I','II','III','IV','V','VI','VII','VIII','IX'];
 
-  // Build a reverse lookup: GEN_MAP key → Coveo gen value  (e.g. 'I' → 'gen-i')
+/** Highlight the generation row this Pokémon actually belongs to. */
+function highlightActiveGenerationById(id) {
+  const n = genNumberFromId(id);
+  const roman = n ? GEN_ROMAN[n - 1] : null;
   document.querySelectorAll('.gen-item').forEach(item => {
-    const coveoVal = GEN_MAP[item.dataset.gen] ?? '';
-    if (genSet.has(coveoVal)) {
-      item.classList.add('active');
-      item.classList.remove('dimmed');
-    } else {
-      item.classList.add('dimmed');
-      item.classList.remove('active');
-    }
+    const match = roman && item.dataset.gen === roman;
+    item.classList.toggle('active', !!match);
+    item.classList.toggle('dimmed', !match);
+    // `on` means "filter applied"; keep it independent of this indicator.
+    if (!_activeGen) item.classList.remove('on');
   });
 }
 
@@ -304,28 +369,22 @@ function clearGenHighlight() {
 }
 
 function updateAdvancedQuery(aq) {
-  const sb = document.querySelector('atomic-search-box');
-  if (!sb?.searchBox) return;
-  // Resubmit current query; AQ is set via engine action
-  const si = document.querySelector('atomic-search-interface');
-  const engine = si?.engine;
-  if (!engine) return;
-
-  // Coveo headless: dispatch setAdvancedSearchQuery then executeSearch
+  // The Coveo index backing this app is a plain web crawl of pokemondb.net — it
+  // carries no @type1/@type2 fields, so an advanced query can never filter on
+  // them. Previously the fallback appended the AQ string to the *query text*,
+  // which corrupted the query, widened recall (96 → 500 results) and
+  // accumulated on every click. Type filtering is now done client-side in
+  // applyTypeFilter() against the PokéAPI types we already fetch.
+  //
+  // If the Headless action ever becomes reachable AND the fields get indexed,
+  // this is where server-side faceting would go.
+  const engine = document.querySelector('atomic-search-interface')?.engine;
+  const updateAQ = engine?.actions?.query?.updateAdvancedSearchQueries;
+  if (typeof updateAQ !== 'function') return;   // no-op, and leaves q untouched
   try {
-    const { buildSearchParameterSerializer } = window.CoveoHeadless ?? {};
-    // Fallback: use the query field from state
-    const q = engine.state?.query?.q ?? '';
-    engine.dispatch(
-      engine.actions?.query?.updateAdvancedSearchQueries?.({ aq }) ??
-      { type: 'query/updateAdvancedSearchQueries', payload: { aq } }
-    );
-    engine.dispatch({ type: 'search/executeSearch', payload: {} });
-  } catch (_) {
-    // If headless actions are unavailable, just resubmit the current text
-    const q = engine.state?.query?.q ?? '';
-    dispatchSearch(q || '*');
-  }
+    engine.dispatch(updateAQ({ aq }));
+    engine.executeFirstSearch?.();
+  } catch (_) { /* never fall back to mutating the query text */ }
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -334,11 +393,24 @@ function updateAdvancedQuery(aq) {
 function wireGenList() {
   document.querySelectorAll('.gen-item').forEach(item => {
     item.addEventListener('click', () => {
+      const gen = item.dataset.gen;
+      const wasOn = item.classList.contains('on');
       document.querySelectorAll('.gen-item').forEach(i => i.classList.remove('on'));
-      item.classList.add('on');
-      const gen = GEN_MAP[item.dataset.gen] ?? '';
-      // Dispatch a generation-filtered search
-      if (gen) dispatchSearch(`generation:${gen}`);
+
+      // Clicking the active generation again clears the filter.
+      if (wasOn) {
+        _activeGen = null;
+      } else {
+        item.classList.add('on');
+        _activeGen = gen;
+        clearGenHighlight();
+      }
+
+      // Filter the current result set rather than running `generation:gen-ii`
+      // as a free-text query — that matched page prose and returned mostly
+      // wrong-generation Pokémon while looking like it had worked.
+      _selectedIndex = 0;
+      renderFiltered({ autoSelect: true });
     });
   });
 }
@@ -626,9 +698,13 @@ async function initAtomic() {
 // 5. Search dispatch helper (drives the hidden Atomic SearchBox)
 // ─────────────────────────────────────────────────────────────
 function dispatchSearch(q) {
+  // An empty submit used to return the entire index (1031 results) headed by a
+  // non-Pokémon listing page, while leaving the previous AI answer on screen.
+  const text = String(q ?? '').trim();
+  if (!text) return;
   const sb = document.querySelector('atomic-search-box');
   if (sb?.searchBox) {
-    sb.searchBox.updateText(q);
+    sb.searchBox.updateText(text);
     sb.searchBox.submit();
   }
 }
@@ -691,16 +767,9 @@ function wireEngineSubscription() {
         lastQuery = query;
       }
 
-      // Render results list, honouring the current selection index.
-      renderResultsList(results, total);
-
-      // Auto-select top result on a fresh search; on a filter update just
-      // re-select whatever _selectedIndex already points at so the panel
-      // stays in sync if the result set shifted.
-      if (results.length > 0) {
-        const idx = Math.min(_selectedIndex, results.length - 1);
-        selectResult(results[idx], !queryChanged);
-      }
+      _rawResults = results;
+      _rawTotal   = total;
+      renderFiltered({ autoSelect: !queryChanged });
 
       // Fire RGA only on new text searches
       if (queryChanged && query) {
@@ -715,38 +784,112 @@ function wireEngineSubscription() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// 8. Render the results list in the center column
+// 8. Client-side filtering + results list
+//
+// The Coveo index has no structured Pokémon fields (no @type1/@generation),
+// so filtering happens here against the PokéAPI data we already fetch and
+// cache for every result. This keeps the chips and generation rows honest:
+// they either filter correctly or they do not claim to filter at all.
 // ─────────────────────────────────────────────────────────────
-function renderResultsList(results, total) {
+let _rawResults = [];     // untouched results from the engine
+let _rawTotal   = 0;
+let _shownResults = [];   // what is actually rendered (post-filter)
+const _activeTypes = new Set();
+let   _activeGen   = null;   // 'I' … 'IX' or null
+
+// National-dex ranges per generation — used to filter by generation without
+// a Coveo `generation` field. PokéAPI ids match national dex for base species.
+const GEN_RANGES = {
+  I: [1, 151],    II: [152, 251],  III: [252, 386],
+  IV: [387, 493], V: [494, 649],   VI: [650, 721],
+  VII: [722, 809], VIII: [810, 905], IX: [906, 1025],
+};
+
+/** Resolve PokéAPI data for a result (cached by fetchPokeData). */
+async function resultPoke(r) {
+  return fetchPokeData(extractPokemonName(r.title));
+}
+
+/** Apply the active type/generation filters to the raw result set. */
+async function computeFiltered() {
+  if (!_activeTypes.size && !_activeGen) return _rawResults;
+  const pokes = await Promise.all(_rawResults.map(resultPoke));
+  return _rawResults.filter((r, i) => {
+    const poke = pokes[i];
+    if (!poke) return false;   // unverifiable while a filter is active → hide
+    if (_activeTypes.size && !poke.types.some(t => _activeTypes.has(t.toLowerCase()))) return false;
+    if (_activeGen) {
+      const range = GEN_RANGES[_activeGen];
+      if (!range || poke.id < range[0] || poke.id > range[1]) return false;
+    }
+    return true;
+  });
+}
+
+/** Recompute the filtered list and repaint. */
+async function renderFiltered({ autoSelect = false } = {}) {
+  const filtering = _activeTypes.size > 0 || _activeGen !== null;
+  const list = document.getElementById('results-list');
+  if (list && filtering) {
+    list.innerHTML = '<div class="ritem" style="color:#555;font-size:11px;padding:10px 12px;">Filtering…</div>';
+  }
+  _shownResults = await computeFiltered();
+  renderResultsList(_shownResults, _rawTotal, filtering);
+
+  if (_shownResults.length > 0) {
+    const idx = Math.min(_selectedIndex, _shownResults.length - 1);
+    selectResult(_shownResults[idx], autoSelect);
+  }
+}
+
+function renderResultsList(results, total, filtering = false) {
   const list  = document.getElementById('results-list');
   const count = document.getElementById('result-count');
   if (!list) return;
 
-  count.textContent = total ? `${total} found` : '—';
+  // Report what is actually reachable, not just what the index matched.
+  // "736 found" next to 10 rows and no pager was misleading.
+  if (count) {
+    if (filtering) {
+      count.textContent = `${results.length} of ${_rawResults.length} shown`;
+    } else if (total) {
+      count.textContent = results.length < total
+        ? `showing ${results.length} of ${total}`
+        : `${total} found`;
+    } else {
+      count.textContent = '—';
+    }
+  }
 
   if (!results.length) {
-    list.innerHTML = '<div class="ritem" style="color:#555;font-size:11px;padding:10px 12px;">No results found</div>';
+    list.innerHTML = filtering
+      ? '<div class="ritem" style="color:#555;font-size:11px;padding:10px 12px;">No results match these filters</div>'
+      : '<div class="ritem" style="color:#555;font-size:11px;padding:10px 12px;">No results found</div>';
     return;
   }
 
-  // Use _selectedIndex as source of truth for which row is highlighted,
-  // rather than always stamping index 0 as selected.
   const activeSel = Math.min(_selectedIndex, results.length - 1);
 
   list.innerHTML = results.map((r, i) => {
-    const name  = extractPokemonName(r.title);
-    const type1 = r.raw?.type1 ?? '';
-    const type2 = r.raw?.type2 ?? '';
+    const name = extractPokemonName(r.title);
     return `
       <div class="ritem${i === activeSel ? ' sel' : ''}" data-index="${i}">
-        <span class="rname">${name}</span>
-        ${typeBadgeHtml(type1)}
-        ${type2 ? typeBadgeHtml(type2) : ''}
+        <span class="rname">${escapeHtml(name)}</span>
+        <span class="rbadges" data-badges-for="${escapeHtml(name)}"></span>
       </div>`;
   }).join('');
 
-  // Wire click handlers — update _selectedIndex so the subscription
-  // knows the user's choice if a subsequent filter update arrives.
+  // Type badges come from PokéAPI (the Coveo index has no type fields), so
+  // they are filled in asynchronously once the cached lookup resolves.
+  results.forEach(r => {
+    const name = extractPokemonName(r.title);
+    fetchPokeData(name).then(poke => {
+      if (!poke) return;
+      const slot = list.querySelector(`[data-badges-for="${CSS.escape(name)}"]`);
+      if (slot) slot.innerHTML = poke.types.map(t => typeBadgeHtml(t)).join('');
+    });
+  });
+
   list.querySelectorAll('.ritem').forEach(item => {
     item.addEventListener('click', () => {
       list.querySelectorAll('.ritem').forEach(i => i.classList.remove('sel'));
@@ -754,12 +897,15 @@ function renderResultsList(results, total) {
       _selectedIndex = parseInt(item.dataset.index, 10);
       const selected = results[_selectedIndex];
       selectResult(selected, false);
-      // RGA is normally triggered by a new text search; when the user picks
-      // a different result from the list we need to fire it explicitly with
-      // the chosen Pokémon's name so the Professor Oak panel updates too.
       fetchRGA(extractPokemonName(selected.title), results);
     });
   });
+}
+
+/** Escape text destined for innerHTML. */
+function escapeHtml(str) {
+  return String(str ?? '').replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
 function typeBadgeHtml(type) {
@@ -780,40 +926,87 @@ function extractPokemonName(title) {
 // ─────────────────────────────────────────────────────────────
 // 9. Select a result → populate photo, right panel, similar
 // ─────────────────────────────────────────────────────────────
+// Monotonic token: every selectResult call claims one, and re-checks it after
+// each await. A slower earlier request can therefore no longer overwrite the
+// panel with a stale Pokémon when the user searches rapidly.
+let _selectToken = 0;
+let _lastSelectedTypes = [];
+
+/**
+ * Blank every data panel and say so, rather than leaving the previous
+ * Pokémon's stats sitting under a new name.
+ */
+function resetPanels(name) {
+  const msg = `<div style="color:#666;font-size:11px;">No detailed data for ${escapeHtml(name)}</div>`;
+  const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
+
+  set('stat-bars', msg);
+  set('weak-chips',   '<span style="color:#555;font-size:11px;">—</span>');
+  set('resist-chips', '<span style="color:#555;font-size:11px;">—</span>');
+  set('strong-chips', '<span style="color:#555;font-size:11px;">—</span>');
+  set('moves-tbody',
+    `<tr><td colspan="3" style="color:#666;font-size:11px;text-align:center;padding:10px;">No move data for ${escapeHtml(name)}</td></tr>`);
+  set('similar-grid', '<div class="sim-placeholder">—</div>');
+  set('map-pills',    '<span class="mpill">No encounter data</span>');
+  set('map-gen-toggles', '<span class="gtbtn-none">No wild encounter data</span>');
+
+  const wrap = document.getElementById('map-region-wrap');
+  if (wrap) wrap.style.display = 'none';
+  const sub = document.getElementById('map-sub');
+  if (sub) sub.innerHTML = '';
+
+  // Name tags keep the Pokémon name but drop the stale type/number chips.
+  const tags = document.getElementById('rp-tags');
+  if (tags) tags.innerHTML = '';
+  const rec = document.getElementById('ai-rec-txt');
+  if (rec) rec.textContent = `No matchup data for ${name}`;
+  const num = document.getElementById('photo-num');
+  if (num) num.textContent = '';
+
+  _currentEncountersByGen = new Map();
+  _lastSelectedTypes = [];
+  clearTypeHighlight();
+  clearGenHighlight();
+}
+
 async function selectResult(result, autoSelect) {
   const name = extractPokemonName(result.title);
   if (!name || name.length < 2) return;
+
+  const token = ++_selectToken;
 
   // Immediately update name labels
   setPhotoName(name, null);
   setRightPanelName(name, [], null);
 
   // ── Artwork from pokemondb.net (Coveo-indexed or CDN-derived) ──
-  // PokeAPI is NOT used for the main artwork image.
   const artworkUrl = pokemonDbArtworkUrl(name, result.raw);
-  updatePhotoCard(artworkUrl, name, null, result.raw?.type1 ?? '');
+  updatePhotoCard(artworkUrl, name, null, '');
 
-  // V2: set the header circle sprite immediately from pokemondb.
-  // This runs unconditionally — before PokeAPI — so it works even
-  // for Pokémon PokeAPI doesn't know about yet (e.g. new Gen IX entries).
+  // Header circle sprite — set before the PokéAPI await so it works even for
+  // Pokémon PokéAPI does not know about.
   const headerSprite = document.getElementById('header-sprite');
   if (headerSprite) {
-    const spriteUrl = pokemonDbSpriteUrl(name);
     headerSprite.alt = name;
     headerSprite.onload  = () => { headerSprite.style.opacity = '1'; };
     headerSprite.onerror = () => { headerSprite.style.opacity = '0'; };
-    headerSprite.src = spriteUrl;
+    headerSprite.src = pokemonDbSpriteUrl(name);
   }
 
   // ── PokéAPI for stats / moves / types / location ──
   const poke = await fetchPokeData(name);
-  if (!poke) return;
+  if (token !== _selectToken) return;          // superseded by a newer selection
+
+  if (!poke) {
+    // Never leave the previous Pokémon's data under this one's name.
+    resetPanels(name);
+    return;
+  }
 
   // Photo card — refresh number + glow once we have the id
   setPhotoName(name, poke.id);
   updatePhotoCard(artworkUrl, name, poke.id, poke.types[0]);
 
-  // If PokeAPI has a sprite, upgrade the header circle to it
   if (headerSprite && poke.sprite) {
     headerSprite.onload  = () => { headerSprite.style.opacity = '1'; };
     headerSprite.onerror = () => { /* keep pokemondb sprite already showing */ };
@@ -825,24 +1018,25 @@ async function selectResult(result, autoSelect) {
   renderStatBars(poke.stats);
   renderMovesTable(poke.moves, poke.types);
   renderTypeEffectiveness(poke.types);
+  _lastSelectedTypes = poke.types;
+  renderMatchupLine(poke.types);
 
-  // Sidebar highlights — show which types & generation(s) belong to this Pokémon
-  highlightActiveTypes(poke.types);
-  highlightActiveGenerations(result.raw?.generation ?? null);
+  // Sidebar highlights — only when the user is not actively filtering,
+  // so the highlight never fights the filter state.
+  if (!_activeTypes.size) highlightActiveTypes(poke.types);
+  if (!_activeGen) highlightActiveGenerationById(poke.id);
 
-  // Map location — fetch grouped by gen, then build dynamic toggles
-  const originGenNum = ORIGIN_GEN_NUM[
-    (Array.isArray(result.raw?.generation)
-      ? result.raw.generation[0]
-      : result.raw?.generation ?? ''
-    ).toLowerCase().trim()
-  ] ?? null;
+  // Map location — derive the origin generation from the dex number, since the
+  // Coveo index carries no `generation` field.
+  const originGenNum = genNumberFromId(poke.id);
   _currentPokemonName = name;
-  _currentEncountersByGen = await fetchLocationsByGen(poke.id);
+  const encounters = await fetchLocationsByGen(poke.id);
+  if (token !== _selectToken) return;          // superseded while fetching
+  _currentEncountersByGen = encounters;
   buildMapToggles(_currentEncountersByGen, originGenNum);
 
   // Similar Pokémon (same primary type)
-  renderSimilarPokemon(poke.types[0], name);
+  renderSimilarPokemon(poke.types[0], name, token);
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -928,48 +1122,56 @@ async function renderMovesTable(moves, pokeTypes) {
     return;
   }
 
-  // For each move we need its type — batch-fetch from PokéAPI
-  // Show up to 20 moves; fetch types lazily
   const displayed = moves.slice(0, 20);
 
-  // Render immediately with placeholders
   tbody.innerHTML = displayed.map(m => {
     const lvLabel = m.level === 0 ? '—' : m.level;
     const moveName = m.name.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-    return `<tr data-move="${m.name}">
+    return `<tr data-move="${escapeHtml(m.name)}">
       <td class="mlv">${lvLabel}</td>
-      <td class="mname">${moveName}</td>
+      <td class="mname">${escapeHtml(moveName)}<span class="mpow"></span></td>
       <td class="mtype-cell"><span class="mtype-pill" style="background:#2a2a3e;color:#888">…</span></td>
     </tr>`;
   }).join('');
 
-  // Fetch move types in the background
   for (const m of displayed) {
-    fetchMoveType(m.name).then(type => {
-      const row = tbody.querySelector(`tr[data-move="${m.name}"]`);
+    fetchMoveMeta(m.name).then(meta => {
+      const row = tbody.querySelector(`tr[data-move="${CSS.escape(m.name)}"]`);
       if (!row) return;
-      const cell = row.querySelector('.mtype-pill');
-      if (!cell) return;
-      const t = (type ?? 'normal').toLowerCase();
-      const colors = TYPE_COLORS[t] ?? { bg: '#9099A1', text: '#fff' };
-      cell.style.background = colors.bg + '33';
-      cell.style.color = colors.bg;
-      cell.textContent = t.charAt(0).toUpperCase() + t.slice(1);
+      const pill = row.querySelector('.mtype-pill');
+      if (pill) {
+        const t = (meta.type ?? 'normal').toLowerCase();
+        const colors = TYPE_COLORS[t] ?? { bg: '#9099A1' };
+        pill.style.background = colors.bg + '33';
+        pill.style.color = colors.bg;
+        pill.textContent = t.charAt(0).toUpperCase() + t.slice(1);
+      }
+      // Power and physical/special answer "will that actually hurt?" — the
+      // level column alone never did.
+      const pow = row.querySelector('.mpow');
+      if (pow) {
+        const icon = meta.cls === 'physical' ? 'PHY' : meta.cls === 'special' ? 'SPC' : 'STA';
+        pow.textContent = meta.power ? ` · ${meta.power} ${icon}` : ` · ${icon}`;
+      }
     });
   }
 }
 
 const _moveCache = {};
-async function fetchMoveType(moveName) {
+async function fetchMoveMeta(moveName) {
   if (_moveCache[moveName]) return _moveCache[moveName];
   try {
     const r = await fetch(`https://pokeapi.co/api/v2/move/${moveName}`);
-    if (!r.ok) return 'normal';
+    if (!r.ok) return { type: 'normal', power: null, cls: '' };
     const d = await r.json();
-    const type = d.type?.name ?? 'normal';
-    _moveCache[moveName] = type;
-    return type;
-  } catch { return 'normal'; }
+    const meta = {
+      type:  d.type?.name ?? 'normal',
+      power: d.power ?? null,
+      cls:   d.damage_class?.name ?? '',
+    };
+    _moveCache[moveName] = meta;
+    return meta;
+  } catch { return { type: 'normal', power: null, cls: '' }; }
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -977,92 +1179,128 @@ async function fetchMoveType(moveName) {
 // ─────────────────────────────────────────────────────────────
 function renderTypeEffectiveness(types) {
   const weakEl   = document.getElementById('weak-chips');
+  const resistEl = document.getElementById('resist-chips');
   const strongEl = document.getElementById('strong-chips');
   if (!weakEl || !strongEl) return;
 
-  // Combine weak/strong for all types
-  const weakSet   = new Set();
+  const defTypes = types.map(t => t.toLowerCase());
+  const none = '<span style="color:#555;font-size:11px;">None</span>';
+
+  // ── Defensive: multiply every attacking type through the full chart ──
+  const weak = [];    // ×2 / ×4
+  const resist = [];  // ×½ / ×¼
+  const immune = [];  // ×0
+  for (const atk of ALL_TYPES) {
+    const m = typeMultiplier(atk, defTypes);
+    if (m === 0)      immune.push(atk);
+    else if (m > 1)   weak.push([atk, m]);
+    else if (m < 1)   resist.push([atk, m]);
+  }
+  // Heaviest first, so the ×4s lead
+  weak.sort((a, b) => b[1] - a[1]);
+  resist.sort((a, b) => a[1] - b[1]);
+
+  const cap = t => t.charAt(0).toUpperCase() + t.slice(1);
+
+  weakEl.innerHTML = weak.map(([t, m]) =>
+    `<span class="echip wk">${cap(t)} ${multLabel(m)}</span>`).join('') || none;
+
+  // Immunities are the single most decision-relevant fact — show them first
+  // and style them distinctly from ordinary resistances.
+  if (resistEl) {
+    resistEl.innerHTML =
+      immune.map(t => `<span class="echip im">${cap(t)} ×0</span>`).join('')
+      + resist.map(([t, m]) => `<span class="echip rs">${cap(t)} ${multLabel(m)}</span>`).join('')
+      || none;
+  }
+
+  // ── Offensive: what this Pokémon's own STAB moves beat ──
   const strongSet = new Set();
-
-  types.forEach(t => {
-    const t2 = t.toLowerCase();
-    const chart = TYPE_CHART[t2];
-    if (!chart) return;
-    chart.weak.forEach(w => weakSet.add(w));
-    chart.strong.forEach(s => strongSet.add(s));
-  });
-
-  // ×4 indicator for dual-type double weaknesses
-  const weakCounts = {};
-  types.forEach(t => {
-    (TYPE_CHART[t.toLowerCase()]?.weak ?? []).forEach(w => {
-      weakCounts[w] = (weakCounts[w] ?? 0) + 1;
+  defTypes.forEach(atk => {
+    ALL_TYPES.forEach(def => {
+      if ((TYPE_CHART[atk]?.[def] ?? 1) > 1) strongSet.add(def);
     });
   });
-
-  weakEl.innerHTML = [...weakSet].map(w => {
-    const label = w.charAt(0).toUpperCase() + w.slice(1);
-    const mult = weakCounts[w] >= 2 ? ' ×4' : ' ×2';
-    return `<span class="echip wk">${label}${mult}</span>`;
-  }).join('') || '<span style="color:#555;font-size:11px;">None</span>';
-
-  strongEl.innerHTML = [...strongSet].map(s => {
-    const label = s.charAt(0).toUpperCase() + s.slice(1);
-    return `<span class="echip st">${label}</span>`;
-  }).join('') || '<span style="color:#555;font-size:11px;">None</span>';
+  strongEl.innerHTML = [...strongSet].map(t =>
+    `<span class="echip st">${cap(t)}</span>`).join('') || none;
 }
 
 // ─────────────────────────────────────────────────────────────
 // 15. Similar Pokémon — fetch 3 same-type Pokémon from PokéAPI
 // ─────────────────────────────────────────────────────────────
-async function renderSimilarPokemon(primaryType, excludeName) {
+async function renderSimilarPokemon(primaryType, excludeName, token) {
   const grid = document.getElementById('similar-grid');
   if (!grid) return;
 
   grid.innerHTML = '<div class="sim-placeholder">Loading…</div>';
 
   try {
-    const t   = primaryType.toLowerCase();
-    const r   = await fetch(`https://pokeapi.co/api/v2/type/${t}`);
+    const t = primaryType.toLowerCase();
+    const r = await fetch(`https://pokeapi.co/api/v2/type/${t}`);
+    if (token !== undefined && token !== _selectToken) return;
     if (!r.ok) { grid.innerHTML = '<div class="sim-placeholder">—</div>'; return; }
     const data = await r.json();
+    if (token !== undefined && token !== _selectToken) return;
 
-    // Pick 3 random Pokémon of this type (excluding the current one)
+    // Exclude alternate forms, but keep genuine species whose slug contains a
+    // hyphen (ho-oh, porygon-z, type-null, tapu-koko, iron-valiant, great-tusk).
+    // The previous allowlist used 'alolan/galarian/hisuian' where PokéAPI uses
+    // 'alola/galar/hisui', so it matched nothing and dropped real Pokémon.
+    const FORM_SUFFIXES = new Set([
+      'mega','megax','megay','gmax','alola','galar','hisui','paldea','totem',
+      'standard','zen','average','small','large','super','baile','pau','pompom',
+      'sensu','midday','midnight','dusk','solo','school','amped','lowkey',
+      'ice','noice','male','female','plant','sandy','trash','origin','altered',
+      'sky','land','ordinary','resolute','aria','pirouette','blade','shield',
+      'incarnate','therian','black','white','primal','complete','10','50',
+      'red-striped','blue-striped','white-striped','single-strike','rapid-strike',
+      'crowned','eternamax','hero','zero','curly','droopy','stretchy',
+      'two-segment','three-segment','family-of-four','family-of-three',
+      'green-plumage','blue-plumage','yellow-plumage','white-plumage',
+      'four','roaming','starter','bloodmoon','teal','wellspring','hearthflame',
+      'cornerstone','terastal','stellar',
+    ]);
     const pool = (data.pokemon ?? [])
       .map(p => p.pokemon.name)
       .filter(n => n.toLowerCase() !== excludeName.toLowerCase())
-      .filter(n => !n.includes('-mega') && !n.includes('-gmax'));  // filter forms
+      .filter(n => {
+        const parts = n.split('-');
+        if (parts.length === 1) return true;
+        // Drop if ANY trailing segment is a known form marker
+        return !parts.slice(1).some(seg => FORM_SUFFIXES.has(seg));
+      });
 
-    const picked = shuffleSlice(pool, 3);
+    // Deterministic pick: the same Pokémon always yields the same three
+    // suggestions, so the panel can be returned to and compared.
+    const picked = stablePick(pool, 3, excludeName);
     if (!picked.length) {
       grid.innerHTML = '<div class="sim-placeholder">No similar Pokémon found</div>';
       return;
     }
 
-    // Fetch sprites
-    const cards = await Promise.all(picked.map(async name => {
-      const poke = await fetchPokeData(name);
-      return { name, poke };
-    }));
+    const cards = await Promise.all(picked.map(async name => ({
+      name, poke: await fetchPokeData(name),
+    })));
+    if (token !== undefined && token !== _selectToken) return;
 
     grid.innerHTML = cards.map(({ name, poke }) => {
-      const displayName = name.charAt(0).toUpperCase() + name.slice(1);
-      const t2 = primaryType.toLowerCase();
-      const colors = TYPE_COLORS[t2] ?? { bg: '#444', text: '#ccc' };
+      const displayName = name.replace(/-/g, ' ')
+        .split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      // Badge each card with its OWN types, not the source Pokémon's — the old
+      // version labelled Carkol (Rock/Fire) as "Fire" because Charizard is Fire.
+      const badges = (poke?.types ?? [primaryType]).map(tp => {
+        const c = TYPE_COLORS[tp.toLowerCase()] ?? { bg: '#444' };
+        return `<span class="sim-type" style="background:${c.bg}33;color:${c.bg};border:1px solid ${c.bg}66">${tp.charAt(0).toUpperCase() + tp.slice(1)}</span>`;
+      }).join('');
       return `
-        <div class="sim-card" data-name="${name}">
-          <img class="sim-sprite"
-               src="${poke?.sprite ?? ''}"
-               alt="${displayName}"
-               onerror="this.style.display='none'" />
-          <div class="sim-name">${displayName}</div>
-          <span class="sim-type" style="background:${colors.bg}33;color:${colors.bg};border:1px solid ${colors.bg}66">
-            ${primaryType.charAt(0).toUpperCase() + primaryType.slice(1)}
-          </span>
+        <div class="sim-card" data-name="${escapeHtml(name)}">
+          <img class="sim-sprite" src="${poke?.sprite ?? ''}"
+               alt="${escapeHtml(displayName)}" onerror="this.style.display='none'" />
+          <div class="sim-name">${escapeHtml(displayName)}</div>
+          ${badges}
         </div>`;
     }).join('');
 
-    // Wire clicks on similar cards
     grid.querySelectorAll('.sim-card').forEach(card => {
       card.addEventListener('click', () => {
         grid.querySelectorAll('.sim-card').forEach(c => c.classList.remove('sel'));
@@ -1075,6 +1313,25 @@ async function renderSimilarPokemon(primaryType, excludeName) {
   } catch {
     grid.innerHTML = '<div class="sim-placeholder">—</div>';
   }
+}
+
+/**
+ * Pick n items deterministically from arr, seeded by `seed`, so repeated
+ * renders of the same Pokémon always produce the same suggestions.
+ */
+function stablePick(arr, n, seed) {
+  let h = 2166136261;
+  for (const ch of String(seed)) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); }
+  const out = [];
+  const used = new Set();
+  for (let i = 0; i < n && used.size < arr.length; i++) {
+    let idx = Math.abs(h) % arr.length;
+    while (used.has(idx)) idx = (idx + 1) % arr.length;
+    used.add(idx);
+    out.push(arr[idx]);
+    h = Math.imul(h ^ (h >>> 13), 16777619);
+  }
+  return out;
 }
 
 function shuffleSlice(arr, n) {
@@ -1090,13 +1347,58 @@ function shuffleSlice(arr, n) {
 // 16. RGA — generative answer → fills ai-answer (center) and
 //     ai-rec-txt (right panel)
 // ─────────────────────────────────────────────────────────────
+/**
+ * Build the deterministic matchup line for the currently selected Pokémon.
+ * Type maths is exact, local and instant — it leads, and the language model
+ * only ever comments underneath it. Previously the model re-derived
+ * effectiveness from crawled prose and contradicted the panel beside it
+ * (it called Water a Charizard *resistance*).
+ */
+function matchupSummary(types) {
+  if (!types?.length) return '';
+  const defTypes = types.map(t => t.toLowerCase());
+  const best = [], immune = [];
+  for (const atk of ALL_TYPES) {
+    const m = typeMultiplier(atk, defTypes);
+    if (m === 0) immune.push(atk);
+    else if (m >= 2) best.push([atk, m]);
+  }
+  best.sort((a, b) => b[1] - a[1]);
+  const cap = t => t.charAt(0).toUpperCase() + t.slice(1);
+  const parts = [];
+  if (best.length)   parts.push(`Hit it with ${best.map(([t, m]) => `${cap(t)} ${multLabel(m)}`).join(', ')}.`);
+  else               parts.push('Nothing is super effective against it.');
+  if (immune.length) parts.push(`Do NOT use ${immune.map(cap).join(' or ')} — no effect.`);
+  return parts.join(' ');
+}
+
+/**
+ * Paint the computed matchup into the recommendation card, preserving any
+ * model prose already there. Called by selectResult the moment types are known.
+ */
+function renderMatchupLine(types) {
+  const aiRec = document.getElementById('ai-rec-txt');
+  if (!aiRec) return;
+  const summary = matchupSummary(types);
+  if (!summary) return;
+  const prose = aiRec.querySelector('.ai-prose')?.outerHTML ?? '';
+  aiRec.innerHTML = `<span class="ai-calc">${escapeHtml(summary)}</span>` + prose;
+}
+
+let _rgaToken = 0;
+
 async function fetchRGA(query, results) {
   const aiAns  = document.getElementById('ai-answer');
   const aiRec  = document.getElementById('ai-rec-txt');
   const model  = document.getElementById('model-select')?.value ?? 'coveo-rga';
+  const token  = ++_rgaToken;
 
+  // The deterministic matchup line is rendered by selectResult(), which is the
+  // only place that knows the selected Pokémon's types. fetchRGA is dispatched
+  // from the engine subscription before that resolves, so it must not read
+  // _lastSelectedTypes here — it re-reads it after the await, by which time
+  // selectResult has run.
   if (aiAns) { aiAns.textContent = '✦ Thinking…'; aiAns.className = 'ai-ans loading'; aiAns.style.display = ''; }
-  if (aiRec) aiRec.textContent = 'Generating recommendation…';
 
   try {
     let answer;
@@ -1107,7 +1409,7 @@ async function fetchRGA(query, results) {
         body:    JSON.stringify({ query }),
       });
       const data = await resp.json();
-      answer = data.answer ?? '—';
+      answer = data.answer ?? '';
     } else {
       const context = results.slice(0, 5).map(r => ({
         title:   r.title ?? '',
@@ -1119,18 +1421,46 @@ async function fetchRGA(query, results) {
         body:    JSON.stringify({ query, context }),
       });
       const data = await resp.json();
-      answer = data.answer ?? '—';
+      answer = data.answer ?? '';
     }
+    if (token !== _rgaToken) return;   // a newer query superseded this one
+
+    const summary = matchupSummary(_lastSelectedTypes ?? []);
+
+    // Treat the model's non-answers as absent rather than printing them raw.
+    const empty = !answer
+      || /^\(no answer generated\)/i.test(answer)
+      || /^\(RGA model did not trigger/i.test(answer)
+      || /^\((CRGA|Coveo|Stream)/i.test(answer);
 
     if (aiAns) {
-      aiAns.textContent = `✦ ${answer}`;
       aiAns.className = 'ai-ans';
       aiAns.style.display = '';
+      if (empty) {
+        aiAns.textContent = summary
+          ? `✦ ${summary}`
+          : '✦ No write-up for this query — try a Pokémon name.';
+      } else {
+        aiAns.textContent = `✦ ${answer}`;
+      }
     }
-    if (aiRec) aiRec.textContent = `"${answer}"`;
+    if (aiRec) {
+      const calc = summary ? `<span class="ai-calc">${escapeHtml(summary)}</span>` : '';
+      const prose = empty ? '' : `<span class="ai-prose">“${escapeHtml(answer)}”</span>`;
+      aiRec.innerHTML = calc + prose || '—';
+    }
   } catch (_) {
-    if (aiAns) { aiAns.textContent = '(AI answer unavailable)'; aiAns.style.display = ''; }
-    if (aiRec)   aiRec.textContent = '(unavailable)';
+    if (token !== _rgaToken) return;
+    // The computed matchup still stands even when the model is unreachable.
+    const summary = matchupSummary(_lastSelectedTypes ?? []);
+    if (aiAns) {
+      aiAns.className = 'ai-ans';
+      aiAns.style.display = '';
+      aiAns.textContent = summary ? `✦ ${summary}` : '✦ (AI answer unavailable)';
+    }
+    if (aiRec) aiRec.innerHTML = summary
+      ? `<span class="ai-calc">${escapeHtml(summary)}</span>`
+      : '(unavailable)';
   }
 }
 
