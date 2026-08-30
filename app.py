@@ -17,7 +17,7 @@ CORS(app, origins=[
     "http://127.0.0.1:5003", "http://localhost:5003",
 ])
 
-IMAGES_DIR   = Path(__file__).parent / "pokemon_images"
+IMAGES_DIR   = Path(__file__).parent / "data" / "images"
 FRONTEND_DIR = Path(__file__).parent / "frontend"
 COVEO_ORG    = os.getenv("COVEO_ORGANIZATION_ID", "")
 COVEO_TOKEN  = os.getenv("COVEO_ACCESS_TOKEN", "")
