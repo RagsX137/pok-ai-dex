@@ -1,12 +1,13 @@
 import os
 import re
-from pathlib import Path
 
 import requests as req_lib
 from flask import Flask, jsonify, request, send_from_directory
 from flask import render_template_string
 from flask_cors import CORS
 from dotenv import load_dotenv
+
+from pokedex.config import settings
 
 load_dotenv()
 
@@ -17,11 +18,11 @@ CORS(app, origins=[
     "http://127.0.0.1:5003", "http://localhost:5003",
 ])
 
-IMAGES_DIR   = Path(__file__).parent / "data" / "images"
-FRONTEND_DIR = Path(__file__).parent / "frontend"
-COVEO_ORG    = os.getenv("COVEO_ORGANIZATION_ID", "")
-COVEO_TOKEN  = os.getenv("COVEO_ACCESS_TOKEN", "")
-COVEO_BASE   = f"https://{COVEO_ORG}.org.coveo.com" if COVEO_ORG else "https://platform.cloud.coveo.com"
+IMAGES_DIR   = settings.images_dir
+FRONTEND_DIR = settings.frontend_dir
+COVEO_ORG    = settings.coveo_org
+COVEO_TOKEN  = settings.coveo_token
+COVEO_BASE   = settings.coveo_base
 
 # ── Active model (mutable at runtime via /api/set-model) ─────────────────────
 _active_model = os.getenv("OLLAMA_MODEL", "llama3")
@@ -109,7 +110,7 @@ def rga():
     Body: { "query": str, "context": [{"title": str, "excerpt": str}] }
     Returns: { "answer": str }
     """
-    from agent import generate_rga_answer
+    from pokedex.agent import generate_rga_answer
     data    = request.get_json(force=True)
     query   = data.get("query", "")
     context = data.get("context", [])
@@ -268,7 +269,7 @@ def ask():
     Body: { "query": str }
     Returns: { "message": str, "pokemon_list": [...] }
     """
-    from agent import run_agent
+    from pokedex.agent import run_agent
     data   = request.get_json(force=True)
     query  = data.get("query", "")
     result = run_agent(query)
@@ -323,10 +324,3 @@ def list_models():
         app.logger.warning("ollama list failed: %s", exc)
         names = []
     return jsonify({"models": names})
-
-
-if __name__ == "__main__":
-    # macOS Monterey+ reserves port 5000 for AirPlay, so this app uses 5003.
-    # debug=True exposes the Werkzeug interactive debugger and full tracebacks
-    # in HTTP responses — opt in explicitly via FLASK_DEBUG=1 for local work.
-    app.run(debug=os.getenv("FLASK_DEBUG") == "1", port=5003)

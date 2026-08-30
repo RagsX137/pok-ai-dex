@@ -4,16 +4,18 @@ import ollama as ol
 import requests as req_lib
 from dotenv import load_dotenv
 
+from pokedex.config import settings
+
 load_dotenv()
 
-OLLAMA_MODEL    = os.getenv("OLLAMA_MODEL", "llama3")
-OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+OLLAMA_MODEL    = settings.ollama_model
+OLLAMA_BASE_URL = settings.ollama_base_url
 
 _client = ol.Client(host=OLLAMA_BASE_URL)
 
-COVEO_ORG   = os.getenv("COVEO_ORGANIZATION_ID", "")
-COVEO_TOKEN = os.getenv("COVEO_ACCESS_TOKEN", "")
-COVEO_BASE  = f"https://{COVEO_ORG}.org.coveo.com" if COVEO_ORG else "https://platform.cloud.coveo.com"
+COVEO_ORG   = settings.coveo_org
+COVEO_TOKEN = settings.coveo_token
+COVEO_BASE  = settings.coveo_base
 
 
 def _coveo_search(query: str, num_results: int = 5) -> list[dict]:
