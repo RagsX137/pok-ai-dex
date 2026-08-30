@@ -1,8 +1,9 @@
 """
-test_semantic_encoder.py
-========================
-Confirms the Semantic-PokEncoder (KNN Ranking Function) is active and
-contributing to scores on the Coveo 'default' pipeline.
+semantic_encoder_report.py
+===========================
+Report generator (not a pytest test, despite the old test_ name it was moved
+from) that confirms the Semantic-PokEncoder (KNN Ranking Function) is active
+and contributing to scores on the Coveo 'default' pipeline.
 
 How the encoder actually works
 -------------------------------

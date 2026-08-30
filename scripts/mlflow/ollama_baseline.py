@@ -10,9 +10,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+REPO_ROOT   = Path(__file__).resolve().parents[2]
 FLASK_BASE  = "http://localhost:5003"
 EXPERIMENT  = "pokedex-llm-comparison"
-CASES_FILE  = Path(__file__).parent / "eval_cases.json"
+CASES_FILE  = REPO_ROOT / "data" / "eval_cases" / "core.json"
 CASES       = json.loads(CASES_FILE.read_text())
 
 

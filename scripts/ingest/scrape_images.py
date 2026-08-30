@@ -1,10 +1,15 @@
 # Import required packages
 import os
 import time
+from pathlib import Path
+
 import pandas as pd
 from bs4 import BeautifulSoup
 from requests import get
 from urllib.parse import urljoin
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+FAILED_OUT = REPO_ROOT / "data" / "failed_pokemon.txt"
 
 # --------------------------------------------
 # STEP 1: SCRAPE DATA
@@ -54,7 +59,7 @@ link_frame = pd.DataFrame({
 # STEP 4: SETUP FOR DOWNLOADING IMAGES
 # --------------------------------------------
 # Create folder to store images
-folder_name = "data/images"
+folder_name = REPO_ROOT / "data" / "images"
 os.makedirs(folder_name, exist_ok=True)  # Ensure folder exists, if not, make
 
 # Number of times to retry downloading an image if it fails
@@ -168,7 +173,7 @@ if failed_pokemon:
     for name in failed_pokemon:
         print(f"- {name.title()}")
 
-    with open("failed_pokemon.txt", "w") as f:
+    with open(FAILED_OUT, "w") as f:
         for name in failed_pokemon:
             f.write(name + "\n")
 else:

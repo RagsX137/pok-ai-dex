@@ -5,16 +5,17 @@ Sweeps the KNN cosine threshold (0.70 → 0.85) and measures top-3 hit rate
 on each of the 11 test queries.  No pipeline changes needed — each request
 injects a `rankingExpressions` override that shadows the pipeline's QRE.
 
-Results are saved to threshold_results.json so you can diff runs over time.
+Results are saved to artifacts/threshold_results.json so you can diff runs
+over time.
 
 Usage
 -----
-    python tune_cosine_threshold.py
+    python scripts/coveo/tune_cosine_threshold.py
 
 Output
 ------
   • Console table: one row per threshold, columns per query category
-  • threshold_results.json: full per-query hit data for every threshold
+  • artifacts/threshold_results.json: full per-query hit data for every threshold
 """
 
 import json
@@ -29,13 +30,15 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+REPO_ROOT = Path(__file__).resolve().parents[2]
+
 COVEO_ORG   = os.getenv("COVEO_ORGANIZATION_ID", "")
 COVEO_TOKEN = os.getenv("COVEO_ACCESS_TOKEN", "")
 COVEO_BASE  = f"https://{COVEO_ORG}.org.coveo.com" if COVEO_ORG else "https://platform.cloud.coveo.com"
 PIPELINE    = os.getenv("COVEO_PIPELINE", "default")
 SEARCH_HUB  = os.getenv("COVEO_SEARCH_HUB", "PokedexUI")
 NUM_RESULTS = 5
-RESULTS_FILE = Path("threshold_results.json")
+RESULTS_FILE = REPO_ROOT / "artifacts" / "threshold_results.json"
 
 # The exact KNN vector field name from the pipeline's rankingInfo debug output
 KNN_FIELD = "knn_vector_037690fe_cd91_4e3f_961d_3b5c5f25bfb4_embeddings_vector"

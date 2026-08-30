@@ -18,16 +18,16 @@ Usage
   .venv/bin/mlflow ui --port 5010
 
   # Terminal 2 — run both models (Flask must be running on port 5003)
-  .venv/bin/python eval_llm_comparison.py
+  .venv/bin/python scripts/mlflow/compare_llms.py
 
   # Run only Professor-Oak on a custom cases file
-  .venv/bin/python eval_llm_comparison.py --coveo-only --cases-file my_cases.json
+  .venv/bin/python scripts/mlflow/compare_llms.py --coveo-only --cases-file my_cases.json
 
   # Run only Ollama
-  .venv/bin/python eval_llm_comparison.py --ollama-only
+  .venv/bin/python scripts/mlflow/compare_llms.py --ollama-only
 
   # Override the Ollama model
-  .venv/bin/python eval_llm_comparison.py --ollama-model mistral:7b
+  .venv/bin/python scripts/mlflow/compare_llms.py --ollama-model mistral:7b
 
 Then open http://localhost:5010 and compare runs under "pokedex-llm-comparison".
 """
@@ -43,9 +43,10 @@ from rouge_score import rouge_scorer
 
 # ── Defaults ──────────────────────────────────────────────────────────────────
 
-FLASK_BASE         = "http://localhost:5003"
-EXPERIMENT         = "pokedex-llm-comparison"
-DEFAULT_CASES_FILE = Path(__file__).parent / "eval_cases.json"
+REPO_ROOT           = Path(__file__).resolve().parents[2]
+FLASK_BASE          = "http://localhost:5003"
+EXPERIMENT          = "pokedex-llm-comparison"
+DEFAULT_CASES_FILE  = REPO_ROOT / "data" / "eval_cases" / "core.json"
 DEFAULT_OLLAMA_MODEL = "gemma4:12b-mlx"
 
 # ── Scorer ────────────────────────────────────────────────────────────────────

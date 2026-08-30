@@ -1,10 +1,15 @@
 
 # --- IMPORTS AND SETUP ---
+from pathlib import Path
+
 from requests import get
 from bs4 import BeautifulSoup
 import pandas as pd
 import time
 from urllib.parse import urljoin
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+CSV_OUT = REPO_ROOT / "data" / "pokemon_db.csv"
 
 # --------------------------------------------
 # STEP 1: FETCH MAIN POKÉMON LIST AND LINKS
@@ -220,7 +225,7 @@ pokedex_df['pokedex_num'] = pokedex_df['pokedex_num'].astype(str)
 merged_df = pd.merge(link_frame, pokedex_df, left_on="pokemon", right_on="poke_name_from_link")
 final_df = merged_df.drop(columns=["poke_name_from_link"])
 
-file_name = "pokemon_db.csv"
+file_name = CSV_OUT
 final_df.to_csv(file_name, index=False)
 
 print(f"\nData saved successfully as '{file_name}'")
