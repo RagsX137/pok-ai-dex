@@ -12,8 +12,8 @@ injects it as a Query Ranking Expression (QRE) that computes cosine similarity
 between the query vector and each document's pre-computed embedding vector.
 The contribution shows up in rankingInfo as "Ranking functions: N".
 
-What this test measures
------------------------
+What this report measures
+-------------------------
 1. knn_score   — the "Ranking functions" contribution extracted from rankingInfo.
                  Non-zero means the encoder fired for that document.
 2. top-3 hit   — whether the expected Pokemon appears in the top 3 results.

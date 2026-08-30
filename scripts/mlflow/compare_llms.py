@@ -1,6 +1,6 @@
 """
-eval_llm_comparison.py
-======================
+compare_llms.py
+================
 Compares Ollama vs Coveo Professor-Oak on Pokémon queries.
 Logs each run to MLflow so you can diff them side-by-side.
 

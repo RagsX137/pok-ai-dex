@@ -36,6 +36,8 @@ hdrs_json = {
 
 print(f"Org: {COVEO_ORG}\n")
 
+failed_queries = []
+
 for QUERY in QUERIES:
     print(f"Query: {QUERY}\n")
 
@@ -65,7 +67,9 @@ for QUERY in QUERIES:
     if not stream_id:
         print("\nERROR: No streamId after retries.")
         print("Check that the RGA model is associated with the pipeline in Coveo Admin.")
-        sys.exit(1)
+        print(f"SKIPPING query: {QUERY!r}\n")
+        failed_queries.append((QUERY, "no streamId after retries"))
+        continue
 
     print(f"\nstreamId:  {stream_id}")
     print(f"searchUid: {search_uid}")
@@ -87,7 +91,9 @@ for QUERY in QUERIES:
 
     if r2.status_code != 200:
         print("ERROR:", r2.text[:400])
-        sys.exit(1)
+        print(f"SKIPPING query: {QUERY!r}\n")
+        failed_queries.append((QUERY, f"stream request returned {r2.status_code}"))
+        continue
 
     answer_parts = []
     citations    = []
@@ -128,3 +134,11 @@ for QUERY in QUERIES:
     for c in citations:
         print(f"  - {c.get('title', '')}  ({c.get('uri') or c.get('clickUri', '')})")
     print("="*60 + "\n")
+
+# ── Summary ──────────────────────────────────────────────────────────────────
+print(f"\n{len(QUERIES) - len(failed_queries)}/{len(QUERIES)} queries succeeded.")
+if failed_queries:
+    print("FAILED:")
+    for q, reason in failed_queries:
+        print(f"  - {q!r}: {reason}")
+    sys.exit(1)
