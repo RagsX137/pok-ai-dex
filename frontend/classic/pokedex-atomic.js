@@ -1,4 +1,4 @@
-import { TYPE_COLORS } from './type-colors.js';
+import { TYPE_COLORS } from '../modules/type-colors.js';
 
 // ────────────────────────────────────────────────────────────
 // 1.  Fetch Coveo credentials from Flask

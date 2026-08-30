@@ -6,7 +6,7 @@
  *   - Right panel:   stats · moves · type effectiveness · RGA recommendation
  */
 
-import { TYPE_COLORS } from './type-colors.js';
+import { TYPE_COLORS } from './modules/type-colors.js';
 
 // ─────────────────────────────────────────────────────────────
 // TYPE EFFECTIVENESS  (Gen VI+ official chart)

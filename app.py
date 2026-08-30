@@ -30,7 +30,7 @@ _active_model = os.getenv("OLLAMA_MODEL", "llama3")
 # ── Static frontend ───────────────────────────────────────────────────────────
 @app.route("/")
 def index():
-    html = (FRONTEND_DIR / "index.html").read_text()
+    html = (FRONTEND_DIR / "classic" / "index.html").read_text()
     return render_template_string(html, COVEO_ORGANIZATION_ID=COVEO_ORG)
 
 
