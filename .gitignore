@@ -2,7 +2,7 @@
 .env
 
 # Generated image assets
-pokemon_images/
+data/images/
 # Python
 __pycache__/
 *.pyc

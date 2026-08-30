@@ -54,7 +54,7 @@ link_frame = pd.DataFrame({
 # STEP 4: SETUP FOR DOWNLOADING IMAGES
 # --------------------------------------------
 # Create folder to store images
-folder_name = "pokemon_images"
+folder_name = "data/images"
 os.makedirs(folder_name, exist_ok=True)  # Ensure folder exists, if not, make
 
 # Number of times to retry downloading an image if it fails
