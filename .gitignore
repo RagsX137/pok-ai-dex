@@ -20,3 +20,6 @@ eval_data/*.db
 eval_data/*.db-wal
 eval_data/*.db-shm
 eval_data/exports/
+
+# Generated outputs — regenerable, never committed
+artifacts/

@@ -1,0 +1,30 @@
+[project]
+name = "pokedex"
+version = "0.1.0"
+description = "Agentic Pokedex - Coveo semantic search with Ollama and Coveo RGA"
+requires-python = ">=3.11"
+dependencies = [
+    "flask>=3.1",
+    "flask-cors>=6.0",
+    "python-dotenv>=1.0",
+    "requests>=2.32",
+    "ollama>=0.4",
+]
+
+[project.optional-dependencies]
+ingest = ["beautifulsoup4>=4.15", "pandas>=2.2"]
+mlflow = ["mlflow>=3.0", "rouge-score>=0.1"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["pokedex*", "eval_harness*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+    "e2e: requires a running server on POKEDEX_URL and a Playwright browser",
+]
