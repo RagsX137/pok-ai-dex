@@ -1,0 +1,1105 @@
+{
+"abomasnow": [
+"grass",
+"ice"
+],
+"abra": [
+"psychic"
+],
+"aggron": [
+"steel",
+"rock"
+],
+"aipom": [
+"normal"
+],
+"alomomola": [
+"water"
+],
+"altaria": [
+"dragon",
+"flying"
+],
+"amaura": [
+"rock",
+"ice"
+],
+"arcanine": [
+"fire"
+],
+"aron": [
+"steel",
+"rock"
+],
+"arrokuda": [
+"water"
+],
+"avalugg": [
+"ice"
+],
+"azelf": [
+"psychic"
+],
+"azumarill": [
+"water",
+"fairy"
+],
+"beartic": [
+"ice"
+],
+"beheeyem": [
+"psychic"
+],
+"bellibolt": [
+"electric"
+],
+"binacle": [
+"rock",
+"water"
+],
+"bisharp": [
+"dark",
+"steel"
+],
+"blipbug": [
+"bug"
+],
+"blissey": [
+"normal"
+],
+"blitzle": [
+"electric"
+],
+"boldore": [
+"rock"
+],
+"boltund": [
+"electric"
+],
+"bombirdier": [
+"flying",
+"dark"
+],
+"bouffalant": [
+"normal"
+],
+"braixen": [
+"fire"
+],
+"bramblin": [
+"grass",
+"ghost"
+],
+"breloom": [
+"grass",
+"fighting"
+],
+"brionne": [
+"water"
+],
+"bronzong": [
+"steel",
+"psychic"
+],
+"bronzor": [
+"steel",
+"psychic"
+],
+"brute-bonnet": [
+"grass",
+"dark"
+],
+"bulbasaur": [
+"grass",
+"poison"
+],
+"buneary": [
+"normal"
+],
+"butterfree": [
+"bug",
+"flying"
+],
+"buzzwole": [
+"bug",
+"fighting"
+],
+"cacnea": [
+"grass"
+],
+"cacturne": [
+"grass",
+"dark"
+],
+"calyrex": [
+"psychic",
+"grass"
+],
+"carbink": [
+"rock",
+"fairy"
+],
+"carkol": [
+"rock",
+"fire"
+],
+"carracosta": [
+"water",
+"rock"
+],
+"cascoon": [
+"bug"
+],
+"castform": [
+"normal"
+],
+"celebi": [
+"psychic",
+"grass"
+],
+"celesteela": [
+"steel",
+"flying"
+],
+"cetitan": [
+"ice"
+],
+"chansey": [
+"normal"
+],
+"charjabug": [
+"bug",
+"electric"
+],
+"charmeleon": [
+"fire"
+],
+"cherrim": [
+"grass"
+],
+"chespin": [
+"grass"
+],
+"chewtle": [
+"water"
+],
+"chikorita": [
+"grass"
+],
+"chimchar": [
+"fire"
+],
+"cinderace": [
+"fire"
+],
+"clamperl": [
+"water"
+],
+"clauncher": [
+"water"
+],
+"clobbopus": [
+"fighting"
+],
+"coalossal": [
+"rock",
+"fire"
+],
+"combee": [
+"bug",
+"flying"
+],
+"copperajah": [
+"steel"
+],
+"cosmoem": [
+"psychic"
+],
+"crabominable": [
+"fighting",
+"ice"
+],
+"cranidos": [
+"rock"
+],
+"croagunk": [
+"poison",
+"fighting"
+],
+"croconaw": [
+"water"
+],
+"crustle": [
+"bug",
+"rock"
+],
+"cryogonal": [
+"ice"
+],
+"darkrai": [
+"dark"
+],
+"decidueye": [
+"grass",
+"ghost"
+],
+"deerling": [
+"normal",
+"grass"
+],
+"delcatty": [
+"normal"
+],
+"delphox": [
+"fire",
+"psychic"
+],
+"diglett": [
+"ground"
+],
+"dodrio": [
+"normal",
+"flying"
+],
+"dolliv": [
+"grass",
+"normal"
+],
+"dondozo": [
+"water"
+],
+"dottler": [
+"bug",
+"psychic"
+],
+"dragonair": [
+"dragon"
+],
+"dragonite": [
+"dragon",
+"flying"
+],
+"drapion": [
+"poison",
+"dark"
+],
+"dratini": [
+"dragon"
+],
+"ducklett": [
+"water",
+"flying"
+],
+"dusknoir": [
+"ghost"
+],
+"duskull": [
+"ghost"
+],
+"electabuzz": [
+"electric"
+],
+"electrode": [
+"electric"
+],
+"elekid": [
+"electric"
+],
+"emolga": [
+"electric",
+"flying"
+],
+"exeggutor": [
+"grass",
+"psychic"
+],
+"exploud": [
+"normal"
+],
+"falinks": [
+"fighting"
+],
+"ferroseed": [
+"grass",
+"steel"
+],
+"finizen": [
+"water"
+],
+"flamigo": [
+"flying",
+"fighting"
+],
+"flapple": [
+"grass",
+"dragon"
+],
+"floatzel": [
+"water"
+],
+"floette": [
+"fairy"
+],
+"floragato": [
+"grass"
+],
+"flutter-mane": [
+"ghost",
+"fairy"
+],
+"frigibax": [
+"dragon",
+"ice"
+],
+"frogadier": [
+"water"
+],
+"garchomp": [
+"dragon",
+"ground"
+],
+"gastrodon": [
+"water",
+"ground"
+],
+"genesect": [
+"bug",
+"steel"
+],
+"geodude": [
+"rock",
+"ground"
+],
+"gible": [
+"dragon",
+"ground"
+],
+"gigalith": [
+"rock"
+],
+"glastrier": [
+"ice"
+],
+"gliscor": [
+"ground",
+"flying"
+],
+"gogoat": [
+"grass"
+],
+"golduck": [
+"water"
+],
+"goodra": [
+"dragon"
+],
+"gothita": [
+"psychic"
+],
+"gothitelle": [
+"psychic"
+],
+"grafaiai": [
+"poison",
+"normal"
+],
+"great-tusk": [
+"ground",
+"fighting"
+],
+"greedent": [
+"normal"
+],
+"grimmsnarl": [
+"dark",
+"fairy"
+],
+"grookey": [
+"grass"
+],
+"grovyle": [
+"grass"
+],
+"gulpin": [
+"poison"
+],
+"gurdurr": [
+"fighting"
+],
+"guzzlord": [
+"dark",
+"dragon"
+],
+"haxorus": [
+"dragon"
+],
+"hippopotas": [
+"ground"
+],
+"hoopa": [
+"psychic",
+"ghost"
+],
+"houndour": [
+"dark",
+"fire"
+],
+"houndstone": [
+"ghost"
+],
+"illumise": [
+"bug"
+],
+"iron-bundle": [
+"ice",
+"water"
+],
+"iron-hands": [
+"fighting",
+"electric"
+],
+"iron-thorns": [
+"rock",
+"electric"
+],
+"iron-treads": [
+"ground",
+"steel"
+],
+"iron-valiant": [
+"fairy",
+"fighting"
+],
+"jangmo-o": [
+"dragon"
+],
+"jirachi": [
+"steel",
+"psychic"
+],
+"kabuto": [
+"rock",
+"water"
+],
+"kabutops": [
+"rock",
+"water"
+],
+"kartana": [
+"grass",
+"steel"
+],
+"kecleon": [
+"normal"
+],
+"klang": [
+"steel"
+],
+"kleavor": [
+"bug",
+"rock"
+],
+"komala": [
+"normal"
+],
+"kommo-o": [
+"dragon",
+"fighting"
+],
+"krookodile": [
+"ground",
+"dark"
+],
+"lairon": [
+"steel",
+"rock"
+],
+"lampent": [
+"ghost",
+"fire"
+],
+"lanturn": [
+"water",
+"electric"
+],
+"larvesta": [
+"bug",
+"fire"
+],
+"latias": [
+"dragon",
+"psychic"
+],
+"leafeon": [
+"grass"
+],
+"leavanny": [
+"bug",
+"grass"
+],
+"lechonk": [
+"normal"
+],
+"liepard": [
+"dark"
+],
+"lileep": [
+"rock",
+"grass"
+],
+"lillipup": [
+"normal"
+],
+"lokix": [
+"bug",
+"dark"
+],
+"lombre": [
+"water",
+"grass"
+],
+"lopunny": [
+"normal"
+],
+"lotad": [
+"water",
+"grass"
+],
+"loudred": [
+"normal"
+],
+"lucario": [
+"fighting",
+"steel"
+],
+"ludicolo": [
+"water",
+"grass"
+],
+"lugia": [
+"psychic",
+"flying"
+],
+"lumineon": [
+"water"
+],
+"magcargo": [
+"fire",
+"rock"
+],
+"magearna": [
+"steel",
+"fairy"
+],
+"manaphy": [
+"water"
+],
+"mantine": [
+"water",
+"flying"
+],
+"marill": [
+"water",
+"fairy"
+],
+"marowak": [
+"ground"
+],
+"marshadow": [
+"fighting",
+"ghost"
+],
+"maschiff": [
+"dark"
+],
+"masquerain": [
+"bug",
+"flying"
+],
+"meganium": [
+"grass"
+],
+"metagross": [
+"steel",
+"psychic"
+],
+"metang": [
+"steel",
+"psychic"
+],
+"metapod": [
+"bug"
+],
+"mewtwo": [
+"psychic"
+],
+"mienfoo": [
+"fighting"
+],
+"mienshao": [
+"fighting"
+],
+"monferno": [
+"fire",
+"fighting"
+],
+"mr-mime": [
+"psychic",
+"fairy"
+],
+"mudbray": [
+"ground"
+],
+"nacli": [
+"rock"
+],
+"naganadel": [
+"poison",
+"dragon"
+],
+"nidoking": [
+"poison",
+"ground"
+],
+"ninetales": [
+"fire"
+],
+"ninjask": [
+"bug",
+"flying"
+],
+"noctowl": [
+"normal",
+"flying"
+],
+"noibat": [
+"flying",
+"dragon"
+],
+"noivern": [
+"flying",
+"dragon"
+],
+"oddish": [
+"grass",
+"poison"
+],
+"okidogi": [
+"poison",
+"fighting"
+],
+"onix": [
+"rock",
+"ground"
+],
+"orthworm": [
+"steel"
+],
+"pancham": [
+"fighting"
+],
+"pansear": [
+"fire"
+],
+"parasect": [
+"bug",
+"grass"
+],
+"pawniard": [
+"dark",
+"steel"
+],
+"pelipper": [
+"water",
+"flying"
+],
+"petilil": [
+"grass"
+],
+"phanpy": [
+"ground"
+],
+"phantump": [
+"ghost",
+"grass"
+],
+"pichu": [
+"electric"
+],
+"pidgeot": [
+"normal",
+"flying"
+],
+"pidove": [
+"normal",
+"flying"
+],
+"piloswine": [
+"ice",
+"ground"
+],
+"pineco": [
+"bug"
+],
+"piplup": [
+"water"
+],
+"poliwag": [
+"water"
+],
+"poliwrath": [
+"water",
+"fighting"
+],
+"poltchageist": [
+"grass",
+"ghost"
+],
+"porygon": [
+"normal"
+],
+"porygon2": [
+"normal"
+],
+"primarina": [
+"water",
+"fairy"
+],
+"psyduck": [
+"water"
+],
+"purugly": [
+"normal"
+],
+"quilava": [
+"fire"
+],
+"raboot": [
+"fire"
+],
+"raging-bolt": [
+"electric",
+"dragon"
+],
+"raichu": [
+"electric"
+],
+"rampardos": [
+"rock"
+],
+"rapidash": [
+"fire"
+],
+"rattata": [
+"normal"
+],
+"regice": [
+"ice"
+],
+"regidrago": [
+"dragon"
+],
+"regirock": [
+"rock"
+],
+"registeel": [
+"steel"
+],
+"rhydon": [
+"ground",
+"rock"
+],
+"ribombee": [
+"bug",
+"fairy"
+],
+"roaring-moon": [
+"dragon",
+"dark"
+],
+"rolycoly": [
+"rock"
+],
+"rufflet": [
+"normal",
+"flying"
+],
+"samurott": [
+"water"
+],
+"sandaconda": [
+"ground"
+],
+"sandslash": [
+"ground"
+],
+"sandy-shocks": [
+"electric",
+"ground"
+],
+"sawk": [
+"fighting"
+],
+"sceptile": [
+"grass"
+],
+"scizor": [
+"bug",
+"steel"
+],
+"scolipede": [
+"bug",
+"poison"
+],
+"scovillain": [
+"grass",
+"fire"
+],
+"scrafty": [
+"dark",
+"fighting"
+],
+"scyther": [
+"bug",
+"flying"
+],
+"seedot": [
+"grass"
+],
+"sentret": [
+"normal"
+],
+"seviper": [
+"poison"
+],
+"shellder": [
+"water"
+],
+"shieldon": [
+"rock",
+"steel"
+],
+"shiinotic": [
+"grass",
+"fairy"
+],
+"shinx": [
+"electric"
+],
+"shuckle": [
+"bug",
+"rock"
+],
+"silicobra": [
+"ground"
+],
+"simisear": [
+"fire"
+],
+"skiddo": [
+"grass"
+],
+"skorupi": [
+"poison",
+"bug"
+],
+"slither-wing": [
+"bug",
+"fighting"
+],
+"slowking": [
+"water",
+"psychic"
+],
+"slugma": [
+"fire"
+],
+"snorunt": [
+"ice"
+],
+"snubbull": [
+"fairy"
+],
+"sobble": [
+"water"
+],
+"solosis": [
+"psychic"
+],
+"solrock": [
+"rock",
+"psychic"
+],
+"spearow": [
+"normal",
+"flying"
+],
+"spinda": [
+"normal"
+],
+"squirtle": [
+"water"
+],
+"starly": [
+"normal",
+"flying"
+],
+"steelix": [
+"steel",
+"ground"
+],
+"stonjourner": [
+"rock"
+],
+"stunfisk": [
+"ground",
+"electric"
+],
+"suicune": [
+"water"
+],
+"surskit": [
+"bug",
+"water"
+],
+"swalot": [
+"poison"
+],
+"swellow": [
+"normal",
+"flying"
+],
+"sylveon": [
+"fairy"
+],
+"tapu-bulu": [
+"grass",
+"fairy"
+],
+"tarountula": [
+"bug"
+],
+"teddiursa": [
+"normal"
+],
+"terrakion": [
+"rock",
+"fighting"
+],
+"tinkatuff": [
+"fairy",
+"steel"
+],
+"toedscruel": [
+"ground",
+"grass"
+],
+"torracat": [
+"fire"
+],
+"toucannon": [
+"normal",
+"flying"
+],
+"tranquill": [
+"normal",
+"flying"
+],
+"trevenant": [
+"ghost",
+"grass"
+],
+"tropius": [
+"grass",
+"flying"
+],
+"trumbeak": [
+"normal",
+"flying"
+],
+"turtwig": [
+"grass"
+],
+"typhlosion": [
+"fire"
+],
+"tyrantrum": [
+"rock",
+"dragon"
+],
+"tyrogue": [
+"fighting"
+],
+"ursaring": [
+"normal"
+],
+"uxie": [
+"psychic"
+],
+"vanillite": [
+"ice"
+],
+"varoom": [
+"steel",
+"poison"
+],
+"veluza": [
+"water",
+"psychic"
+],
+"venipede": [
+"bug",
+"poison"
+],
+"vigoroth": [
+"normal"
+],
+"vileplume": [
+"grass",
+"poison"
+],
+"volcanion": [
+"fire",
+"water"
+],
+"vullaby": [
+"dark",
+"flying"
+],
+"wartortle": [
+"water"
+],
+"watchog": [
+"normal"
+],
+"wo-chien": [
+"dark",
+"grass"
+],
+"wooper": [
+"water",
+"ground"
+],
+"wurmple": [
+"bug"
+],
+"wyrdeer": [
+"normal",
+"psychic"
+],
+"xatu": [
+"psychic",
+"flying"
+],
+"zacian": [
+"fairy"
+],
+"zarude": [
+"dark",
+"grass"
+],
+"zekrom": [
+"dragon",
+"electric"
+]
+}
