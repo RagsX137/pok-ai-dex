@@ -1,6 +1,12 @@
 import pytest
 
-pytest.importorskip("playwright.sync_api")
+# exc_type=ImportError (not the pytest-9 default of ModuleNotFoundError) so a
+# broken Playwright install (e.g. a native-dependency/ABI mismatch, which
+# raises a plain ImportError rather than ModuleNotFoundError) is also treated
+# as "unavailable" and skipped here, rather than blowing up collection for
+# the whole repo — tests/unit must survive Playwright being present but
+# broken, not just Playwright being absent.
+pytest.importorskip("playwright.sync_api", exc_type=ImportError)
 from playwright.sync_api import sync_playwright  # noqa: E402
 
 

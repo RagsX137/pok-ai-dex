@@ -23,3 +23,6 @@ eval_data/exports/
 
 # Generated outputs — regenerable, never committed
 artifacts/
+
+# setuptools editable-install metadata — regenerable
+*.egg-info/

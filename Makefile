@@ -1,4 +1,4 @@
-.PHONY: run test test-unit test-e2e eval lint
+.PHONY: run test test-unit test-e2e eval
 
 # NOTE: `python -m pokedex` does not exist until Task 9 of the reorg. Until
 # then `make run` will fail with "No module named pokedex" — that failure is

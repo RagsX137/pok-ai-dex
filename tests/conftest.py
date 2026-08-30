@@ -10,10 +10,18 @@ def base_url() -> str:
 
 @pytest.fixture(scope="session")
 def live_url(base_url: str) -> str:
-    """Base URL of an already-running server, or skip the test."""
+    """Base URL of an already-running server.
+
+    Fails (does not skip) when nothing answers. Every e2e test depends on
+    this fixture, so a forgotten server — or an app so broken it cannot even
+    bind its port — must make the suite fail loudly. A skip here would let
+    `make test-e2e` report green while zero of its tests actually ran, which
+    defeats its purpose as the reorg's safety net.
+    """
     try:
-        if requests.get(base_url + "/", timeout=5).status_code != 200:
-            pytest.skip(f"no app responding at {base_url}")
-    except requests.RequestException:
-        pytest.skip(f"no app at {base_url} - start it with `make run`")
+        resp = requests.get(base_url + "/", timeout=5)
+    except requests.RequestException as exc:
+        pytest.fail(f"no app at {base_url} - start it with `make run` ({exc})")
+    if resp.status_code != 200:
+        pytest.fail(f"app at {base_url} returned {resp.status_code}, expected 200")
     return base_url
