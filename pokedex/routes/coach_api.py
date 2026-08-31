@@ -167,12 +167,25 @@ def _grade_answer(answer: str, cmp_names: tuple[str, str] | None) -> list[dict]:
     """Run objective type/chart checks; return list of flag dicts."""
     flags = []
     try:
+        from pathlib import Path
         from eval_harness.grading import check_chart_claims, check_type_claims
+        from eval_harness.typechart import TypeChart
+        import json
+
         for err in check_chart_claims(answer):
             flags.append({"type": "chart_error", "message": err["claim"],
                           "quote": err.get("quote", "")})
-        for err in check_type_claims(answer):
-            flags.append({"type": "type_error", "message": err["claim"],
+
+        # Build minimal chart + universe for type-claim checking
+        cache_path = Path("eval_data/type_cache.json")
+        chart = TypeChart(cache_path, offline=cache_path.exists())
+        try:
+            corpus_path = Path("eval_data/corpus.json")
+            universe = json.loads(corpus_path.read_text()) if corpus_path.exists() else []
+        except Exception:
+            universe = []
+        for err in check_type_claims(answer, chart, universe):
+            flags.append({"type": "type_error", "message": err.get("pokemon", ""),
                           "quote": err.get("quote", "")})
     except Exception:
         pass
