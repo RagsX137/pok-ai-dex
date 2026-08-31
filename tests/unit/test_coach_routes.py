@@ -110,3 +110,46 @@ def test_coach_challenge_returns_prompt(client):
     assert "session_id" in d
     assert "scenario" in d
     assert len(d["prompt"]) > 10
+
+
+def test_coach_matchup_answered_from_typechart(client):
+    """When a 6-name team + wild are present, the answer must name at least one
+    teammate (or say 'none'). It must NOT be an encyclopedia entry."""
+    # No mock needed — _grade_chart is module-level and real.
+    # We mock CoveoClient to confirm it is NOT called on this path.
+    with patch("pokedex.routes.coach_api.CoveoClient") as MockCoveo:
+        r = client.post("/api/coach", json={
+            "session_id": "typechart-test",
+            "message": (
+                "My team is Venipede, Solosis, Iron Treads, Sawk, Carkol and Gothita. "
+                "Which of them has a type advantage against Toucannon?"
+            ),
+        })
+    assert r.status_code == 200
+    d = r.get_json()
+    answer = d["answer"].lower()
+    # The answer must mention at least one teammate by name, OR say "none".
+    team_lower = ["venipede", "solosis", "iron treads", "sawk", "carkol", "gothita"]
+    named = any(t in answer for t in team_lower) or "none" in answer
+    assert named, f"Answer did not name any teammate: {d['answer']}"
+    # Coveo must not have been called.
+    MockCoveo.assert_not_called()
+
+
+def test_coach_no_advantage_says_none(client):
+    """When no teammate has an advantage, the answer must say 'none' (not fabricate one)."""
+    # Build a team of 6 pure-Normal types all present in the type cache vs. pure Steel.
+    # Normal hits Steel for 0.5x — none of them have an advantage.
+    # (Uses cache-resident names to avoid LookupError before Task 10 backfills the cache.)
+    with patch("pokedex.routes.coach_api.CoveoClient") as MockCoveo:
+        r = client.post("/api/coach", json={
+            "session_id": "none-test",
+            "message": (
+                "My team is Aipom, Blissey, Bouffalant, Buneary, Chansey and Rattata. "
+                "Which of them has a type advantage against Registeel?"
+            ),
+        })
+    assert r.status_code == 200
+    d = r.get_json()
+    assert "none" in d["answer"].lower() or "no teammate" in d["answer"].lower()
+    MockCoveo.assert_not_called()

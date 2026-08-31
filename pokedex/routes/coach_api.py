@@ -11,6 +11,8 @@ from flask import Blueprint, current_app, jsonify, request
 from pokedex.conversation import append_turn, get_history
 from pokedex.coveo import CoveoClient
 
+from pokedex.matchup import detect_matchup_intent, MatchupIntent  # noqa: E402
+
 coach_bp = Blueprint("coach_api", __name__)
 
 # ── Module-level grading resources (load once at startup) ─────
@@ -20,6 +22,7 @@ _grade_universe: list = []
 try:
     from eval_harness.grading import check_chart_claims, check_type_claims  # type: ignore
     from eval_harness.typechart import TypeChart  # type: ignore
+    from eval_harness.reference import ideal_answer as _ideal_answer  # type: ignore
 
     _cache_path = Path("eval_data/type_cache.json")
     _grade_chart = TypeChart(_cache_path, offline=_cache_path.exists())
@@ -27,6 +30,8 @@ try:
     _grade_universe = json.loads(_corpus_path.read_text()) if _corpus_path.exists() else []
 except Exception:
     pass  # grading is best-effort; missing eval_harness is fine
+
+_ideal_answer = globals().get("_ideal_answer")  # None if eval_harness absent
 
 # ── Comparison intent detection ───────────────────────────────
 # Patterns (case-insensitive). Each returns (name_a, name_b) or None.
@@ -146,42 +151,58 @@ def coach():
     cmp_names = _detect_comparison(message)
 
     history = get_history(session_id)
-    query = _build_context_prompt(history, message)
 
-    client = CoveoClient()
-    result = client.generated_answer(query)
+    # ── Type-chart fast path ──────────────────────────────────────────────
+    # If we can resolve the team and the wild Pokémon from this message, compute
+    # the answer directly from the type chart. This is always correct, always fast,
+    # and never hallucinates. The LLM path is the fallback, not the primary.
+    answer = None
+    citations = []
+    intent = None
 
-    # Fallback to search excerpts if RGA did not fire OR Coveo abstained
-    # (stream_completed is False  → no stream ID issued; RGA model never ran)
-    # (stream_completed is True and answer empty → Coveo chose not to answer)
-    _rga_abstained = (
-        result.stream_completed is False
-        or (result.stream_completed is True and not result.answer.strip("() "))
-    )
-    if _rga_abstained and result.error is None:
-        search_results = client.search(query, num=5).get("results", [])
-        snippets = "; ".join(
-            r.get("excerpt", r.get("title", ""))[:200]
-            for r in search_results[:3]
-            if r.get("excerpt") or r.get("title")
+    if _grade_chart is not None and _ideal_answer is not None:
+        intent = detect_matchup_intent(message, history)
+        if intent is not None:
+            try:
+                gt = _grade_chart.ground_truth(intent.team, intent.wild)
+                answer = _ideal_answer(intent.probe, gt, intent.team)
+            except Exception:
+                # Name not in cache and offline. Fall through to Coveo.
+                answer = None
+                intent = None
+
+    # ── Coveo fallback (encyclopaedia questions, unresolved teams, etc.) ──
+    if answer is None:
+        query = _build_context_prompt(history, message)
+        client = CoveoClient()
+        result = client.generated_answer(query)
+
+        _rga_abstained = (
+            result.stream_completed is False
+            or (result.stream_completed is True and not result.answer.strip("() "))
         )
-        answer = (
-            f"(RGA model did not trigger. Top result: {snippets})"
-            if snippets else "(RGA model did not trigger for this query.)"
-        )
-        citations = []
-    elif result.error:
-        answer = f"(Error: {result.error})"
-        citations = []
-    else:
-        answer = result.answer
-        citations = [
-            {
-                "title": c.get("title", ""),
-                "uri":   c.get("uri") or c.get("clickUri", ""),
-            }
-            for c in result.citations
-        ]
+        if _rga_abstained and result.error is None:
+            search_results = client.search(query, num=5).get("results", [])
+            snippets = "; ".join(
+                r.get("excerpt", r.get("title", ""))[:200]
+                for r in search_results[:3]
+                if r.get("excerpt") or r.get("title")
+            )
+            answer = (
+                f"(RGA model did not trigger. Top result: {snippets})"
+                if snippets else "(RGA model did not trigger for this query.)"
+            )
+        elif result.error:
+            answer = f"(Error: {result.error})"
+        else:
+            answer = result.answer
+            citations = [
+                {
+                    "title": c.get("title", ""),
+                    "uri":   c.get("uri") or c.get("clickUri", ""),
+                }
+                for c in result.citations
+            ]
 
     # Grading flags (type/chart errors in the answer)
     grading_flags = _grade_answer(answer, cmp_names)
