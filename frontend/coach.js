@@ -370,9 +370,12 @@ async function sendMessage(overrideText) {
       }
 
       // Don't promote a flagged sentence as the "Quick Answer".
+      // Use f.quote (the exact erroneous text) if present; fall back to f.message
+      // (a Pokémon name) only when no quote is available.
       const firstSentenceIsFlagged = grading_flags?.some(f => {
         const firstSentence = answer.split(/[.!?]/)[0].toLowerCase();
-        return f.message && firstSentence.includes(f.message.toLowerCase());
+        const token = (f.quote || f.message || '').toLowerCase();
+        return token && firstSentence.includes(token);
       });
       if (!firstSentenceIsFlagged) updateSnippet(answer);
       else updateSnippet('');

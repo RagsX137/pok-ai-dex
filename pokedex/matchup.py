@@ -19,9 +19,11 @@ def _corpus() -> frozenset[str]:
 
 
 def _resolve(name: str) -> str | None:
-    """Return a canonical lowercase Pokémon name, or None."""
-    from pokedex.routes.coveo_api import _closest_pokemon
-    return _closest_pokemon(name.lower().strip(), max_dist=2)
+    """Return a canonical lowercase Pokémon name, or None.
+    Exact resolution only — routing decisions must never invent an entity.
+    """
+    from pokedex import pokemon_names
+    return pokemon_names.resolve(name.lower().strip())
 
 
 # ── team extraction ──────────────────────────────────────────────────────────

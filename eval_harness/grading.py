@@ -158,17 +158,17 @@ def check_type_claims(answer: str, chart, universe: list[str]) -> list[dict]:
         for m in pattern.finditer(answer or ""):
             # Trim "Your Loudred" -> "Loudred". The regex captures a loose span;
             # the corpus decides where the name actually starts.
-            key = pokemon_names.resolve_suffix(m.group("name"), universe=pool)
-            if not key:
+            lookup_key = pokemon_names.resolve_suffix(m.group("name"), universe=pool)
+            if not lookup_key:
                 continue
-            name = lookup[key]          # caller's casing: grading.py:239 needs it
+            name = lookup[lookup_key]   # caller's casing: grading.py:239 needs it
             claimed = [m.group("t1").lower()]
             if m.group("t2"):
                 claimed.append(m.group("t2").lower())
-            key = (name, tuple(sorted(claimed)), mode)
-            if key in seen:
+            dedup_key = (name, tuple(sorted(claimed)), mode)
+            if dedup_key in seen:
                 continue
-            seen.add(key)
+            seen.add(dedup_key)
             try:
                 actual = chart.types_of(name)
             except Exception:

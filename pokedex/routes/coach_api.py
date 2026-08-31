@@ -35,8 +35,11 @@ except Exception:
 
 _ideal_answer = globals().get("_ideal_answer")  # None if eval_harness absent
 if "is_abstention" not in globals():
+    # Fallback when eval_harness is absent: treat the sentinel string literally.
+    _ABSTENTION_SENTINEL = "(no answer generated)"
     def is_abstention(answer: str) -> bool:  # type: ignore[misc]
-        return not (answer or "").strip("() ")
+        s = (answer or "").strip()
+        return not s or s == _ABSTENTION_SENTINEL or (s.startswith("(") and s.endswith(")") and len(s) <= 30)
 
 # ── Comparison intent detection ───────────────────────────────
 # Patterns (case-insensitive). Each capture is a *candidate span*, deliberately
@@ -305,7 +308,8 @@ def coach_challenge():
     import random
     from eval_harness.scenarios import ScenarioBuilder, AXES  # type: ignore
 
-    data = request.get_json(force=True) or {}
+    raw = request.get_json(force=True, silent=True)
+    data = raw if isinstance(raw, dict) else {}
     axis = data.get("axis", "baseline")
     if axis not in AXES:
         axis = "baseline"
