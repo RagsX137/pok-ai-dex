@@ -708,11 +708,23 @@ function wireEngineSubscription() {
 
       const queryChanged = query !== lastQuery;
 
-      // New text query → reset selection to the top result.
-      // Filter/facet update (same query) → keep whatever index the user chose.
+      // New text query → reset selection and clear any active sidebar filters.
+      // A user typing "bounsweet" with Poison still active should not get
+      // 0 results — the filter chips belong to the previous search context.
+      // Filter/facet update (same query) → keep whatever the user chose.
       if (queryChanged) {
         _selectedIndex = 0;
         lastQuery = query;
+        // Clear type chips
+        if (_activeTypes.size) {
+          _activeTypes.clear();
+          document.querySelectorAll('.tchip.on').forEach(c => c.classList.remove('on'));
+        }
+        // Clear generation filter
+        if (_activeGen) {
+          _activeGen = null;
+          document.querySelectorAll('.gen-item.on').forEach(g => g.classList.remove('on'));
+        }
       }
 
       _rawResults = results;
