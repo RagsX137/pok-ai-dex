@@ -304,12 +304,49 @@
       font-size: 11px; color: #444;
       width: 100%; max-width: 860px;
     }
+
+    /* ── Request-flow strip ── */
+    .flow { display: flex; align-items: stretch; gap: 6px; flex-wrap: wrap; padding: 16px 18px; }
+    .flow-step {
+      flex: 1 1 128px;
+      background: #1e1e32; border: 1px solid #2a2a40;
+      border-radius: 8px; padding: 10px 12px;
+    }
+    .flow-n { font-size: 9px; font-weight: 800; letter-spacing: .1em; color: #4fc3f7; }
+    .flow-t { font-size: 11px; font-weight: 700; color: #e0e0e0; margin-top: 4px; }
+    .flow-d { font-size: 10px; color: #888; margin-top: 3px; line-height: 1.5; }
+
+    /* ── "NEW" pill for coach-era additions ── */
+    .new-pill {
+      font-size: 8px; font-weight: 800; letter-spacing: .1em;
+      background: rgba(68,221,68,.14); color: #66dd66;
+      border: 1px solid rgba(68,221,68,.3);
+      border-radius: 4px; padding: 1px 6px;
+      margin-left: 8px; vertical-align: middle;
+    }
+
+    /* ── Surface tiles (the three UIs) ── */
+    .surface-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 8px; padding: 16px 18px;
+    }
+    @media (max-width: 600px) { .surface-grid { grid-template-columns: 1fr; } }
+    .surface {
+      background: #1e1e32; border: 1px solid #2a2a40;
+      border-radius: 8px; padding: 13px 14px;
+    }
+    .surface-route {
+      font-family: "Courier New", monospace; font-size: 12px;
+      font-weight: 800; color: #4fc3f7;
+    }
+    .surface-name { font-size: 11px; font-weight: 800; color: #f0d040; margin-top: 5px; }
+    .surface-desc { font-size: 10px; color: #888; margin-top: 4px; line-height: 1.55; }
   </style>
 </head>
 <body>
 
 <div class="vtag">▶ Pokédex — Agentic Edition</div>
-<div class="sub">README · Coveo-powered search · Generative Answering · Ollama local LLM</div>
+<div class="sub">README · Coveo search · Generative Answering · Multi-turn coach · Ollama local LLM</div>
 
 <div class="wrap">
 
@@ -319,32 +356,61 @@
       <div class="lens">📡</div>
       <div>
         <div class="hero-title">Agentic Pokédex</div>
-        <div class="hero-edition">Agentic Edition — Dark Dashboard</div>
+        <div class="hero-edition">Agentic Edition — Dashboard + Coach</div>
       </div>
     </div>
     <p class="hero-desc">
-      A full-stack Pokédex powered by <strong style="color:#4fc3f7">Coveo Atomic</strong> for enterprise-grade search
-      and a local <strong style="color:#f0d040">Ollama LLM</strong> for on-device generative answers —
-      all wrapped in a slick dark 3-column dashboard. Search any Pokémon by name, type, ability, or natural language;
-      get AI-generated insights from Professor Oak; explore habitats on regional maps; and compare similar Pokémon
-      side-by-side. No build step. No external LLM calls in the hot path. Just Flask + Coveo + local inference.
+      A full-stack Pokédex powered by <strong style="color:#4fc3f7">Coveo Atomic</strong> for enterprise-grade search,
+      <strong style="color:#f0d040">Coveo CRGA</strong> for grounded generative answers with citations, and a local
+      <strong style="color:#66dd66">Ollama LLM</strong> for fully offline inference. Search any Pokémon by name, type,
+      ability, or natural language on the dark 3-column dashboard — or open the
+      <strong style="color:#b09aff">Pokémon Coach</strong> and hold a real conversation with Professor Oak: he remembers
+      the last few turns, resolves pronouns, renders side-by-side comparison panels on demand, and every answer is
+      graded against an 18×18 type chart before you see it. No build step. Just Flask + Coveo + local inference.
     </p>
     <div class="badge-row">
       <span class="badge b-blue">Flask 2.x</span>
       <span class="badge b-gold">Coveo Atomic v3</span>
+      <span class="badge b-gold">Coveo CRGA</span>
       <span class="badge b-green">Ollama</span>
       <span class="badge b-purple">PokéAPI</span>
       <span class="badge b-red">Python 3.11+</span>
       <span class="badge b-blue">Vanilla JS (ESM)</span>
+      <span class="badge b-green">pytest + Playwright</span>
+    </div>
+  </div>
+
+  <!-- SURFACES -->
+  <div class="card">
+    <div class="card-head">
+      <span class="card-title">Three Surfaces</span>
+      <div class="leds"><div class="led lr"></div><div class="led ly"></div><div class="led lg"></div></div>
+    </div>
+    <div class="surface-grid">
+      <div class="surface">
+        <div class="surface-route">/dashboard</div>
+        <div class="surface-name">Dark Dashboard</div>
+        <div class="surface-desc">The primary UI. 3-column layout with type/generation facets, encounter map, stats,
+          moves, type effectiveness, similar-Pokémon grid, and a per-row <strong style="color:#4fc3f7">Compare</strong> button.</div>
+      </div>
+      <div class="surface">
+        <div class="surface-route">/coach<span class="new-pill">NEW</span></div>
+        <div class="surface-name">Pokémon Coach</div>
+        <div class="surface-desc">Multi-turn chat with Professor Oak. Session memory, comparison panels, query
+          suggestions, challenge mode, and inline type-error flags on every answer.</div>
+      </div>
+      <div class="surface">
+        <div class="surface-route">/</div>
+        <div class="surface-name">Classic Device</div>
+        <div class="surface-desc">The original Pokédex-device-shaped UI — red chrome, screen bezel, control row.
+          Kept working, served from <code>frontend/classic/</code>.</div>
+      </div>
     </div>
   </div>
 
   <!-- ARCHITECTURE -->
   <div class="card">
-    <div class="card-head">
-      <span class="card-title">Architecture</span>
-      <div class="leds"><div class="led lr"></div><div class="led ly"></div><div class="led lg"></div></div>
-    </div>
+    <div class="card-head"><span class="card-title">Architecture</span></div>
     <div class="arch-grid">
       <div class="arch-tile">
         <div class="arch-tile-icon">🔍</div>
@@ -352,36 +418,143 @@
         <div class="arch-tile-desc">Web component search engine. Headless engine proxied through Flask — API keys never reach the browser.</div>
       </div>
       <div class="arch-tile">
+        <div class="arch-tile-icon">🎓</div>
+        <div class="arch-tile-name">Coveo CRGA</div>
+        <div class="arch-tile-desc">Relevance Generative Answering (Professor Oak). SSE stream consumed server-side, returned as JSON with citations.</div>
+      </div>
+      <div class="arch-tile">
         <div class="arch-tile-icon">🤖</div>
         <div class="arch-tile-name">Ollama (local LLM)</div>
         <div class="arch-tile-desc">llama3, mistral, gemma3, phi4 — any pulled model. Generates grounded RGA answers from Coveo search context.</div>
       </div>
       <div class="arch-tile">
-        <div class="arch-tile-icon">🎓</div>
-        <div class="arch-tile-name">Coveo CRGA</div>
-        <div class="arch-tile-desc">Coveo's Relevance Generative Answering (Professor Oak). SSE stream consumed server-side, returned as JSON.</div>
-      </div>
-      <div class="arch-tile">
         <div class="arch-tile-icon">🗄️</div>
         <div class="arch-tile-name">Flask API</div>
-        <div class="arch-tile-desc">Thin Python backend. Proxies Coveo REST, streams CRGA, serves the Ollama agent loop, and injects credentials.</div>
+        <div class="arch-tile-desc">Four blueprints — <code>pages</code>, <code>coach_api</code>, <code>coveo_api</code>, <code>llm_api</code> — wired by <code>create_app()</code>.</div>
+      </div>
+      <div class="arch-tile">
+        <div class="arch-tile-icon">💬</div>
+        <div class="arch-tile-name">Conversation Store</div>
+        <div class="arch-tile-desc">In-memory sessions, 20 turns each, 1 000 sessions max with LRU eviction. No persistence — cleared on restart.</div>
+      </div>
+      <div class="arch-tile">
+        <div class="arch-tile-icon">⚖️</div>
+        <div class="arch-tile-name">Answer Grading</div>
+        <div class="arch-tile-desc">Coach answers run through <code>eval_harness.grading</code> — type and chart claims are checked and flagged inline.</div>
+      </div>
+      <div class="arch-tile">
+        <div class="arch-tile-icon">🧪</div>
+        <div class="arch-tile-name">Eval Harness</div>
+        <div class="arch-tile-desc">Repeatable wild-encounter evaluation. Draws scenarios from the live index, grades answers, stores runs in SQLite.</div>
       </div>
       <div class="arch-tile">
         <div class="arch-tile-icon">🗺️</div>
         <div class="arch-tile-name">PokéAPI + Serebii</div>
-        <div class="arch-tile-desc">Stats, moves, types, and encounter locations fetched from PokéAPI. Region maps sourced from Serebii Pokéarth.</div>
+        <div class="arch-tile-desc">Stats, moves, types, and encounter locations from PokéAPI. Region maps sourced from Serebii Pokéarth.</div>
       </div>
       <div class="arch-tile">
         <div class="arch-tile-icon">🖼️</div>
         <div class="arch-tile-name">PokémonDB Artwork</div>
-        <div class="arch-tile-desc">High-res Pokémon artwork from pokemondb.net CDN. Sprite fallback in the sidebar lens and similar-Pokémon grid.</div>
+        <div class="arch-tile-desc">High-res artwork from pokemondb.net CDN. Sprite fallback in the sidebar lens, comparison cards, and rec grid.</div>
       </div>
     </div>
   </div>
 
-  <!-- FEATURES -->
+  <!-- COACH -->
   <div class="card">
-    <div class="card-head"><span class="card-title">Features</span></div>
+    <div class="card-head"><span class="card-title">Pokémon Coach — anatomy of a turn</span></div>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-n">01</div>
+        <div class="flow-t">Trainer asks</div>
+        <div class="flow-d">Textarea with live Coveo query suggestions from a hidden Atomic search box.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-n">02</div>
+        <div class="flow-t">History folded in</div>
+        <div class="flow-d">Last 4 turns prepended; Oak's replies truncated to 200 chars so the new question still dominates.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-n">03</div>
+        <div class="flow-t">Intent detected</div>
+        <div class="flow-d">Four regex patterns spot "X vs Y", "compare X and Y", "between X and Y", "X or Y".</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-n">04</div>
+        <div class="flow-t">CRGA answers</div>
+        <div class="flow-d">Coveo generates a grounded answer. If the model abstains, the top search excerpts are returned instead.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-n">05</div>
+        <div class="flow-t">Answer graded</div>
+        <div class="flow-d">Type and chart claims are checked against the type chart; mismatches come back as flags.</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-n">06</div>
+        <div class="flow-t">Rendered</div>
+        <div class="flow-d">Bubble with citation pills and ⚠ flags — plus a dual comparison panel when intent was detected.</div>
+      </div>
+    </div>
+    <div class="card-body" style="padding-top:0">
+      <div class="feature-list">
+        <div class="fitem">
+          <div class="fdot" style="background:#b09aff"></div>
+          <div>
+            <div class="fitem-name">Conversation Memory</div>
+            <div class="fitem-desc">Each browser session gets a UUID. The server keeps the last 20 turns and the canonical
+              Pokémon names mentioned in each, so "who counters <em>it</em>?" resolves correctly even when the original
+              message was misspelled.</div>
+          </div>
+        </div>
+        <div class="fitem">
+          <div class="fdot" style="background:#4fc3f7"></div>
+          <div>
+            <div class="fitem-name">Side-by-Side Comparison Panels</div>
+            <div class="fitem-desc">Ask "Compare Gyarados and Vaporeon" and the answer bubble is followed by two full
+              stat panels — artwork, base stats, weaknesses, resistances, moves — with a <code>ΔBST</code> delta column
+              between them and a verdict bar naming the higher-BST Pokémon.</div>
+          </div>
+        </div>
+        <div class="fitem">
+          <div class="fdot" style="background:#66dd66"></div>
+          <div>
+            <div class="fitem-name">Inline Answer Grading</div>
+            <div class="fitem-desc">The same grader the eval harness uses runs on every live answer. A wrong type
+              matchup surfaces as a <code>⚠ Type error</code> flag under the bubble rather than passing silently.</div>
+          </div>
+        </div>
+        <div class="fitem">
+          <div class="fdot" style="background:#f0d040"></div>
+          <div>
+            <div class="fitem-name">Challenge Mode</div>
+            <div class="fitem-desc">The 🎲 chip calls <code>/api/coach-challenge</code>, which draws a real scenario from
+              the eval harness — a team of six and a wild Pokémon on a chosen difficulty axis — and opens the
+              conversation with it.</div>
+          </div>
+        </div>
+        <div class="fitem">
+          <div class="fdot" style="background:#ff9c54"></div>
+          <div>
+            <div class="fitem-name">Deep-linked Comparisons</div>
+            <div class="fitem-desc">Hovering a dashboard result reveals a <strong>Compare</strong> button that opens
+              <code>/coach?compare=X&amp;with=Y</code> — the coach fires the comparison on load.</div>
+          </div>
+        </div>
+        <div class="fitem">
+          <div class="fdot" style="background:#ec8fe6"></div>
+          <div>
+            <div class="fitem-name">Name Spell-Correction</div>
+            <div class="fitem-desc">When a PokéAPI lookup 404s, the client asks <code>/api/pokemon-correct</code>, which
+              Levenshtein-matches the name against <code>data/pokemon_db.csv</code> within 2 edits and retries once.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD FEATURES -->
+  <div class="card">
+    <div class="card-head"><span class="card-title">Dashboard Features</span></div>
     <div class="card-body">
       <div class="feature-list">
         <div class="fitem">
@@ -402,7 +575,7 @@
           <div class="fdot" style="background:#44dd44"></div>
           <div>
             <div class="fitem-name">Dual Generative Answer Modes</div>
-            <div class="fitem-desc">Switch between <strong style="color:#f0d040">Professor Oak (Coveo CRGA)</strong> for cloud-backed answers and any <strong style="color:#4fc3f7">Ollama local model</strong> for fully offline inference. Model selector always visible in the top bar.</div>
+            <div class="fitem-desc">Switch between <strong style="color:#f0d040">Professor Oak (Coveo CRGA)</strong> for cloud-backed answers and any <strong style="color:#4fc3f7">Ollama local model</strong> for fully offline inference. Model selector always visible in the top bar of both the dashboard and the coach.</div>
           </div>
         </div>
         <div class="fitem">
@@ -430,7 +603,7 @@
           <div class="fdot" style="background:#5a8ea1"></div>
           <div>
             <div class="fitem-name">Base Stats · Moves · Type Effectiveness</div>
-            <div class="fitem-desc">Right panel renders animated stat bars (HP/Atk/Def/SpA/SpD/Spe), a scrollable level-up moves table, and a 2-column type matchup grid (Weak To / Strong Against).</div>
+            <div class="fitem-desc">Rendered by the shared <code>modules/pokemon-panel.js</code> module — animated stat bars (HP/Atk/Def/SpA/SpD/Spe), a scrollable level-up moves table, and a type matchup grid. The same module draws the coach's comparison cards, namespaced per panel.</div>
           </div>
         </div>
       </div>
@@ -444,21 +617,30 @@
       <table class="data-table">
         <thead><tr><th>File</th><th>Responsibility</th></tr></thead>
         <tbody>
-          <tr><td class="fname">pokedex/app.py</td><td class="fdesc">Flask application factory — <code>create_app()</code> registers the three blueprints.</td></tr>
+          <tr><td class="fname">pokedex/app.py</td><td class="fdesc">Flask application factory — <code>create_app()</code> registers the four blueprints and scopes CORS to this app's own origins.</td></tr>
+          <tr><td class="fname">pokedex/config.py</td><td class="fdesc">Every port, base URL, pipeline name and directory, defined exactly once as a frozen <code>Settings</code> dataclass.</td></tr>
           <tr><td class="fname">pokedex/coveo.py</td><td class="fdesc">Single Coveo client — <code>CoveoClient.search()</code>, <code>generated_answer()</code>, and <code>parse_genqa_stream()</code>.</td></tr>
           <tr><td class="fname">pokedex/agent.py</td><td class="fdesc">Agentic loop — <code>_coveo_search()</code> retrieves context, <code>generate_rga_answer()</code> asks Ollama, <code>run_agent()</code> orchestrates.</td></tr>
+          <tr><td class="fname">pokedex/conversation.py</td><td class="fdesc">In-memory session store — 20 turns per session, 1 000 sessions max, LRU eviction. <span class="new-pill">NEW</span></td></tr>
+          <tr><td class="fname">pokedex/routes/pages.py</td><td class="fdesc">HTML pages and static assets — <code>/</code>, <code>/dashboard</code>, <code>/coach</code>, <code>/readme</code>, <code>/frontend/*</code>, <code>/images/*</code>.</td></tr>
+          <tr><td class="fname">pokedex/routes/coach_api.py</td><td class="fdesc">Coach endpoints — comparison-intent regexes, history-aware prompt building, answer grading, challenge scenarios. <span class="new-pill">NEW</span></td></tr>
+          <tr><td class="fname">pokedex/routes/coveo_api.py</td><td class="fdesc">Token endpoint, SSRF-guarded search proxy, CRGA route, and the <code>/api/pokemon-correct</code> spell-corrector.</td></tr>
+          <tr><td class="fname">pokedex/routes/llm_api.py</td><td class="fdesc">Ollama routes — <code>/api/rga</code>, <code>/api/ask</code>, <code>/api/set-model</code>, <code>/api/models</code>.</td></tr>
           <tr><td class="fname">frontend/dashboard.html</td><td class="fdesc">3-column dashboard shell. Atomic search interface + hidden search box. Jinja2 template for org ID injection.</td></tr>
           <tr><td class="fname">frontend/dashboard.css</td><td class="fdesc">Dark dashboard design system — grid, sidebar, type chips, generation list, map card, photo card, stats, moves, AI card.</td></tr>
-          <tr><td class="fname">frontend/dashboard.js</td><td class="fdesc">Main dashboard controller — Coveo engine init, search orchestration, PokéAPI fetches, type/gen highlight logic, map card, similar Pokémon.</td></tr>
+          <tr><td class="fname">frontend/dashboard.js</td><td class="fdesc">Dashboard controller — Coveo engine init, search orchestration, type/gen highlight logic, map card, similar Pokémon, hover Compare button.</td></tr>
+          <tr><td class="fname">frontend/coach.html</td><td class="fdesc">Coach chat shell — thread, quick-start chips, input bar, right aside. <span class="new-pill">NEW</span></td></tr>
+          <tr><td class="fname">frontend/coach.css</td><td class="fdesc">Chat UI styles — bubbles, citation pills, grading flags, comparison panels, ΔBST delta column, suggestion dropdown. <span class="new-pill">NEW</span></td></tr>
+          <tr><td class="fname">frontend/coach.js</td><td class="fdesc">Coach controller — session lifecycle, <code>/api/coach</code> turns, comparison panels, query suggestions, challenge mode, <code>?compare=</code> deep links. <span class="new-pill">NEW</span></td></tr>
+          <tr><td class="fname">frontend/modules/pokemon-panel.js</td><td class="fdesc">Shared panel primitives — <code>fetchPokeData</code>, <code>renderStatBars</code>, <code>renderMovesTable</code>, <code>renderTypeEffectiveness</code>, namespaced by a <code>ns</code> suffix so many panels coexist.</td></tr>
           <tr><td class="fname">frontend/modules/type-colors.js</td><td class="fdesc">Exported <code>TYPE_COLORS</code> map — canonical Pokémon type → <code>{bg, text}</code> colour pairs.</td></tr>
           <tr><td class="fname">frontend/modules/type-chart.js</td><td class="fdesc">Exported <code>TYPE_CHART</code>, <code>typeMultiplier</code>, <code>multLabel</code> — held in parity with <code>eval_harness/typechart.py</code>.</td></tr>
-          <tr><td class="fname">frontend/classic/index.html</td><td class="fdesc">Original Pokédex-device-shaped UI (red chrome, screen bezel, control row).</td></tr>
-          <tr><td class="fname">frontend/classic/pokedex-atomic.js</td><td class="fdesc">Atomic engine init and Flask proxy bridge for the original device UI.</td></tr>
-          <tr><td class="fname">frontend/classic/pokedex-styles.css</td><td class="fdesc">CSS device chrome for the original Pokédex-shaped UI.</td></tr>
-          <tr><td class="fname">.env.example</td><td class="fdesc">Template for all required environment variables — copy to <code>.env</code> before running.</td></tr>
-          <tr><td class="fname">eval_harness/</td><td class="fdesc">Repeatable wild-encounter evaluation harness — see <code>eval_harness/README.md</code>.</td></tr>
-          <tr><td class="fname">scripts/ingest/</td><td class="fdesc">One-off scrapers for Pokémon DB data and artwork.</td></tr>
+          <tr><td class="fname">frontend/classic/</td><td class="fdesc">The original Pokédex-device UI — <code>index.html</code>, <code>pokedex-atomic.js</code>, <code>pokedex-styles.css</code>.</td></tr>
+          <tr><td class="fname">eval_harness/</td><td class="fdesc">Repeatable wild-encounter evaluation harness — scenarios, grading, SQLite store, CLI. See <code>eval_harness/README.md</code>.</td></tr>
+          <tr><td class="fname">eval_data/</td><td class="fdesc"><code>corpus.json</code> + <code>type_cache.json</code> (committed); <code>pokedex_eval.db</code> (gitignored, regenerable).</td></tr>
+          <tr><td class="fname">scripts/</td><td class="fdesc"><code>ingest/</code> scrapers for Pokémon data and artwork, <code>coveo/</code> CRGA and encoder probes, <code>mlflow/</code> model comparison.</td></tr>
           <tr><td class="fname">tests/</td><td class="fdesc">Unit tests (<code>tests/unit/</code>, no server needed) and Playwright e2e tests (<code>tests/e2e/</code>).</td></tr>
+          <tr><td class="fname">.env.example</td><td class="fdesc">Template for all required environment variables — copy to <code>.env</code> before running.</td></tr>
         </tbody>
       </table>
     </div>
@@ -471,19 +653,63 @@
       <table class="data-table">
         <thead><tr><th>Method</th><th>Route</th><th>Description</th></tr></thead>
         <tbody>
-          <tr><td><span class="method m-get">GET</span></td><td class="rpath">/</td><td class="fdesc">Serves the original Pokédex device UI (<code>index.html</code>).</td></tr>
-          <tr><td><span class="method m-get">GET</span></td><td class="rpath">/dashboard</td><td class="fdesc">Serves the dark 3-column dashboard (<code>dashboard.html</code>). Main app entry point.</td></tr>
+          <tr><td><span class="method m-get">GET</span></td><td class="rpath">/</td><td class="fdesc">Serves the original Pokédex device UI (<code>classic/index.html</code>).</td></tr>
+          <tr><td><span class="method m-get">GET</span></td><td class="rpath">/dashboard</td><td class="fdesc">Serves the dark 3-column dashboard. Main app entry point.</td></tr>
+          <tr><td><span class="method m-get">GET</span></td><td class="rpath">/coach</td><td class="fdesc">Serves the Pokémon Coach chat UI. Accepts <code>?compare=X&amp;with=Y</code> to open on a comparison. <span class="new-pill">NEW</span></td></tr>
           <tr><td><span class="method m-get">GET</span></td><td class="rpath">/readme</td><td class="fdesc">This page — styled HTML README.</td></tr>
-          <tr><td><span class="method m-get">GET</span></td><td class="rpath">/api/coveo-token</td><td class="fdesc">Returns <code>{token, organizationId}</code>. API key injected server-side — never exposed in HTML/JS.</td></tr>
-          <tr><td><span class="method m-post">POST</span></td><td class="rpath">/api/coveo-proxy</td><td class="fdesc">Proxies Coveo REST calls. Body: <code>{method, path, body}</code>. Injects auth header server-side.</td></tr>
-          <tr><td><span class="method m-post">POST</span></td><td class="rpath">/api/rga</td><td class="fdesc">Ollama RGA. Body: <code>{query, context[]}</code>. Returns <code>{answer}</code>.</td></tr>
+          <tr><td><span class="method m-post">POST</span></td><td class="rpath">/api/coach</td><td class="fdesc">One coach turn. Body: <code>{session_id, message}</code>. Returns <code>{answer, citations, comparison, grading_flags}</code>. <span class="new-pill">NEW</span></td></tr>
+          <tr><td><span class="method m-post">POST</span></td><td class="rpath">/api/coach-challenge</td><td class="fdesc">Draws an eval-harness battle scenario. Body: <code>{axis?}</code>. Returns <code>{prompt, session_id, scenario}</code>. <span class="new-pill">NEW</span></td></tr>
+          <tr><td><span class="method m-get">GET</span></td><td class="rpath">/api/coveo-token</td><td class="fdesc">Returns <code>{token, organizationId}</code>. API key injected server-side — never baked into HTML/JS.</td></tr>
+          <tr><td><span class="method m-post">POST</span></td><td class="rpath">/api/coveo-proxy</td><td class="fdesc">Proxies Coveo REST calls. Body: <code>{method, path, body}</code>. Path is regex-restricted to <code>/rest/search/v2*</code>.</td></tr>
           <tr><td><span class="method m-post">POST</span></td><td class="rpath">/api/rga-coveo</td><td class="fdesc">Coveo CRGA (Professor Oak). Returns <code>{answer, citations}</code>.</td></tr>
+          <tr><td><span class="method m-post">POST</span></td><td class="rpath">/api/rga</td><td class="fdesc">Ollama RGA. Body: <code>{query, context[]}</code>. Returns <code>{answer}</code>.</td></tr>
           <tr><td><span class="method m-post">POST</span></td><td class="rpath">/api/ask</td><td class="fdesc">Full agentic loop. Body: <code>{query}</code>. Returns <code>{message, pokemon_list}</code>.</td></tr>
           <tr><td><span class="method m-post">POST</span></td><td class="rpath">/api/set-model</td><td class="fdesc">Hot-swaps the active Ollama model at runtime. Body: <code>{model}</code>.</td></tr>
           <tr><td><span class="method m-get">GET</span></td><td class="rpath">/api/models</td><td class="fdesc">Lists all locally pulled Ollama models.</td></tr>
-          <tr><td><span class="method m-get">GET</span></td><td class="rpath">/images/&lt;filename&gt;</td><td class="fdesc">Serves artwork from local <code>data/images/</code> directory.</td></tr>
+          <tr><td><span class="method m-get">GET</span></td><td class="rpath">/api/pokemon-correct</td><td class="fdesc"><code>?q=&lt;name&gt;</code> — closest known Pokémon name within 2 edits, or <code>null</code>. <span class="new-pill">NEW</span></td></tr>
+          <tr><td><span class="method m-get">GET</span></td><td class="rpath">/frontend/&lt;path&gt;</td><td class="fdesc">Serves front-end assets (JS modules, CSS) from <code>frontend/</code>.</td></tr>
+          <tr><td><span class="method m-get">GET</span></td><td class="rpath">/images/&lt;filename&gt;</td><td class="fdesc">Serves artwork from the local <code>data/images/</code> directory.</td></tr>
         </tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- TESTING & EVALUATION -->
+  <div class="card">
+    <div class="card-head"><span class="card-title">Testing &amp; Evaluation</span></div>
+    <div class="two-col" style="padding:16px 18px;">
+      <div class="step-list">
+        <div class="step">
+          <div class="step-num">✓</div>
+          <div class="step-body">
+            <div class="step-title">Unit tests — 31, no server needed</div>
+            <div class="step-detail"><code>make test-unit</code><br/>Config, Coveo client, routes, conversation store, coach routes, and an 18×18 type-chart parity check between <code>type-chart.js</code> and <code>typechart.py</code>.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">✓</div>
+          <div class="step-body">
+            <div class="step-title">End-to-end tests — 23, live server</div>
+            <div class="step-detail"><code>make run &amp;</code> then <code>make test-e2e</code><br/>Playwright drives the dashboard and the coach: page load, search, filters, map, type effectiveness, a full coach turn, and comparison deep links.</div>
+          </div>
+        </div>
+      </div>
+      <div class="step-list">
+        <div class="step">
+          <div class="step-num">⚗</div>
+          <div class="step-body">
+            <div class="step-title">Wild-encounter eval harness</div>
+            <div class="step-detail"><code>python -m eval_harness run --label baseline</code><br/><code>python -m eval_harness report</code><br/><code>python -m eval_harness regrade --run 1</code></div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">!</div>
+          <div class="step-body">
+            <div class="step-title">Known issues</div>
+            <div class="step-detail">Observed defects are recorded as strict xfails and documented in <code>docs/known-issues.md</code>, so a fix trips the suite rather than passing unnoticed.</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -496,10 +722,12 @@
           <div class="env-row"><span class="env-key">COVEO_ACCESS_TOKEN</span><span class="env-val">Coveo API key (search + CRGA)</span></div>
           <div class="env-row"><span class="env-key">COVEO_ORGANIZATION_ID</span><span class="env-val">Coveo org ID</span></div>
           <div class="env-row"><span class="env-key">COVEO_PIPELINE</span><span class="env-val">Query pipeline (default: <code>default</code>)</span></div>
-          <div class="env-row"><span class="env-key">COVEO_RGA_PIPELINE</span><span class="env-val">RGA-enabled pipeline (default: <code>default</code>)</span></div>
+          <div class="env-row"><span class="env-key">COVEO_RGA_PIPELINE</span><span class="env-val">RGA-enabled pipeline (defaults to <code>COVEO_PIPELINE</code>)</span></div>
           <div class="env-row"><span class="env-key">COVEO_SEARCH_HUB</span><span class="env-val">Search hub (default: <code>PokedexUI</code>)</span></div>
           <div class="env-row"><span class="env-key">OLLAMA_MODEL</span><span class="env-val">Default model (e.g. <code>llama3</code>)</span></div>
           <div class="env-row"><span class="env-key">OLLAMA_BASE_URL</span><span class="env-val">Ollama host (default: <code>http://localhost:11434</code>)</span></div>
+          <div class="env-row"><span class="env-key">POKEDEX_PORT</span><span class="env-val">Server port (default: <code>5003</code> — macOS reserves 5000)</span></div>
+          <div class="env-row"><span class="env-key">POKEDEX_URL</span><span class="env-val">Base URL used by tests and the eval harness</span></div>
         </div>
       </div>
     </div>
@@ -519,7 +747,7 @@
             <div class="step-num">2</div>
             <div class="step-body">
               <div class="step-title">Install dependencies</div>
-              <div class="step-detail"><code>pip install flask flask-cors python-dotenv requests ollama</code></div>
+              <div class="step-detail"><code>pip install -r requirements-dev.txt</code></div>
             </div>
           </div>
           <div class="step">
@@ -533,14 +761,14 @@
             <div class="step-num">4</div>
             <div class="step-body">
               <div class="step-title">Pull an Ollama model</div>
-              <div class="step-detail"><code>ollama pull llama3</code></div>
+              <div class="step-detail"><code>ollama pull llama3</code> — optional; only needed for local-model answers.</div>
             </div>
           </div>
           <div class="step">
             <div class="step-num">5</div>
             <div class="step-body">
               <div class="step-title">Run</div>
-              <div class="step-detail"><code>python app.py</code> — open <code>http://127.0.0.1:5003/dashboard</code></div>
+              <div class="step-detail"><code>make run</code> — then open <code>/dashboard</code> or <code>/coach</code> on <code>http://127.0.0.1:5003</code></div>
             </div>
           </div>
         </div>
@@ -583,7 +811,7 @@
       <div class="model-pill">▼ mistral</div>
       <div class="model-pill">▼ gemma3</div>
       <div class="model-pill">▼ phi4</div>
-      <p style="font-size:11px;color:#555;margin-top:4px;width:100%;">Any model available in your local Ollama instance will also appear. Use <code>ollama pull &lt;model&gt;</code> to add more.</p>
+      <p style="font-size:11px;color:#555;margin-top:4px;width:100%;">Any model available in your local Ollama instance will also appear — both dropdowns are populated live from <code>/api/models</code>. Use <code>ollama pull &lt;model&gt;</code> to add more.</p>
     </div>
   </div>
 
@@ -591,25 +819,28 @@
   <div class="ai-card">
     <div class="ai-head"><div class="ai-dot"></div><span class="ai-lbl">Professor Oak's Note</span></div>
     <div class="ai-txt">
-      The AI answer pipeline selects the model based on the dropdown at the top of the dashboard.
-      Choose <strong>Professor-Oak (Coveo)</strong> for cloud-backed CRGA answers with inline citations,
-      or any local Ollama model for fully offline, grounded RAG using Coveo search results as context.
-      The server-side agent loop in <code>agent.py</code> always retrieves real Pokémon data from the
-      Coveo index before generating — it never hallucinates from weights alone.
+      Nothing here answers from weights alone. The dashboard's agent loop in <code>agent.py</code> always retrieves real
+      Pokémon data from the Coveo index before generating, and the coach sends every question — plus the recent
+      conversation — through Coveo CRGA, which cites the documents it used. When CRGA declines to answer, the coach
+      says so and falls back to the top search excerpts rather than inventing a reply. Then the grader checks the
+      answer's type claims against the chart, and disagreements are shown to you, not swallowed.
     </div>
   </div>
 
   <!-- SECURITY NOTE -->
   <div class="note">
-    <strong>Security:</strong> Coveo API keys are never exposed to the browser. The <code>/api/coveo-proxy</code> and
-    <code>/api/rga-coveo</code> routes inject the <code>COVEO_ACCESS_TOKEN</code> header server-side for every request.
-    The <code>/api/coveo-token</code> endpoint returns only what Coveo Atomic needs to initialise its headless engine.
+    <strong>Security:</strong> Coveo API keys are never exposed to the browser — <code>/api/coveo-proxy</code> and
+    <code>/api/rga-coveo</code> inject the <code>COVEO_ACCESS_TOKEN</code> header server-side for every request, and
+    <code>/api/coveo-token</code> returns only what Coveo Atomic needs to initialise its headless engine. The proxy's
+    path is regex-anchored to <code>/rest/search/v2*</code> so a caller cannot steer a request to another host, CORS is
+    scoped to this app's own origins rather than reflecting any origin, and coach sessions are capped at 20 turns and
+    1 000 sessions so the process cannot grow unboundedly.
   </div>
 
 </div><!-- /.wrap -->
 
-<footer style="margin-top:24px;border-top:1px solid #2a2a40;padding-top:10px;text-align:center;font-size:11px;color:#444;width:100%;max-width:860px;">
-  Agentic Pokédex · Coveo + Ollama + Flask
+<footer>
+  Agentic Pokédex · Coveo + Ollama + Flask · dashboard, coach, and classic device UIs
 </footer>
 
 </body>
