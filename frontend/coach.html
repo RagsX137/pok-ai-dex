@@ -1,7 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"/><title>Pokémon Coach</title></head>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pokémon Coach — Professor Oak</title>
+  <link rel="stylesheet" href="/frontend/coach.css" />
+  <link rel="stylesheet" href="/frontend/dashboard.css" />
+
+  <!-- Coveo Atomic (same CDN as dashboard) -->
+  <script type="module" src="https://static.cloud.coveo.com/atomic/v3/atomic.esm.js"></script>
+  <link rel="stylesheet" href="https://static.cloud.coveo.com/atomic/v3/themes/coveo.css" />
+</head>
+
 <body data-coveo-org="{{ COVEO_ORGANIZATION_ID }}">
-  <p id="coach-placeholder">Coach coming soon</p>
+
+<!-- Hidden Atomic interface — engine only, no rendered UI -->
+<atomic-search-interface id="atomic-search-interface" style="display:none">
+  <atomic-search-box
+    id="atomic-search-box-hidden"
+    number-of-queries="6"
+    minimum-query-length="2"
+    clear-filters="false"
+    style="display:none;">
+  </atomic-search-box>
+</atomic-search-interface>
+
+<div class="coach-wrap">
+
+  <!-- ── TOP BAR ── -->
+  <div class="coach-topbar">
+    <div class="leds">
+      <div class="led lr"></div>
+      <div class="led ly"></div>
+      <div class="led lg"></div>
+    </div>
+    <span class="coach-brand">Professor Oak</span>
+    <span class="coach-sub">Agentic Pokémon Coach · Coveo-powered</span>
+    <a href="/dashboard" class="dashboard-link">⇐ Dashboard</a>
+    <div class="model-pill">
+      <span class="model-arrow">▼</span>
+      <select id="model-select" title="Select AI model">
+        <optgroup label="Coveo">
+          <option value="coveo-rga">Professor-Oak (Coveo)</option>
+        </optgroup>
+        <optgroup label="Ollama (local)">
+          <option value="llama3">llama3</option>
+        </optgroup>
+      </select>
+    </div>
+  </div>
+
+  <!-- ── MAIN CHAT COLUMN ── -->
+  <div class="coach-main">
+
+    <div class="thread" id="thread">
+      <!-- Quick-start chips shown before first message -->
+      <div class="quick-chips" id="quick-chips">
+        <div class="quick-chip" data-prompt="Build me a balanced team of 6 Pokémon">⚔ Build me a team</div>
+        <div class="quick-chip" data-prompt="What types counter Ice/Dragon dual-types?">🧊 Counter Ice/Dragon</div>
+        <div class="quick-chip" data-prompt="Compare Gyarados and Vaporeon for a Water slot">⇌ Compare two Pokémon</div>
+        <div class="quick-chip" data-challenge="true">🎲 Challenge me</div>
+      </div>
+    </div>
+
+    <!-- Input bar -->
+    <div class="input-bar">
+      <div class="suggestions-drop" id="suggestions-drop"></div>
+      <div class="input-row">
+        <textarea
+          id="coach-input"
+          class="coach-input"
+          placeholder="Ask Oak anything… 'Compare Charizard vs Dragonite', 'Who counters my Gyarados?'"
+          autocomplete="off"
+          spellcheck="false"
+          rows="1"></textarea>
+        <button class="send-btn" id="send-btn" title="Send">⌕</button>
+      </div>
+    </div>
+
+  </div><!-- /.coach-main -->
+
+  <!-- ── RIGHT ASIDE ── -->
+  <aside class="coach-aside">
+    <div class="aside-section">
+      <div class="aside-title">Quick Answer</div>
+      <div class="snippet-text" id="aside-snippet">
+        <span class="snippet-empty">Ask a question to see a quick answer here.</span>
+      </div>
+    </div>
+    <div class="aside-title" style="padding:12px 14px 0;margin-bottom:0">Similar Pokémon</div>
+    <div class="rec-grid" id="rec-grid">
+      <div class="snippet-empty" style="font-size:11px;color:#555;padding:4px 0">
+        Recommendations will appear here after your first question.
+      </div>
+    </div>
+  </aside>
+
+</div><!-- /.coach-wrap -->
+
+<script type="module" src="/frontend/coach.js"></script>
 </body>
 </html>
