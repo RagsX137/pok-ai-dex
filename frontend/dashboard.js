@@ -1207,8 +1207,10 @@ function wireMapPan() {
 // ─────────────────────────────────────────────────────────────
 // 19. Boot
 // ─────────────────────────────────────────────────────────────
-// Inject compare-button CSS so it applies on the dashboard page
-// (coach.css is only loaded on /coach)
+// NOTE: Compare-button styles are injected here rather than placed in dashboard.css
+// because the plan's Global Constraints forbid modifying dashboard.css.
+// coach.css is only loaded on /coach — this IIFE ensures .cmp-btn styles apply
+// on /dashboard where the button is actually rendered.
 (function injectCmpBtnStyles() {
   const style = document.createElement('style');
   style.textContent = `

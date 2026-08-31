@@ -21,6 +21,9 @@ import {
 // ── Session ───────────────────────────────────────────────────
 let _sessionId = crypto.randomUUID();
 
+// ── In-flight guard ──────────────────────────────────────────
+let _busy = false;
+
 // ── DOM refs ──────────────────────────────────────────────────
 const thread      = () => document.getElementById('thread');
 const inputEl     = () => document.getElementById('coach-input');
@@ -113,8 +116,8 @@ async function appendComparisonPanel(comparison) {
     fetchPokeData(pokemon_b),
   ]);
 
-  const nsA = `-cmp-a-${Date.now()}`;
-  const nsB = `-cmp-b-${Date.now()}`;
+  const nsA = `-cmp-a-${crypto.randomUUID()}`;
+  const nsB = `-cmp-b-${crypto.randomUUID()}`;
 
   function panelHtml(name, poke, ns) {
     const capName = name.charAt(0).toUpperCase() + name.slice(1);
@@ -135,10 +138,9 @@ async function appendComparisonPanel(comparison) {
       <div class="cmp-body">
         <div class="cmp-photo">
           <div class="photo-glow" id="photo-glow${ns}"></div>
-          <img class="psprite" id="psprite${ns}"
+          <img class="psprite cmp-artwork" id="psprite${ns}"
                src="${esc(pokemonDbArtworkUrl(name))}"
-               alt="${esc(capName)}"
-               onerror="this.style.display='none'" />
+               alt="${esc(capName)}" />
           <div class="cmp-photo-overlay">${esc(capName)}</div>
         </div>
         <div class="sec">Base Stats</div>
@@ -208,18 +210,29 @@ async function appendComparisonPanel(comparison) {
   thread().appendChild(wrap);
   scrollBottom();
 
+  // Wire image error handlers (CSP-safe — no inline onerror attributes)
+  wrap.querySelectorAll('img.cmp-artwork').forEach(img => {
+    img.addEventListener('error', () => { img.style.display = 'none'; });
+  });
+
   // Fill rendering primitives after DOM is in place
   if (pokeA) {
     renderStatBars(pokeA.stats, nsA);
     renderTypeEffectiveness(pokeA.types, nsA);
     renderMovesTable(pokeA.moves, pokeA.types, nsA);
     updatePhotoCard(pokemonDbArtworkUrl(pokemon_a), pokemon_a, pokeA.id, pokeA.types[0], nsA);
+  } else {
+    const cardA = wrap.querySelector(`#rp-name${nsA}`)?.closest('.cmp-card');
+    if (cardA) cardA.innerHTML = `<p style="color:#e57373;padding:8px 0">Pokémon not found: ${esc(pokemon_a)}</p>`;
   }
   if (pokeB) {
     renderStatBars(pokeB.stats, nsB);
     renderTypeEffectiveness(pokeB.types, nsB);
     renderMovesTable(pokeB.moves, pokeB.types, nsB);
     updatePhotoCard(pokemonDbArtworkUrl(pokemon_b), pokemon_b, pokeB.id, pokeB.types[0], nsB);
+  } else {
+    const cardB = wrap.querySelector(`#rp-name${nsB}`)?.closest('.cmp-card');
+    if (cardB) cardB.innerHTML = `<p style="color:#e57373;padding:8px 0">Pokémon not found: ${esc(pokemon_b)}</p>`;
   }
 }
 
@@ -283,7 +296,7 @@ async function updateRecommendations(pokemonName) {
       const typeLabel = (poke?.types ?? [type]).map(t => t.charAt(0).toUpperCase() + t.slice(1)).join('/');
       return `<div class="rec-card" data-name="${esc(name)}">
         <img class="rec-sprite" src="${esc(poke?.sprite ?? pokemonDbSpriteUrl(name))}"
-             alt="${esc(display)}" onerror="this.style.display='none'" />
+             alt="${esc(display)}" />
         <div class="rec-info">
           <div class="rec-name">${esc(display)}</div>
           <div class="rec-type">${esc(typeLabel)}</div>
@@ -291,6 +304,10 @@ async function updateRecommendations(pokemonName) {
       </div>`;
     }).join('');
 
+    // Wire image error handlers (CSP-safe)
+    grid.querySelectorAll('img.rec-sprite').forEach(img => {
+      img.addEventListener('error', () => { img.style.display = 'none'; });
+    });
     grid.querySelectorAll('.rec-card').forEach(card => {
       card.addEventListener('click', () => {
         const name = card.dataset.name;
@@ -304,56 +321,62 @@ async function updateRecommendations(pokemonName) {
 
 // ── Send a message ────────────────────────────────────────────
 async function sendMessage(overrideText) {
+  if (_busy) return;
   const input = inputEl();
   const text = (overrideText ?? input?.value ?? '').trim();
   if (!text) return;
 
-  // Hide quick chips after first message
-  const chips = quickChips();
-  if (chips) chips.style.display = 'none';
-
-  if (input) input.value = '';
-  closeSuggestions();
-
-  appendUserBubble(text);
-  appendThinking();
+  _busy = true;
+  sendBtn().disabled = true;
 
   try {
-    const resp = await fetch('/api/coach', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ session_id: _sessionId, message: text }),
-    });
-    removeThinking();
+    // Hide quick chips after first message
+    const chips = quickChips();
+    if (chips) chips.style.display = 'none';
 
-    if (!resp.ok) {
-      appendErrorBubble('(Error contacting Professor Oak — please try again.)');
-      return;
+    if (input) input.value = '';
+    closeSuggestions();
+
+    appendUserBubble(text);
+    appendThinking();
+
+    try {
+      const resp = await fetch('/api/coach', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: _sessionId, message: text }),
+      });
+      removeThinking();
+
+      if (!resp.ok) {
+        appendErrorBubble('(Error contacting Professor Oak — please try again.)');
+        return;
+      }
+
+      const data = await resp.json();
+      const { answer, citations, comparison, grading_flags } = data;
+
+      if (comparison) {
+        // Render the text answer as a brief intro bubble, then the comparison panel
+        appendOakBubble(answer, citations, grading_flags);
+        await appendComparisonPanel(comparison);
+      } else {
+        appendOakBubble(answer, citations, grading_flags);
+      }
+
+      updateSnippet(answer);
+
+      // Update recommendations from first Pokémon mentioned in the answer
+      const firstMention = answer.match(/\b([A-Z][a-z]{2,})\b/);
+      if (firstMention) updateRecommendations(firstMention[1].toLowerCase());
+
+    } catch (err) {
+      removeThinking();
+      appendErrorBubble('(Professor Oak is unavailable — check the server.)');
     }
-
-    const data = await resp.json();
-    const { answer, citations, comparison, grading_flags, session_id } = data;
-
-    // Sync session_id in case backend generated one
-    if (session_id) _sessionId = session_id;
-
-    if (comparison) {
-      // Render the text answer as a brief intro bubble, then the comparison panel
-      appendOakBubble(answer, citations, grading_flags);
-      await appendComparisonPanel(comparison);
-    } else {
-      appendOakBubble(answer, citations, grading_flags);
-    }
-
-    updateSnippet(answer);
-
-    // Update recommendations from first Pokémon mentioned in the answer
-    const firstMention = answer.match(/\b([A-Z][a-z]{2,})\b/);
-    if (firstMention) updateRecommendations(firstMention[1].toLowerCase());
-
-  } catch (err) {
-    removeThinking();
-    appendErrorBubble('(Professor Oak is unavailable — check the server.)');
+  } finally {
+    _busy = false;
+    sendBtn().disabled = false;
   }
 }
 

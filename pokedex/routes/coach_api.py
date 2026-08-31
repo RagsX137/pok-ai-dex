@@ -1,15 +1,32 @@
 """Coach API blueprint: stateful conversation, comparison detection, challenge mode."""
 from __future__ import annotations
 
+import json
 import re
 import uuid
+from pathlib import Path
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, current_app, jsonify, request
 
 from pokedex.conversation import append_turn, get_history
 from pokedex.coveo import CoveoClient
 
 coach_bp = Blueprint("coach_api", __name__)
+
+# ── Module-level grading resources (load once at startup) ─────
+# These are optional — if eval_harness is absent the guards below skip grading.
+_grade_chart = None
+_grade_universe: list = []
+try:
+    from eval_harness.grading import check_chart_claims, check_type_claims  # type: ignore
+    from eval_harness.typechart import TypeChart  # type: ignore
+
+    _cache_path = Path("eval_data/type_cache.json")
+    _grade_chart = TypeChart(_cache_path, offline=_cache_path.exists())
+    _corpus_path = Path("eval_data/corpus.json")
+    _grade_universe = json.loads(_corpus_path.read_text()) if _corpus_path.exists() else []
+except Exception:
+    pass  # grading is best-effort; missing eval_harness is fine
 
 # ── Comparison intent detection ───────────────────────────────
 # Patterns (case-insensitive). Each returns (name_a, name_b) or None.
@@ -164,27 +181,19 @@ def coach():
 
 
 def _grade_answer(answer: str, cmp_names: tuple[str, str] | None) -> list[dict]:
-    """Run objective type/chart checks; return list of flag dicts."""
-    flags = []
-    try:
-        from pathlib import Path
-        from eval_harness.grading import check_chart_claims, check_type_claims
-        from eval_harness.typechart import TypeChart
-        import json
+    """Run objective type/chart checks; return list of flag dicts.
 
-        for err in check_chart_claims(answer):
+    Uses module-level singletons (_grade_chart, _grade_universe) initialised at
+    import time so eval_data files are read once per server process, not per request.
+    """
+    flags = []
+    if _grade_chart is None:
+        return flags  # eval_harness not available; skip grading
+    try:
+        for err in check_chart_claims(answer):  # type: ignore[name-defined]
             flags.append({"type": "chart_error", "message": err["claim"],
                           "quote": err.get("quote", "")})
-
-        # Build minimal chart + universe for type-claim checking
-        cache_path = Path("eval_data/type_cache.json")
-        chart = TypeChart(cache_path, offline=cache_path.exists())
-        try:
-            corpus_path = Path("eval_data/corpus.json")
-            universe = json.loads(corpus_path.read_text()) if corpus_path.exists() else []
-        except Exception:
-            universe = []
-        for err in check_type_claims(answer, chart, universe):
+        for err in check_type_claims(answer, _grade_chart, _grade_universe):  # type: ignore[name-defined]
             flags.append({"type": "type_error", "message": err.get("pokemon", ""),
                           "quote": err.get("quote", "")})
     except Exception:
@@ -215,26 +224,21 @@ def coach_challenge():
     as a ready-to-send coach message. The scenario dict gives the client
     enough information to render the team and wild Pokémon.
     """
-    import json
     import random
-    from pathlib import Path
-    from eval_harness.scenarios import ScenarioBuilder, AXES
-    from eval_harness.typechart import TypeChart
+    from eval_harness.scenarios import ScenarioBuilder, AXES  # type: ignore
 
     data = request.get_json(force=True) or {}
     axis = data.get("axis", "baseline")
     if axis not in AXES:
         axis = "baseline"
 
+    # Use the module-level TypeChart singleton; fall back to generic prompt if unavailable
+    chart = _grade_chart
+    pool = list(_grade_universe)
+
     try:
-        cache_path = Path("eval_data/type_cache.json")
-        chart = TypeChart(cache_path, offline=cache_path.exists())
-        # Load Pokémon names from corpus or fall back to a small hardcoded set
-        try:
-            corpus_path = Path("eval_data/corpus.json")
-            pool = json.loads(corpus_path.read_text()) if corpus_path.exists() else []
-        except Exception:
-            pool = []
+        if chart is None:
+            raise RuntimeError("eval_harness not available")
         if len(pool) < 7:
             pool = [
                 "charizard", "blastoise", "venusaur", "pikachu", "gengar",
@@ -251,15 +255,15 @@ def coach_challenge():
             f"My team is {', '.join(sc.team)}. "
             f"Which of them has a type advantage against {sc.wild}?"
         )
-    except Exception as exc:
-        # Graceful fallback — return a generic prompt
+    except Exception:
+        # Graceful fallback — return a generic prompt; do not expose internals to client
+        current_app.logger.exception("coach-challenge scenario build failed")
         probe_text = "I'm facing a wild Pokémon. Can you help me decide who to send out?"
         session_id = str(uuid.uuid4())
         return jsonify({
             "prompt":     probe_text,
             "session_id": session_id,
             "scenario":   {},
-            "error":      str(exc),
         })
 
     session_id = str(uuid.uuid4())
