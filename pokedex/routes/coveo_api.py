@@ -1,54 +1,24 @@
 """Coveo API blueprint: token endpoint, SSRF-guarded proxy, and CRGA."""
-import csv
 import re
 
 import requests as req_lib
 from flask import Blueprint, jsonify, request
 
+from pokedex import pokemon_names
 from pokedex.config import settings
 from pokedex.coveo import CoveoClient
 
-# ── Pokémon name list (loaded once at import time) ────────────
-# Used by /api/pokemon-correct to resolve misspelled names.
-_POKEMON_NAMES: list[str] = []
-try:
-    _csv_path = settings.repo_root / "data" / "pokemon_db.csv"
-    with _csv_path.open(newline="", encoding="utf-8") as _f:
-        _POKEMON_NAMES = [row["pokemon"].lower() for row in csv.DictReader(_f) if row.get("pokemon")]
-except Exception:
-    pass  # graceful — endpoint returns null if file is absent
-
-
-def _edit_distance(a: str, b: str) -> int:
-    """Standard DP Levenshtein distance."""
-    if a == b:
-        return 0
-    if not a:
-        return len(b)
-    if not b:
-        return len(a)
-    prev = list(range(len(b) + 1))
-    for i, ca in enumerate(a, 1):
-        curr = [i]
-        for j, cb in enumerate(b, 1):
-            curr.append(min(prev[j] + 1, curr[j - 1] + 1, prev[j - 1] + (0 if ca == cb else 1)))
-        prev = curr
-    return prev[-1]
+pokemon_names.init(settings.repo_root)
 
 
 def _closest_pokemon(name: str, max_dist: int = 2) -> str | None:
-    """Return the closest known Pokémon name within max_dist edits, or None."""
-    if not _POKEMON_NAMES or not name:
-        return None
-    key = name.lower().strip()
-    if key in _POKEMON_NAMES:
-        return key
-    best_name, best_dist = None, max_dist + 1
-    for candidate in _POKEMON_NAMES:
-        d = _edit_distance(key, candidate)
-        if d < best_dist:
-            best_dist, best_name = d, candidate
-    return best_name if best_dist <= max_dist else None
+    """Kept for /api/pokemon-correct. Delegates to the shared resolver.
+
+    Callers making a *decision* (routing, grading) must use
+    pokemon_names.resolve / resolve_suffix / resolve_prefix instead — this
+    function coerces, and will happily turn 'speed' into 'seel'.
+    """
+    return pokemon_names.closest(name, max_dist)
 
 coveo_bp = Blueprint("coveo_api", __name__)
 

@@ -12,11 +12,10 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
-# Lazily import _POKEMON_NAMES from coveo_api to avoid a circular import.
-# We call _closest_pokemon from there instead of duplicating the lookup.
-def _corpus() -> list[str]:
-    from pokedex.routes.coveo_api import _POKEMON_NAMES
-    return _POKEMON_NAMES
+# Lazily access the shared corpus and resolver to avoid a circular import.
+def _corpus() -> frozenset[str]:
+    from pokedex import pokemon_names
+    return pokemon_names.names()
 
 
 def _resolve(name: str) -> str | None:

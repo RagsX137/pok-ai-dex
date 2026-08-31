@@ -222,3 +222,49 @@ def test_challenge_does_not_pre_store_turn(client):
     # The session returned by challenge must be empty — no pre-stored turn.
     history = get_history(d["session_id"])
     assert history == [], f"Expected empty history, got {history}"
+
+import pytest
+from pokedex.routes.coach_api import _detect_comparison
+
+COMPARISONS = [
+    # (message, expected)
+    ("Compare Charizard to Dragonite",                    ("charizard", "dragonite")),
+    ("between Charizard and Dragonite, who wins",         ("charizard", "dragonite")),
+    ("Charizard vs Dragonite",                            ("charizard", "dragonite")),
+    ("Charizard vs Dragonite, who wins?",                 ("charizard", "dragonite")),
+    ("Which is better: Umbreon or Espeon?",               ("umbreon", "espeon")),
+    # hyphen + digit names — the class the old character class could not see
+    ("Porygon-Z or Porygon2, which is better?",           ("porygon-z", "porygon2")),
+    ("Ho-Oh or Lugia?",                                   ("ho-oh", "lugia")),
+    ("Mr. Mime or Mime Jr.?",                             ("mr. mime", "mime jr.")),
+    ("compare Farfetch'd with Sirfetch'd",                ("farfetch'd", "sirfetch'd")),
+    # lead-in words before the first name — regressed by search()+continue
+    ("Should I use Charizard or Blastoise against this?", ("charizard", "blastoise")),
+    ("Do I send Gengar or Alakazam?",                     ("gengar", "alakazam")),
+    ("Is Snorlax or Blissey the better wall?",            ("snorlax", "blissey")),
+    ("Would you pick Jangmo-o or Kommo-o for this?",      ("jangmo-o", "kommo-o")),
+]
+
+@pytest.mark.parametrize("message,expected", COMPARISONS)
+def test_detect_comparison_positives(message, expected):
+    assert _detect_comparison(message) == expected
+
+BENIGN = [
+    "Do I lead with the tank or the sweeper?",
+    "Should I heal it or switch out?",
+    "Is Charizard good or bad in this matchup?",
+    "Rate my team out of ten or give me a grade",
+    "Can you explain STAB versus base power for me?",
+    "Should I switch or stay in?",
+    "Do I use an item or attack?",
+    # single words with an edit-distance-2 neighbour in the corpus: these are
+    # exactly what fuzzy "validation" would have coerced into a comparison
+    "Speed or bulk?",
+    "Toxic or seed?",
+    "Tank or wall?",
+    "Lead or switch?",
+]
+
+@pytest.mark.parametrize("message", BENIGN)
+def test_detect_comparison_no_false_positives(message):
+    assert _detect_comparison(message) is None

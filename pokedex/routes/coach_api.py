@@ -10,6 +10,8 @@ from flask import Blueprint, current_app, jsonify, request
 
 from pokedex.conversation import append_turn, get_history
 from pokedex.coveo import CoveoClient
+from pokedex import pokemon_names
+from pokedex.pokemon_names import NAME_CHARS as _NC
 
 from pokedex.matchup import detect_matchup_intent, MatchupIntent  # noqa: E402
 
@@ -37,36 +39,24 @@ if "is_abstention" not in globals():
         return not (answer or "").strip("() ")
 
 # ── Comparison intent detection ───────────────────────────────
-# Patterns (case-insensitive). Each returns (name_a, name_b) or None.
+# Patterns (case-insensitive). Each capture is a *candidate span*, deliberately
+# loose — _detect_comparison trims it down to the part that actually resolves,
+# so the regex no longer has to be clever about where a name starts and ends.
 _CMP_PATTERNS = [
     # "compare Charizard and Dragonite" / "compare X vs Y"
-    re.compile(
-        r'\bcompare\s+([A-Za-z][A-Za-z\'\-\.♀♂ ]{1,30}?)\s+'
-        r'(?:and|vs\.?|versus)\s+([A-Za-z][A-Za-z\'\-\.♀♂ ]{1,30})',
-        re.I
-    ),
+    re.compile(rf'\bcompare\s+([A-Za-z][{_NC}]{{1,30}}?)\s+'
+               rf'(?:to|with|and|vs\.?|versus)\s+([A-Za-z][{_NC}]{{1,30}})', re.I),
     # "between Charizard and Dragonite, ..."
-    # No spaces in capture groups: without a keyword terminator after group 2,
-    # allowing spaces causes runaway matching into the rest of the sentence.
-    re.compile(
-        r'\bbetween\s+([A-Za-z][A-Za-z\'\-\.♀♂]{1,24})\s+and\s+([A-Za-z][A-Za-z\'\-\.♀♂]{1,24})',
-        re.I
-    ),
+    re.compile(rf'\bbetween\s+([A-Za-z][{_NC}]{{1,30}}?)\s+and\s+([A-Za-z][{_NC}]{{1,30}})', re.I),
     # "Charizard vs Dragonite" / "Charizard versus Dragonite"
-    re.compile(
-        r'\b([A-Za-z][A-Za-z\'\-\.♀♂ ]{1,30}?)\s+'
-        r'(?:vs\.?|versus)\s+([A-Za-z][A-Za-z\'\-\.♀♂ ]{1,30})',
-        re.I
-    ),
+    re.compile(rf'\b([A-Za-z][{_NC}]{{1,30}}?)\s+(?:vs\.?|versus)\s+([A-Za-z][{_NC}]{{1,30}})', re.I),
     # "which is better: Umbreon or Espeon" / "Umbreon or Espeon"
-    re.compile(
-        r'\b([A-Za-z][A-Za-z\'\-\.♀♂ ]{1,30}?)\s+or\s+([A-Za-z][A-Za-z\'\-\.♀♂ ]{1,30})'
-        r'(?=\s*[?,]|\s+for|\s+on|\s+against|\s*$)',
-        re.I
-    ),
+    re.compile(rf'\b([A-Za-z][{_NC}]{{1,30}}?)\s+or\s+([A-Za-z][{_NC}]{{1,30}})'
+               rf'(?=\s*[?,]|\s+for|\s+on|\s+against|\s*$)', re.I),
 ]
 
 # Single-word Pokémon names that would produce false positives in the "or" pattern.
+# Still used by _extract_pokemon_mentions.
 _STOPWORDS = {
     'a', 'an', 'the', 'my', 'your', 'his', 'her', 'their', 'our',
     'not', 'no', 'yes', 'can', 'will', 'should', 'would', 'could',
@@ -78,18 +68,23 @@ _STOPWORDS = {
 
 
 def _detect_comparison(message: str) -> tuple[str, str] | None:
-    """Return (pokemon_a, pokemon_b) if the message is a comparison request."""
+    """Return (pokemon_a, pokemon_b) if the message is a comparison request.
+
+    Both sides must resolve EXACTLY against the corpus. Fuzzy matching is
+    deliberately not used here: at edit distance 2 'speed' resolves to 'seel'
+    and 'null' to 'numel', which would fabricate a comparison out of a question
+    that never named a Pokemon.
+
+    finditer, not search: the first match of a pattern is often the wrong span
+    ("should i use charizard" / "blastoise against this"). Later matches, and
+    the prefix/suffix trim, recover the real names.
+    """
     for pattern in _CMP_PATTERNS:
-        m = pattern.search(message)
-        if m:
-            a = m.group(1).strip().lower()
-            b = m.group(2).strip().lower()
-            # Reject stopwords and strings over 25 chars (not Pokémon names)
-            if a in _STOPWORDS or b in _STOPWORDS:
-                continue
-            if len(a) > 25 or len(b) > 25:
-                continue
-            return a, b
+        for m in pattern.finditer(message or ""):
+            a = pokemon_names.resolve_suffix(m.group(1))
+            b = pokemon_names.resolve_prefix(m.group(2))
+            if a and b and a != b:
+                return a, b
     return None
 
 
@@ -272,11 +267,11 @@ _POKEMON_MENTION_RE = re.compile(r'\b([A-Z][a-z]{2,}(?:-[A-Z][a-z]+)?)\b')
 def _extract_pokemon_mentions(text: str) -> list[str]:
     """
     Return canonical Pokémon names found in `text`, verified against the
-    924-name corpus via _closest_pokemon.  Capitalisation heuristics alone
+    corpus via _closest_pokemon.  Capitalisation heuristics alone
     produce too many false positives (ordinary English words, verbs, etc.).
     """
-    from pokedex.routes.coveo_api import _closest_pokemon, _POKEMON_NAMES
-    if not _POKEMON_NAMES:
+    from pokedex.routes.coveo_api import _closest_pokemon
+    if not pokemon_names.names():
         # Corpus not loaded — fall back to the old capitalised-word heuristic
         # rather than returning nothing.
         return list(dict.fromkeys(
