@@ -28,6 +28,12 @@ def test_dashboard_renders_with_org_injected(client, monkeypatch):
     assert b"{{ COVEO_ORGANIZATION_ID }}" not in r.data
 
 
+def test_coach_renders_with_org_injected(client):
+    r = client.get("/coach")
+    assert r.status_code == 200
+    assert b"{{ COVEO_ORGANIZATION_ID }}" not in r.data
+
+
 def test_coveo_proxy_rejects_paths_outside_search(client):
     r = client.post("/api/coveo-proxy",
                     json={"path": "/rest/organizations/x/apikeys", "body": {}})
