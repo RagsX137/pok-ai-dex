@@ -6,8 +6,12 @@
  *   - Right panel:   stats · moves · type effectiveness · RGA recommendation
  */
 
-import { TYPE_COLORS } from './modules/type-colors.js';
-import { TYPE_CHART, ALL_TYPES, typeMultiplier, multLabel } from './modules/type-chart.js';
+import { TYPE_COLORS, TYPE_CHART, ALL_TYPES, typeMultiplier, multLabel,
+         pokeSlug, pokemonDbArtworkUrl, pokemonDbSpriteUrl,
+         fetchPokeData, fetchMoveMeta,
+         renderStatBars, renderMovesTable, renderTypeEffectiveness,
+         updatePhotoCard, setPanelHeader, matchupSummary,
+         STAT_KEYS } from './modules/pokemon-panel.js';
 
 // Generation → Roman numeral mapping (used for Coveo facet values)
 const GEN_MAP = {
@@ -108,125 +112,6 @@ const ORIGIN_GEN_NUM = {
   'gen-i': 1, 'gen-ii': 2, 'gen-iii': 3, 'gen-iv': 4,
   'gen-v': 5, 'gen-vi': 6, 'gen-vii': 7, 'gen-viii': 8, 'gen-ix': 9,
 };
-
-// ─────────────────────────────────────────────────────────────
-// PokéDB artwork helpers
-// ─────────────────────────────────────────────────────────────
-
-/**
- * Return the pokemondb.net high-res artwork URL for a given name.
- * Falls back through Coveo-indexed image_url → local file.
- * PokeAPI is NOT used for the artwork image.
- *
- * @param {string} name      - Pokémon name (any case)
- * @param {object} [raw]     - Coveo result.raw (may contain image_url)
- * @returns {string}
- */
-/**
- * Normalise a display name into the slug PokéAPI and pokemondb both expect.
- * Display names carry apostrophes, spaces, periods, accents and gender symbols
- * that neither CDN accepts — "Farfetch'd" → farfetchd, "Tapu Koko" → tapu-koko.
- * Without this the fetch 404s and the panel silently keeps the previous
- * Pokémon's data.
- */
-const SLUG_OVERRIDES = {
-  "farfetch'd": 'farfetchd',   "sirfetch'd": 'sirfetchd',
-  'mr. mime': 'mr-mime',       'mr. rime': 'mr-rime',
-  'mime jr.': 'mime-jr',       'type: null': 'type-null',
-  'nidoran♀': 'nidoran-f',     'nidoran♂': 'nidoran-m',
-  'deoxys': 'deoxys-normal',   'wormadam': 'wormadam-plant',
-  'giratina': 'giratina-altered', 'shaymin': 'shaymin-land',
-  'basculin': 'basculin-red-striped', 'darmanitan': 'darmanitan-standard',
-  'tornadus': 'tornadus-incarnate', 'thundurus': 'thundurus-incarnate',
-  'landorus': 'landorus-incarnate', 'keldeo': 'keldeo-ordinary',
-  'meloetta': 'meloetta-aria', 'meowstic': 'meowstic-male',
-  'aegislash': 'aegislash-shield', 'pumpkaboo': 'pumpkaboo-average',
-  'gourgeist': 'gourgeist-average', 'zygarde': 'zygarde-50',
-  'oricorio': 'oricorio-baile', 'lycanroc': 'lycanroc-midday',
-  'wishiwashi': 'wishiwashi-solo', 'minior': 'minior-red-meteor',
-  'toxtricity': 'toxtricity-amped', 'eiscue': 'eiscue-ice',
-  'indeedee': 'indeedee-male', 'urshifu': 'urshifu-single-strike',
-  'basculegion': 'basculegion-male', 'enamorus': 'enamorus-incarnate',
-  'oinkologne': 'oinkologne-male', 'maushold': 'maushold-family-of-four',
-  'squawkabilly': 'squawkabilly-green-plumage', 'palafin': 'palafin-zero',
-  'tatsugiri': 'tatsugiri-curly', 'dudunsparce': 'dudunsparce-two-segment',
-};
-
-function pokeSlug(name) {
-  const key = String(name ?? '').toLowerCase().trim();
-  if (SLUG_OVERRIDES[key]) return SLUG_OVERRIDES[key];
-  return key
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')  // é → e
-    .replace(/['’.:]/g, '')                             // Farfetch'd, Mr. Mime
-    .replace(/[^a-z0-9]+/g, '-')                        // spaces → hyphen
-    .replace(/^-+|-+$/g, '');
-}
-
-function pokemonDbArtworkUrl(name, raw) {
-  const slug = pokeSlug(name);
-  // Prefer the URL Coveo already indexed from pokemondb.net
-  if (raw?.image_url) return raw.image_url;
-  // Derive directly from pokemondb CDN (large artwork)
-  return `https://img.pokemondb.net/artwork/large/${slug}.jpg`;
-}
-
-/**
- * Return the pokemondb.net sprite URL (used for the sidebar header icon — V2).
- * These are the "home" normal sprites which are small and load fast.
- *
- * @param {string} name - Pokémon name
- * @returns {string}
- */
-function pokemonDbSpriteUrl(name) {
-  const slug = pokeSlug(name);
-  return `https://img.pokemondb.net/sprites/home/normal/${slug}.png`;
-}
-
-// ─────────────────────────────────────────────────────────────
-// PokéAPI cache  (still used for stats, moves, types, location)
-// ─────────────────────────────────────────────────────────────
-const _cache = {};
-
-async function fetchPokeData(name) {
-  const key = pokeSlug(name);
-  if (!key) return null;
-  if (_cache[key]) return _cache[key];
-  try {
-    const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${key}`);
-    if (!r.ok) return null;
-    const d = await r.json();
-
-    // Moves: level-up only, sorted by level
-    // Keep the HIGHEST level each move is learned at, then sort descending.
-    // Sorting ascending showed a fully-evolved Charizard's level-1 baby moves
-    // (Scratch, Growl, Ember) — useless for judging what it can hit you with.
-    const byName = new Map();
-    for (const m of d.moves) {
-      for (const v of m.version_group_details) {
-        if (v.move_learn_method.name !== 'level-up') continue;
-        const prev = byName.get(m.move.name);
-        if (prev === undefined || v.level_learned_at > prev) {
-          byName.set(m.move.name, v.level_learned_at);
-        }
-      }
-    }
-    const levelMoves = [...byName.entries()]
-      .map(([name, level]) => ({ name, level }))
-      .sort((a, b) => b.level - a.level);
-
-    const data = {
-      id:       d.id,
-      sprite:   d.sprites?.front_default ?? '',
-      types:    d.types.map(t => t.type.name),
-      stats:    Object.fromEntries(d.stats.map(s => [s.stat.name, s.base_stat])),
-      moves:    levelMoves,
-    };
-    _cache[key] = data;
-    return data;
-  } catch {
-    return null;
-  }
-}
 
 // ─────────────────────────────────────────────────────────────
 // 1. Build type chips in the left sidebar
@@ -937,11 +822,11 @@ async function selectResult(result, autoSelect) {
 
   // Immediately update name labels
   setPhotoName(name, null);
-  setRightPanelName(name, [], null);
+  setPanelHeader(name, [], null, '');
 
   // ── Artwork from pokemondb.net (Coveo-indexed or CDN-derived) ──
   const artworkUrl = pokemonDbArtworkUrl(name, result.raw);
-  updatePhotoCard(artworkUrl, name, null, '');
+  updatePhotoCard(artworkUrl, name, null, '', '');
 
   // Header circle sprite — set before the PokéAPI await so it works even for
   // Pokémon PokéAPI does not know about.
@@ -965,7 +850,7 @@ async function selectResult(result, autoSelect) {
 
   // Photo card — refresh number + glow once we have the id
   setPhotoName(name, poke.id);
-  updatePhotoCard(artworkUrl, name, poke.id, poke.types[0]);
+  updatePhotoCard(artworkUrl, name, poke.id, poke.types[0], '');
 
   if (headerSprite && poke.sprite) {
     headerSprite.onload  = () => { headerSprite.style.opacity = '1'; };
@@ -974,10 +859,10 @@ async function selectResult(result, autoSelect) {
   }
 
   // Right panel
-  setRightPanelName(name, poke.types, poke.id);
-  renderStatBars(poke.stats);
-  renderMovesTable(poke.moves, poke.types);
-  renderTypeEffectiveness(poke.types);
+  setPanelHeader(name, poke.types, poke.id, '');
+  renderStatBars(poke.stats, '');
+  renderMovesTable(poke.moves, poke.types, '');
+  renderTypeEffectiveness(poke.types, '');
   _lastSelectedTypes = poke.types;
   renderMatchupLine(poke.types);
 
@@ -999,190 +884,12 @@ async function selectResult(result, autoSelect) {
   renderSimilarPokemon(poke.types[0], name, token);
 }
 
-// ─────────────────────────────────────────────────────────────
-// 10. Photo card updater
-// ─────────────────────────────────────────────────────────────
-function updatePhotoCard(artworkUrl, name, pokeId, primaryType) {
-  const img = document.getElementById('psprite');
-  if (img) {
-    // artworkUrl comes from pokemondb.net — NOT PokeAPI
-    img.src = artworkUrl || `/images/${name.toLowerCase()}_image.jpg`;
-    img.style.display = '';
-  }
-
-  // Tint the glow to the primary type colour
-  const glow = document.getElementById('photo-glow');
-  if (glow && primaryType) {
-    const colors = TYPE_COLORS[primaryType.toLowerCase()] ?? {};
-    const hex = colors.bg ?? '#ff9832';
-    glow.style.background = `radial-gradient(ellipse at 50% 60%, ${hex}22 0%, transparent 70%)`;
-  }
-}
-
 function setPhotoName(name, pokeId) {
   const nameEl = document.getElementById('photo-name');
   const numEl  = document.getElementById('photo-num');
   if (nameEl) nameEl.textContent = name;
   if (numEl && pokeId)  numEl.textContent = `#${String(pokeId).padStart(3, '0')}`;
   else if (numEl) numEl.textContent = '';
-}
-
-// ─────────────────────────────────────────────────────────────
-// 11. Right panel — name + type tags
-// ─────────────────────────────────────────────────────────────
-function setRightPanelName(name, types, pokeId) {
-  const nameEl = document.getElementById('rp-name');
-  const tagsEl = document.getElementById('rp-tags');
-  if (nameEl) nameEl.textContent = name;
-  if (tagsEl && types.length) {
-    tagsEl.innerHTML = types.map(t => {
-      const colors = TYPE_COLORS[t.toLowerCase()] ?? { bg: '#444', text: '#ccc' };
-      return `<span class="rptag" style="background:${colors.bg}33;color:${colors.bg}">${t.charAt(0).toUpperCase() + t.slice(1)}</span>`;
-    }).join('') + (pokeId ? `<span class="rptag" style="background:rgba(79,195,247,.15);color:#4fc3f7">#${String(pokeId).padStart(3,'0')}</span>` : '');
-  }
-}
-
-// ─────────────────────────────────────────────────────────────
-// 12. Stat bars
-// ─────────────────────────────────────────────────────────────
-const STAT_CONFIG = [
-  { key: 'hp',              label: 'HP',  color: '#44dd44' },
-  { key: 'attack',          label: 'ATK', color: '#f0d040' },
-  { key: 'defense',         label: 'DEF', color: '#4fc3f7' },
-  { key: 'special-attack',  label: 'Sp.A',color: '#ff6b81' },
-  { key: 'special-defense', label: 'Sp.D',color: '#ab6ac8' },
-  { key: 'speed',           label: 'SPD', color: '#ff9c54' },
-];
-const STAT_MAX = 255;
-
-function renderStatBars(stats) {
-  const container = document.getElementById('stat-bars');
-  if (!container) return;
-  container.innerHTML = STAT_CONFIG.map(({ key, label, color }) => {
-    const val = stats[key] ?? 0;
-    const pct = Math.round((val / STAT_MAX) * 100);
-    return `
-      <div class="srow2">
-        <span class="slbl">${label}</span>
-        <div class="strk"><div class="sfil" style="width:${pct}%;background:${color}"></div></div>
-        <span class="sval">${val}</span>
-      </div>`;
-  }).join('');
-}
-
-// ─────────────────────────────────────────────────────────────
-// 13. Moves table
-// ─────────────────────────────────────────────────────────────
-async function renderMovesTable(moves, pokeTypes) {
-  const tbody = document.getElementById('moves-tbody');
-  if (!tbody) return;
-
-  if (!moves || !moves.length) {
-    tbody.innerHTML = '<tr><td colspan="3" style="color:#555;font-size:11px;text-align:center;padding:10px;">No move data</td></tr>';
-    return;
-  }
-
-  const displayed = moves.slice(0, 20);
-
-  tbody.innerHTML = displayed.map(m => {
-    const lvLabel = m.level === 0 ? '—' : m.level;
-    const moveName = m.name.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-    return `<tr data-move="${escapeHtml(m.name)}">
-      <td class="mlv">${lvLabel}</td>
-      <td class="mname">${escapeHtml(moveName)}<span class="mpow"></span></td>
-      <td class="mtype-cell"><span class="mtype-pill" style="background:#2a2a3e;color:#888">…</span></td>
-    </tr>`;
-  }).join('');
-
-  for (const m of displayed) {
-    fetchMoveMeta(m.name).then(meta => {
-      const row = tbody.querySelector(`tr[data-move="${CSS.escape(m.name)}"]`);
-      if (!row) return;
-      const pill = row.querySelector('.mtype-pill');
-      if (pill) {
-        const t = (meta.type ?? 'normal').toLowerCase();
-        const colors = TYPE_COLORS[t] ?? { bg: '#9099A1' };
-        pill.style.background = colors.bg + '33';
-        pill.style.color = colors.bg;
-        pill.textContent = t.charAt(0).toUpperCase() + t.slice(1);
-      }
-      // Power and physical/special answer "will that actually hurt?" — the
-      // level column alone never did.
-      const pow = row.querySelector('.mpow');
-      if (pow) {
-        const icon = meta.cls === 'physical' ? 'PHY' : meta.cls === 'special' ? 'SPC' : 'STA';
-        pow.textContent = meta.power ? ` · ${meta.power} ${icon}` : ` · ${icon}`;
-      }
-    });
-  }
-}
-
-const _moveCache = {};
-async function fetchMoveMeta(moveName) {
-  if (_moveCache[moveName]) return _moveCache[moveName];
-  try {
-    const r = await fetch(`https://pokeapi.co/api/v2/move/${moveName}`);
-    if (!r.ok) return { type: 'normal', power: null, cls: '' };
-    const d = await r.json();
-    const meta = {
-      type:  d.type?.name ?? 'normal',
-      power: d.power ?? null,
-      cls:   d.damage_class?.name ?? '',
-    };
-    _moveCache[moveName] = meta;
-    return meta;
-  } catch { return { type: 'normal', power: null, cls: '' }; }
-}
-
-// ─────────────────────────────────────────────────────────────
-// 14. Type effectiveness
-// ─────────────────────────────────────────────────────────────
-function renderTypeEffectiveness(types) {
-  const weakEl   = document.getElementById('weak-chips');
-  const resistEl = document.getElementById('resist-chips');
-  const strongEl = document.getElementById('strong-chips');
-  if (!weakEl || !strongEl) return;
-
-  const defTypes = types.map(t => t.toLowerCase());
-  const none = '<span style="color:#555;font-size:11px;">None</span>';
-
-  // ── Defensive: multiply every attacking type through the full chart ──
-  const weak = [];    // ×2 / ×4
-  const resist = [];  // ×½ / ×¼
-  const immune = [];  // ×0
-  for (const atk of ALL_TYPES) {
-    const m = typeMultiplier(atk, defTypes);
-    if (m === 0)      immune.push(atk);
-    else if (m > 1)   weak.push([atk, m]);
-    else if (m < 1)   resist.push([atk, m]);
-  }
-  // Heaviest first, so the ×4s lead
-  weak.sort((a, b) => b[1] - a[1]);
-  resist.sort((a, b) => a[1] - b[1]);
-
-  const cap = t => t.charAt(0).toUpperCase() + t.slice(1);
-
-  weakEl.innerHTML = weak.map(([t, m]) =>
-    `<span class="echip wk">${cap(t)} ${multLabel(m)}</span>`).join('') || none;
-
-  // Immunities are the single most decision-relevant fact — show them first
-  // and style them distinctly from ordinary resistances.
-  if (resistEl) {
-    resistEl.innerHTML =
-      immune.map(t => `<span class="echip im">${cap(t)} ×0</span>`).join('')
-      + resist.map(([t, m]) => `<span class="echip rs">${cap(t)} ${multLabel(m)}</span>`).join('')
-      || none;
-  }
-
-  // ── Offensive: what this Pokémon's own STAB moves beat ──
-  const strongSet = new Set();
-  defTypes.forEach(atk => {
-    ALL_TYPES.forEach(def => {
-      if ((TYPE_CHART[atk]?.[def] ?? 1) > 1) strongSet.add(def);
-    });
-  });
-  strongEl.innerHTML = [...strongSet].map(t =>
-    `<span class="echip st">${cap(t)}</span>`).join('') || none;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -1307,31 +1014,6 @@ function shuffleSlice(arr, n) {
 // 16. RGA — generative answer → fills ai-answer (center) and
 //     ai-rec-txt (right panel)
 // ─────────────────────────────────────────────────────────────
-/**
- * Build the deterministic matchup line for the currently selected Pokémon.
- * Type maths is exact, local and instant — it leads, and the language model
- * only ever comments underneath it. Previously the model re-derived
- * effectiveness from crawled prose and contradicted the panel beside it
- * (it called Water a Charizard *resistance*).
- */
-function matchupSummary(types) {
-  if (!types?.length) return '';
-  const defTypes = types.map(t => t.toLowerCase());
-  const best = [], immune = [];
-  for (const atk of ALL_TYPES) {
-    const m = typeMultiplier(atk, defTypes);
-    if (m === 0) immune.push(atk);
-    else if (m >= 2) best.push([atk, m]);
-  }
-  best.sort((a, b) => b[1] - a[1]);
-  const cap = t => t.charAt(0).toUpperCase() + t.slice(1);
-  const parts = [];
-  if (best.length)   parts.push(`Hit it with ${best.map(([t, m]) => `${cap(t)} ${multLabel(m)}`).join(', ')}.`);
-  else               parts.push('Nothing is super effective against it.');
-  if (immune.length) parts.push(`Do NOT use ${immune.map(cap).join(' or ')} — no effect.`);
-  return parts.join(' ');
-}
-
 /**
  * Paint the computed matchup into the recommendation card, preserving any
  * model prose already there. Called by selectResult the moment types are known.
