@@ -11,6 +11,7 @@ from pokedex.routes.pages import pages_bp
 
 def create_app() -> Flask:
     app = Flask(__name__)
+    app.config["MAX_CONTENT_LENGTH"] = 64 * 1024  # 64 KB — ample for any real question
     # Scope CORS to this app's own origins. Reflecting any Origin let *any* website
     # read /api/coveo-token — i.e. the live Coveo API key — from a visitor's browser.
     CORS(app, origins=[

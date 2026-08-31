@@ -197,3 +197,17 @@ def test_abstention_fallback_fires_for_sentinel(client):
     assert d["answer"] != "(no answer generated)"
     # The search fallback text must be present.
     assert "RGA model did not trigger" in d["answer"] or "Pikachu" in d["answer"]
+
+
+@pytest.mark.parametrize("body,expected_status", [
+    (b"[1,2,3]",                                  400),
+    (b'"just a string"',                           400),
+    (b'{"session_id":1,"message":"hi"}',           400),
+    (b'{"session_id":"x","message":999}',          400),
+    (b'{"session_id":"x","message":["a","b"]}',    400),
+    (b'{"session_id":"x","message":{"a":1}}',      400),
+])
+def test_coach_rejects_malformed_body(client, body, expected_status):
+    r = client.post("/api/coach", data=body,
+                    content_type="application/json")
+    assert r.status_code == expected_status, f"body={body!r} got {r.status_code}"

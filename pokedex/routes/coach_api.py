@@ -140,14 +140,20 @@ def coach():
         "grading_flags": list   # list of {type, message} dicts
     }
     """
-    data = request.get_json(force=True) or {}
-    session_id = data.get("session_id", "").strip()
-    message = data.get("message", "").strip()
+    raw = request.get_json(force=True, silent=True)
+    if not isinstance(raw, dict):
+        return jsonify({"error": "request body must be a JSON object"}), 400
 
-    if not session_id:
-        return jsonify({"error": "session_id is required"}), 400
-    if not message:
-        return jsonify({"error": "message is required"}), 400
+    session_id = raw.get("session_id", "")
+    message = raw.get("message", "")
+
+    if not isinstance(session_id, str) or not session_id.strip():
+        return jsonify({"error": "session_id must be a non-empty string"}), 400
+    if not isinstance(message, str) or not message.strip():
+        return jsonify({"error": "message must be a non-empty string"}), 400
+
+    session_id = session_id.strip()
+    message = message.strip()
 
     # Detect comparison intent before calling the LLM
     comparison = None
