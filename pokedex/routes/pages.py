@@ -22,6 +22,12 @@ def dashboard():
     return render_template_string(html, COVEO_ORGANIZATION_ID=_COVEO_ORG)
 
 
+@pages_bp.route("/coach")
+def coach():
+    html = (_FRONTEND_DIR / "coach.html").read_text()
+    return render_template_string(html, COVEO_ORGANIZATION_ID=_COVEO_ORG)
+
+
 @pages_bp.route("/readme")
 def readme():
     return send_from_directory(_FRONTEND_DIR, "readme.html")
