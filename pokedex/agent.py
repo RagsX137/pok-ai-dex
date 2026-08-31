@@ -21,7 +21,7 @@ def _coveo_search(query: str, num_results: int = 5) -> list[dict]:
     """
     # The Semantic Encoder (Semantic-PokEncoder) runs automatically via the
     # KNN Ranking Function injected by the pipeline — no mlParameters needed.
-    results = CoveoClient().search(query, num=num_results)["results"]
+    results = CoveoClient().search(query, num=num_results).get("results", [])
     return [
         {
             "title":   r.get("title", ""),

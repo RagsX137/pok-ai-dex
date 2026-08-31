@@ -20,7 +20,18 @@ class GeneratedAnswer:
     answer: str = ""
     citations: list[dict] = field(default_factory=list)
     stream_id: str | None = None
-    answer_generated: bool | None = None
+    # True  = SSE stream reached a clean COMPLETED end.
+    # False = the search retry loop exhausted all attempts with no stream ID
+    #         (the RGA model never fired — NOT the same as Coveo's own
+    #         answerGenerated=false abstention flag, which signals retrieval
+    #         was too weak to generate a grounded answer).
+    # None  = the flow aborted due to a hard transport/HTTP error before a
+    #         clean determination could be made either way.
+    # DO NOT use this field as a proxy for Coveo's answerGenerated abstention
+    # signal; DirectCoveoClient in eval_harness/backends.py extracts that flag
+    # from the genqa.endOfStreamType payload directly and is the authoritative
+    # source for "did Coveo choose not to answer?"
+    stream_completed: bool | None = None
     error: str | None = None
 
 
@@ -137,7 +148,7 @@ class CoveoClient:
                 msg = f"Coveo search error: {r_search.status_code}"
                 return GeneratedAnswer(
                     answer=f"({msg})", citations=[], stream_id=None,
-                    answer_generated=None, error=msg,
+                    stream_completed=None, error=msg,
                 )
             search_data = r_search.json()
             stream_id = search_data.get("extendedResults", {}).get("generativeQuestionAnsweringId")
@@ -151,7 +162,7 @@ class CoveoClient:
             # text — that is an HTTP-response concern, not this client's job.
             return GeneratedAnswer(
                 answer="", citations=[], stream_id=None,
-                answer_generated=False, error=None,
+                stream_completed=False, error=None,
             )
 
         # ── Step 2: consume the SSE stream ─────────────────────────────────
@@ -170,14 +181,14 @@ class CoveoClient:
             msg = f"Stream request failed: {exc}"
             return GeneratedAnswer(
                 answer=f"({msg})", citations=[], stream_id=stream_id,
-                answer_generated=None, error=msg,
+                stream_completed=None, error=msg,
             )
 
         if r_stream.status_code != 200:
             msg = f"CRGA stream error: {r_stream.status_code}"
             return GeneratedAnswer(
                 answer=f"({msg})", citations=[], stream_id=stream_id,
-                answer_generated=None, error=msg,
+                stream_completed=None, error=msg,
             )
 
         # ── Step 3: parse SSE events ────────────────────────────────────────
@@ -186,11 +197,11 @@ class CoveoClient:
             msg = f"CRGA error: {stream_error}"
             return GeneratedAnswer(
                 answer=f"({msg})", citations=[], stream_id=stream_id,
-                answer_generated=None, error=stream_error,
+                stream_completed=None, error=stream_error,
             )
 
         answer = answer_text.strip() or "(no answer generated)"
         return GeneratedAnswer(
             answer=answer, citations=citations, stream_id=stream_id,
-            answer_generated=True, error=None,
+            stream_completed=True, error=None,
         )

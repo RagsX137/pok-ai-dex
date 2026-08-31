@@ -138,7 +138,7 @@ def rga_coveo():
     client = CoveoClient()
     result = client.generated_answer(query)
 
-    if result.answer_generated is False and result.error is None:
+    if result.stream_completed is False and result.error is None:
         # No RGA model fired — return top search excerpts as a fallback answer
         search_results = client.search(query, num=5).get("results", [])
         snippets = "; ".join(
