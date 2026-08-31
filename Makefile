@@ -1,9 +1,5 @@
-.PHONY: run test test-unit test-e2e eval
+.PHONY: run test test-unit test-e2e eval ingest
 
-# NOTE: `python -m pokedex` does not exist until Task 9 of the reorg. Until
-# then `make run` will fail with "No module named pokedex" — that failure is
-# expected and is the reminder that Task 9 is unfinished. Use
-# `.venv/bin/python app.py` to run the app in the meantime.
 run:
 	.venv/bin/python -m pokedex
 

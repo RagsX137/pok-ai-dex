@@ -8,7 +8,7 @@ everything in SQLite so results accumulate across runs.
 ## Quick start
 
 ```bash
-python app.py                      # the app under test, on :5003
+make run                           # the app under test, on :5003
 python -m eval_harness run --label baseline
 python -m eval_harness report
 ```
@@ -61,7 +61,7 @@ The question asked about each scenario. `--probes lookup,advantage,pronoun`.
 
 - **`app-coveo`** — `POST /api/rga-coveo`. What a trainer in the browser sees.
 - **`direct-coveo`** — replays the same CRGA flow straight against Coveo to
-  capture `answerGenerated`, the abstention flag [app.py](../app.py) currently
+  capture `answerGenerated`, the abstention flag [app.py](../pokedex/app.py) currently
   discards. Run it alongside `app-coveo` to tell "the model declined because
   retrieval was too weak" apart from "something broke".
 - **`app-ollama:<model>`** — `POST /api/rga`, the local-model path. Use a model
