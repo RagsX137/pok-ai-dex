@@ -92,7 +92,7 @@ def coach():
         "grading_flags": list   # list of {type, message} dicts
     }
     """
-    data = request.get_json(force=True)
+    data = request.get_json(force=True) or {}
     session_id = data.get("session_id", "").strip()
     message = data.get("message", "").strip()
 
@@ -167,9 +167,12 @@ def _grade_answer(answer: str, cmp_names: tuple[str, str] | None) -> list[dict]:
     """Run objective type/chart checks; return list of flag dicts."""
     flags = []
     try:
-        from eval_harness.grading import check_chart_claims
+        from eval_harness.grading import check_chart_claims, check_type_claims
         for err in check_chart_claims(answer):
             flags.append({"type": "chart_error", "message": err["claim"],
+                          "quote": err.get("quote", "")})
+        for err in check_type_claims(answer):
+            flags.append({"type": "type_error", "message": err["claim"],
                           "quote": err.get("quote", "")})
     except Exception:
         pass
@@ -199,10 +202,11 @@ def coach_challenge():
     as a ready-to-send coach message. The scenario dict gives the client
     enough information to render the team and wild Pokémon.
     """
+    import json
     import random
-    from eval_harness.scenarios import ScenarioBuilder, AXES, DEFAULT_PROBES
-    from eval_harness.typechart import TypeChart
     from pathlib import Path
+    from eval_harness.scenarios import ScenarioBuilder, AXES
+    from eval_harness.typechart import TypeChart
 
     data = request.get_json(force=True) or {}
     axis = data.get("axis", "baseline")
@@ -214,7 +218,6 @@ def coach_challenge():
         chart = TypeChart(cache_path, offline=cache_path.exists())
         # Load Pokémon names from corpus or fall back to a small hardcoded set
         try:
-            import json
             corpus_path = Path("eval_data/corpus.json")
             pool = json.loads(corpus_path.read_text()) if corpus_path.exists() else []
         except Exception:
