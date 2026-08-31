@@ -4,7 +4,7 @@
 
 **Goal:** Make the coach answer the question it was built to answer — reliably, correctly, without hallucinating typings or recommending Pokémon that cannot deal damage.
 
-**Architecture:** Three sequential projects, each independently shippable. Project 1 routes matchup questions through `TypeChart.ground_truth()` instead of the LLM; the LLM's only remaining job is phrasing a pre-computed answer. Project 2 fixes retrieval query shape so entity names — not transcript fragments — drive Coveo. Project 3 patches hygiene bugs (double-send, broken abstention check, type-confused JSON crashes, grading flag UI, cache coverage).
+**Architecture:** Three sequential projects, each independently shippable. Project 1 routes matchup questions through `TypeChart.ground_truth()` instead of the LLM; the LLM's only remaining job is phrasing a pre-computed answer. Project 2 fixes retrieval query shape so entity names — not transcript fragments — drive Coveo. Project 3 patches hygiene bugs (double-send, broken abstention check, type-confused JSON crashes, grading flag UI, cache coverage, grader phrasing gaps).
 
 **Tech Stack:** Python/Flask (server), vanilla JS ES modules (frontend), pytest (tests), `eval_harness.typechart.TypeChart`, `eval_harness.reference.ideal_answer`, `eval_harness.grading` (grading).
 
@@ -21,7 +21,7 @@
 
 ## Project 1: Answer matchup questions from the type chart, not the LLM
 
-**Eliminates: F1, F2, F3, F5, F6** (the five findings about wrong/late/fabricated answers).
+**Eliminates: F1, F2, F3, F5, F6** (the five findings about wrong/late/fabricated answers). Also eliminates F-D (grading-artifact "correct" verdicts by silence — with the type-chart path the answer is always affirmative and reasoned).
 
 The change: detect when the user is asking a matchup question (team + wild Pokémon present), resolve the names, call `_grade_chart.ground_truth(team, wild)`, render with `ideal_answer`, and hand the LLM a factual summary to re-phrase rather than an open question to guess at. When no names can be resolved, fall through to the existing Coveo path unchanged.
 
@@ -483,7 +483,7 @@ F5 (harmful picks), F6 (cannot say none)."
 
 ## Project 2: Fix retrieval query shape
 
-**Eliminates: F18** (extractor injects English words into Coveo query), **F2 partially** (retrieval budget), **F3 partially** (cold query shape).
+**Eliminates: F18** (extractor injects English words into Coveo query). **Partially improves F2** — the retrieval A/B in Part 7 of the QA log shows that raising `num` alone is insufficient: the bare question (149 chars, `totalCount=30`) retrieved 1/6 teammates while the context blob (399 chars, `totalCount=500`) retrieved only 2/6, despite returning far more total results. The limiting factor is query-entity salience, not budget. Sending entity names directly — what this task achieves — addresses both the salience and the false-injection problems simultaneously.
 
 When Coveo IS called (encyclopaedia questions, unresolved intent), the query sent to it should be entity names, not a transcript. The `_build_context_prompt` function should use the 924-name corpus via `_closest_pokemon` rather than a capitalised-word regex.
 
@@ -577,7 +577,11 @@ Eliminates F18: 'tell', 'shouting', 'every' etc. no longer injected into Coveo q
 
 ## Project 3: Hygiene fixes
 
-Five independent, low-risk patches. Each can be committed separately.
+Six patches. Tasks 4–7 are independent and can be committed in any order.
+**Tasks 8 → 9 → 10 are ordered and must ship in that sequence:** Task 8 builds the shared
+name resolver that Task 9 grades with, and Task 10 widens the type cache — which the live
+server reads too — so it must land only after Task 9 has corrected the grader patterns it
+would otherwise unmask.
 
 ### Task 4: Fix the broken abstention check (F14)
 
@@ -778,8 +782,8 @@ Eliminates F17 (request size limit)."
 ### Task 6: Fix the challenge double-send (F13)
 
 **Files:**
-- Modify: `frontend/coach.js`
-- Test: manual (no server state to unit-test here; the fix is a one-line client change)
+- Modify: `pokedex/routes/coach_api.py`
+- Test: `tests/unit/test_coach_routes.py`
 
 The problem: `coach_challenge` stores the user turn, then `startChallenge()` posts the same message to `/api/coach`, which appends *another* user turn before sending to Coveo — so the session has `[user, user, assistant]` and Coveo receives the question twice.
 
@@ -907,108 +911,597 @@ Eliminates F11: Quick Answer aside is suppressed when the first sentence is flag
 
 ---
 
-### Task 8: Fix the `or` comparison false positives (F12)
+### Task 8: One name resolver, and comparison detection built on it (F12)
 
 **Files:**
-- Modify: `pokedex/routes/coach_api.py`
-- Test: `tests/unit/test_coach_routes.py`
+- Create: `pokedex/pokemon_names.py`
+- Modify: `pokedex/routes/coach_api.py`, `pokedex/routes/coveo_api.py`
+- Test: `tests/unit/test_pokemon_names.py` (new), `tests/unit/test_coach_routes.py`
 
-The `or` pattern in `_CMP_PATTERNS[3]` has no name validation. The fix: require both captured sides to resolve against the Pokémon corpus before accepting a comparison match. This is a one-function change to `_detect_comparison`.
+**Why this is bigger than "add digits to a character class".** F12, F-A, F8, F9 and the `Porygon-Z` miss are one bug wearing five hats: *"is this string a Pokémon name?"* is answered in four places, with four different character classes, over two different corpora.
 
-- [ ] **Step 1: Add failing tests**
+| Site | Character class | Corpus | Cannot see |
+|---|---|---|---|
+| `_CMP_PATTERNS` ([coach_api.py:33](pokedex/routes/coach_api.py:33)) | `[A-Za-z'\-.♀♂ ]` | — | `Porygon2`, `Type: Null` |
+| `_POKEMON_MENTION_RE` ([coach_api.py:234](pokedex/routes/coach_api.py:234)) | `[A-Z][a-z]{2,}(-[A-Z][a-z]+)?` | — | `Ho-Oh`, `Porygon-Z`, `Mr. Mime` |
+| `_NAME` ([grading.py:27](eval_harness/grading.py:27)) | `[A-Z][a-zA-Z'’]*` | caller's `universe` | every hyphen/digit name |
+| `_closest_pokemon` ([coveo_api.py:39](pokedex/routes/coveo_api.py:39)) | n/a — edit distance ≤ 2 | `data/pokemon_db.csv` (1023) | nothing; sees too much |
+
+Patching one class fixes one hat. This task creates the single resolver; Task 9 moves the grader onto it.
+
+**Correction to the previous draft.** That draft proposed gating `_detect_comparison` on `_closest_pokemon(...)`, describing it as "require both sides to resolve." It is not validation — it is fuzzy coercion at edit distance ≤ 2, and it *fabricates* entities:
+
+```
+'null'→'numel'   'tank'→'sawk'   'lead'→'lotad'   'heal'→'seel'
+'speed'→'seel'   'toxic'→'toxel' 'mega'→'mew'     'bulk'→'muk'
+
+"Null or Silvally?" → ('numel', 'silvally')      # user asked about Type: Null
+"Speed or bulk?"    → ('seel', 'muk')            # not a comparison at all
+```
+
+A plan whose stated goal is "without hallucinating typings or recommending Pokémon that cannot deal damage" must not add a code path that invents a Pokémon from the word *speed*. **Routing and grading decisions use exact resolution. Fuzzy matching survives only behind `/api/pokemon-correct`, where the guess is shown to the user and is harmless.**
+
+**Second correction.** That draft also kept `pattern.search()` + `continue`, which skips to the next *pattern* rather than the next *match*. Combined with a hard name gate it converts today's garbage into silence — verified against the current tree:
+
+| input | today | previous draft | this task |
+|---|---|---|---|
+| `Should I use Charizard or Blastoise against this?` | `('should i use charizard', 'blastoise against this')` | **None** | `('charizard','blastoise')` |
+| `Do I send Gengar or Alakazam?` | `('do i send gengar', 'alakazam')` | **None** | `('gengar','alakazam')` |
+| `Is Snorlax or Blissey the better wall?` | `('is snorlax', 'blissey the better wall')` | **None** | `('snorlax','blissey')` |
+| `Would you pick Jangmo-o or Kommo-o for this?` | `('would you pick jangmo-o', 'kommo-o for this')` | **None** | `('jangmo-o','kommo-o')` |
+
+The fix is `finditer` plus trimming each capture to the word-run that actually resolves: **suffix** for the left side (English puts the lead-in before the name), **prefix** for the right side (the greedy second group swallows trailing words).
+
+- [ ] **Step 1: Write the resolver tests**
+
+```python
+# tests/unit/test_pokemon_names.py
+from pathlib import Path
+import pytest
+from pokedex import pokemon_names as pn
+
+pn.init(Path("."))
+
+# One fixture, exercised by every call site. These are the names that broke
+# each of the four ad-hoc regexes.
+HARD_NAMES = ["Porygon-Z", "Porygon2", "Ho-Oh", "Jangmo-o", "Kommo-o",
+              "Mr. Mime", "Mime Jr.", "Farfetch'd", "Type: Null", "Chien-Pao"]
+
+@pytest.mark.parametrize("name", HARD_NAMES)
+def test_hard_names_resolve_exactly(name):
+    assert pn.resolve(name) == name.lower()
+
+@pytest.mark.parametrize("text,expected", [
+    ("should i use charizard", "charizard"),
+    ("is snorlax", "snorlax"),
+    ("would you pick jangmo-o", "jangmo-o"),
+    ("the tank", None),
+    ("do i lead with the sweeper", None),
+])
+def test_resolve_suffix(text, expected):
+    assert pn.resolve_suffix(text) == expected
+
+@pytest.mark.parametrize("text,expected", [
+    ("blastoise against this", "blastoise"),
+    ("blissey the better wall", "blissey"),
+    ("kommo-o for this", "kommo-o"),
+    ("bad in this matchup", None),
+])
+def test_resolve_prefix(text, expected):
+    assert pn.resolve_prefix(text) == expected
+
+@pytest.mark.parametrize("word", ["speed", "bulk", "tank", "heal", "lead",
+                                  "toxic", "mega", "null", "atk", "sand"])
+def test_english_words_never_resolve(word):
+    """Exact resolution must not coerce. These all had an edit-distance-2
+    neighbour in the corpus (speed→seel, tank→sawk, null→numel)."""
+    assert pn.resolve(word) is None
+    assert pn.resolve_suffix(word) is None
+
+def test_closest_is_still_fuzzy_for_spellcheck():
+    """The user-facing spell-check endpoint keeps its tolerance."""
+    assert pn.closest("charizrd") == "charizard"
+```
+
+- [ ] **Step 2: Run — expect collection error (module does not exist)**
+
+```bash
+pytest tests/unit/test_pokemon_names.py -v
+```
+Expected: `ModuleNotFoundError: pokedex.pokemon_names`.
+
+- [ ] **Step 3: Create `pokedex/pokemon_names.py`**
+
+```python
+"""
+One source of truth for "is this string a Pokemon name?".
+
+Four call sites used to answer this question with four different ad-hoc
+character classes over two different corpora, which is why Porygon-Z, Ho-Oh and
+Type: Null were each recognised by some of them and none of the others.
+
+`resolve` is exact: routing and grading decisions must never invent an entity.
+`closest` is the fuzzy edit-distance matcher, and exists only for the
+user-facing /api/pokemon-correct spell-check endpoint, where a wrong guess is
+visible to the user and harmless.
+"""
+from __future__ import annotations
+
+import csv
+import re
+from pathlib import Path
+
+# Every character that occurs in a real name: Porygon-Z, Porygon2, Farfetch'd,
+# Mr. Mime, Type: Null, Ho-Oh, Mime Jr.
+NAME_CHARS = r"A-Za-z0-9'’.\-: "
+
+_NAMES: frozenset[str] = frozenset()
+
+
+def init(repo_root: Path) -> None:
+    """Load the corpus once at import time. Never raises: a missing CSV
+    degrades to 'nothing resolves', which is the safe direction."""
+    global _NAMES
+    try:
+        path = Path(repo_root) / "data" / "pokemon_db.csv"
+        with path.open(newline="", encoding="utf-8") as f:
+            _NAMES = frozenset(
+                r["pokemon"].strip().lower()
+                for r in csv.DictReader(f) if r.get("pokemon")
+            )
+    except Exception:
+        _NAMES = frozenset()
+
+
+def names() -> frozenset[str]:
+    return _NAMES
+
+
+def _norm(text: str) -> str:
+    return re.sub(r"\s+", " ", (text or "").strip().lower())
+
+
+def resolve(text: str, universe: frozenset[str] | None = None) -> str | None:
+    """Exact match after normalisation. No fuzzing, no coercion."""
+    pool = _NAMES if universe is None else universe
+    key = _norm(text)
+    return key if key in pool else None
+
+
+def resolve_suffix(text: str, universe=None, max_words: int = 3) -> str | None:
+    """Longest trailing word-run that is a real name.
+
+    'should i use charizard' -> 'charizard'. Trailing, because English puts the
+    lead-in before the name.
+    """
+    pool = _NAMES if universe is None else universe
+    words = _norm(text).split(" ")
+    for n in range(min(max_words, len(words)), 0, -1):
+        cand = " ".join(words[-n:])
+        if cand in pool:
+            return cand
+    return None
+
+
+def resolve_prefix(text: str, universe=None, max_words: int = 3) -> str | None:
+    """Longest leading word-run that is a real name.
+
+    'blastoise against this' -> 'blastoise'. Leading, because trailing junk is
+    what a greedy second capture group picks up.
+    """
+    pool = _NAMES if universe is None else universe
+    words = _norm(text).split(" ")
+    for n in range(min(max_words, len(words)), 0, -1):
+        cand = " ".join(words[:n])
+        if cand in pool:
+            return cand
+    return None
+
+
+def _edit_distance(a: str, b: str) -> int:
+    """Standard DP Levenshtein distance."""
+    if a == b:
+        return 0
+    if not a:
+        return len(b)
+    if not b:
+        return len(a)
+    prev = list(range(len(b) + 1))
+    for i, ca in enumerate(a, 1):
+        curr = [i]
+        for j, cb in enumerate(b, 1):
+            curr.append(min(prev[j] + 1, curr[j - 1] + 1, prev[j - 1] + (ca != cb)))
+        prev = curr
+    return prev[-1]
+
+
+def closest(name: str, max_dist: int = 2) -> str | None:
+    """Fuzzy match — SPELL-CHECK ONLY.
+
+    Do not use this to make a routing or grading decision. At max_dist=2 it maps
+    'speed'->'seel', 'tank'->'sawk', 'null'->'numel'. It is correct only where a
+    wrong guess is shown to the user for confirmation.
+    """
+    if not _NAMES or not name:
+        return None
+    key = _norm(name)
+    if key in _NAMES:
+        return key
+    best_name, best_dist = None, max_dist + 1
+    for candidate in _NAMES:
+        d = _edit_distance(key, candidate)
+        if d < best_dist:
+            best_dist, best_name = d, candidate
+    return best_name if best_dist <= max_dist else None
+```
+
+Wire it up at the bottom of `pokedex/config.py`'s consumers — simplest is a module-level call in `pokedex/pokemon_names.py`'s importers. In `coveo_api.py`, replace the `_POKEMON_NAMES` block ([coveo_api.py:12-51](pokedex/routes/coveo_api.py:12)) with a delegation that preserves the endpoint's public behaviour:
+
+```python
+from pokedex import pokemon_names
+from pokedex.config import settings
+
+pokemon_names.init(settings.repo_root)
+
+
+def _closest_pokemon(name: str, max_dist: int = 2) -> str | None:
+    """Kept for /api/pokemon-correct. Delegates to the shared resolver.
+
+    Callers making a *decision* (routing, grading) must use
+    pokemon_names.resolve / resolve_suffix / resolve_prefix instead — this
+    function coerces, and will happily turn 'speed' into 'seel'.
+    """
+    return pokemon_names.closest(name, max_dist)
+```
+
+- [ ] **Step 4: Run resolver tests — expect all PASS**
+
+```bash
+pytest tests/unit/test_pokemon_names.py -v
+```
+
+- [ ] **Step 5: Add the comparison tests**
 
 Add to `tests/unit/test_coach_routes.py`:
 
 ```python
-def test_detect_comparison_no_false_positives():
-    from pokedex.routes.coach_api import _detect_comparison
-    benign = [
-        "Do I lead with the tank or the sweeper?",
-        "Should I heal it or switch out?",
-        "Is Charizard good or bad in this matchup?",
-        "Rate my team out of ten or give me a grade",
-    ]
-    for msg in benign:
-        result = _detect_comparison(msg)
-        assert result is None, f"False positive on: {msg!r} → {result}"
+import pytest
+from pokedex.routes.coach_api import _detect_comparison
 
-def test_detect_comparison_real_pokemon_or():
-    from pokedex.routes.coach_api import _detect_comparison
-    result = _detect_comparison("Porygon or Porygon2, which is better?")
-    # Both are real Pokémon — this should match.
-    assert result is not None
-    assert "porygon" in result[0]
+COMPARISONS = [
+    # (message, expected)
+    ("Compare Charizard to Dragonite",                    ("charizard", "dragonite")),
+    ("between Charizard and Dragonite, who wins",         ("charizard", "dragonite")),
+    ("Charizard vs Dragonite",                            ("charizard", "dragonite")),
+    ("Charizard vs Dragonite, who wins?",                 ("charizard", "dragonite")),
+    ("Which is better: Umbreon or Espeon?",               ("umbreon", "espeon")),
+    # hyphen + digit names — the class the old character class could not see
+    ("Porygon-Z or Porygon2, which is better?",           ("porygon-z", "porygon2")),
+    ("Ho-Oh or Lugia?",                                   ("ho-oh", "lugia")),
+    ("Mr. Mime or Mime Jr.?",                             ("mr. mime", "mime jr.")),
+    ("compare Farfetch'd with Sirfetch'd",                ("farfetch'd", "sirfetch'd")),
+    # lead-in words before the first name — regressed by search()+continue
+    ("Should I use Charizard or Blastoise against this?", ("charizard", "blastoise")),
+    ("Do I send Gengar or Alakazam?",                     ("gengar", "alakazam")),
+    ("Is Snorlax or Blissey the better wall?",            ("snorlax", "blissey")),
+    ("Would you pick Jangmo-o or Kommo-o for this?",      ("jangmo-o", "kommo-o")),
+]
+
+@pytest.mark.parametrize("message,expected", COMPARISONS)
+def test_detect_comparison_positives(message, expected):
+    assert _detect_comparison(message) == expected
+
+BENIGN = [
+    "Do I lead with the tank or the sweeper?",
+    "Should I heal it or switch out?",
+    "Is Charizard good or bad in this matchup?",
+    "Rate my team out of ten or give me a grade",
+    "Can you explain STAB versus base power for me?",
+    "Should I switch or stay in?",
+    "Do I use an item or attack?",
+    # single words with an edit-distance-2 neighbour in the corpus: these are
+    # exactly what fuzzy "validation" would have coerced into a comparison
+    "Speed or bulk?",
+    "Toxic or seed?",
+    "Tank or wall?",
+    "Lead or switch?",
+]
+
+@pytest.mark.parametrize("message", BENIGN)
+def test_detect_comparison_no_false_positives(message):
+    assert _detect_comparison(message) is None
 ```
 
-- [ ] **Step 2: Run tests to confirm first test fails**
+- [ ] **Step 6: Run — expect the hyphen/digit and lead-in cases to fail**
 
 ```bash
-pytest tests/unit/test_coach_routes.py::test_detect_comparison_no_false_positives \
-       tests/unit/test_coach_routes.py::test_detect_comparison_real_pokemon_or -v
+pytest tests/unit/test_coach_routes.py -k detect_comparison -v
 ```
-Expected: `test_detect_comparison_no_false_positives` FAILS.
+Expected FAIL: `Porygon-Z…`, `Mr. Mime…`, `Farfetch'd…`, `Jangmo-o…`, and all four lead-in cases (today they return a garbage tuple, not the expected pair). Expected PASS: the five plain cases and most of `BENIGN`.
 
-- [ ] **Step 3: Add corpus validation to `_detect_comparison`**
+- [ ] **Step 7: Rewrite `_CMP_PATTERNS` and `_detect_comparison`**
 
-Replace [`coach_api.py:72-85`](pokedex/routes/coach_api.py:72):
+In [`coach_api.py:33-58`](pokedex/routes/coach_api.py:33), build every pattern from the shared character class:
+
+```python
+from pokedex import pokemon_names
+from pokedex.pokemon_names import NAME_CHARS as _NC
+
+# Patterns (case-insensitive). Each capture is a *candidate span*, deliberately
+# loose — _detect_comparison trims it down to the part that actually resolves,
+# so the regex no longer has to be clever about where a name starts and ends.
+_CMP_PATTERNS = [
+    # "compare Charizard and Dragonite" / "compare X vs Y"
+    re.compile(rf'\bcompare\s+([A-Za-z][{_NC}]{{1,30}}?)\s+'
+               rf'(?:to|with|and|vs\.?|versus)\s+([A-Za-z][{_NC}]{{1,30}})', re.I),
+    # "between Charizard and Dragonite, ..."
+    re.compile(rf'\bbetween\s+([A-Za-z][{_NC}]{{1,30}}?)\s+and\s+([A-Za-z][{_NC}]{{1,30}})', re.I),
+    # "Charizard vs Dragonite" / "Charizard versus Dragonite"
+    re.compile(rf'\b([A-Za-z][{_NC}]{{1,30}}?)\s+(?:vs\.?|versus)\s+([A-Za-z][{_NC}]{{1,30}})', re.I),
+    # "which is better: Umbreon or Espeon" / "Umbreon or Espeon"
+    re.compile(rf'\b([A-Za-z][{_NC}]{{1,30}}?)\s+or\s+([A-Za-z][{_NC}]{{1,30}})'
+               rf'(?=\s*[?,]|\s+for|\s+on|\s+against|\s*$)', re.I),
+]
+```
+
+Then replace [`coach_api.py:72-85`](pokedex/routes/coach_api.py:72):
 
 ```python
 def _detect_comparison(message: str) -> tuple[str, str] | None:
     """Return (pokemon_a, pokemon_b) if the message is a comparison request.
 
-    Both sides must resolve to a known Pokémon name via _closest_pokemon — this
-    prevents benign sentences containing 'or' from being treated as comparisons.
+    Both sides must resolve EXACTLY against the corpus. Fuzzy matching is
+    deliberately not used here: at edit distance 2 'speed' resolves to 'seel'
+    and 'null' to 'numel', which would fabricate a comparison out of a question
+    that never named a Pokemon.
+
+    finditer, not search: the first match of a pattern is often the wrong span
+    ("should i use charizard" / "blastoise against this"). Later matches, and
+    the prefix/suffix trim, recover the real names.
     """
-    from pokedex.routes.coveo_api import _closest_pokemon
     for pattern in _CMP_PATTERNS:
-        m = pattern.search(message)
-        if m:
-            a = m.group(1).strip().lower()
-            b = m.group(2).strip().lower()
-            if a in _STOPWORDS or b in _STOPWORDS:
-                continue
-            if len(a) > 25 or len(b) > 25:
-                continue
-            # Require both sides to be resolvable Pokémon names.
-            ra = _closest_pokemon(a, max_dist=2)
-            rb = _closest_pokemon(b, max_dist=2)
-            if ra and rb:
-                return ra, rb
+        for m in pattern.finditer(message or ""):
+            a = pokemon_names.resolve_suffix(m.group(1))
+            b = pokemon_names.resolve_prefix(m.group(2))
+            if a and b and a != b:
+                return a, b
     return None
 ```
 
-- [ ] **Step 4: Run all tests**
+`_STOPWORDS` and the 25-character guard are no longer referenced here — exact resolution subsumes both. Keep the `_STOPWORDS` constant: `_extract_pokemon_mentions` still uses it.
+
+- [ ] **Step 8: Run the full unit suite**
 
 ```bash
-pytest tests/unit/test_coach_routes.py -v
+pytest tests/unit -v
 ```
-Expected: all PASS.
+Expected: all PASS, including the pre-existing `test_coach_detect_comparison_intent`, which asserts lowercase `"charizard"` / `"dragonite"` — the shape this resolver returns.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 9: Commit**
 
 ```bash
-git add pokedex/routes/coach_api.py tests/unit/test_coach_routes.py
-git commit -m "fix(coach): require corpus validation for both sides of 'or' comparison
+git add pokedex/pokemon_names.py pokedex/routes/coach_api.py pokedex/routes/coveo_api.py \
+        tests/unit/test_pokemon_names.py tests/unit/test_coach_routes.py
+git commit -m "fix(coach): single exact name resolver; rebuild comparison detection on it
 
-Eliminates F12: 'heal it or switch out' no longer triggers comparison cards."
+Eliminates F12. Benign 'or' sentences no longer open a comparison panel, and
+Porygon-Z / Ho-Oh / Mr. Mime / Farfetch'd are recognised for the first time.
+
+Comparison routing now resolves EXACTLY. The previous draft gated on
+_closest_pokemon (edit distance 2), which fabricates entities: 'speed'->'seel',
+'null'->'numel'. Fuzzy matching is now reachable only from
+/api/pokemon-correct, where the guess is shown to the user.
+
+finditer replaces search: with a hard name gate, search()+continue turned
+'Should I use Charizard or Blastoise' into no match at all."
+```
+
+**Known residual:** `"Type: Null or Silvally?"` returns `None` — the colon terminates the capture before the name is complete. That is a miss, not a fabrication; today it returns `('numel', 'silvally')`. Accepted.
+
+**Deliberately deferred:** `_POKEMON_MENTION_RE` ([coach_api.py:234](pokedex/routes/coach_api.py:234)) is the fourth ad-hoc class and has the same blind spots, but it feeds `pokemon_context` for pronoun resolution, whose correctness criteria are set by Task 2. Move it onto `pokemon_names` after Task 2 lands, not before.
+
+**Cross-task hazard for Task 3:** Task 3 proposes using `_closest_pokemon` to pick entity names for the Coveo query. With the fuzzy behaviour documented above, that would inject `seel` into a query about speed. Task 3 should call `pokemon_names.resolve_suffix`, not `closest`.
+
+---
+
+### Task 9: Fix grader name capture, then add a *guarded* appositive pattern (F-A)
+
+**Files:**
+- Modify: `eval_harness/grading.py`
+- Test: `tests/unit/test_grading.py` (new)
+
+**This task must land before Task 10.** Task 10 backfills `type_cache.json` from 315 to ~1023 entries. Today most grader false positives die harmlessly in the `types_of` → `LookupError` → `continue` path at [grading.py:155-158](eval_harness/grading.py:155); backfilling *unmasks* them. And these flags are user-facing: [coach_api.py:225](pokedex/routes/coach_api.py:225) runs `check_type_claims` on every live answer against the 924-name corpus and renders the result as a warning. Expanding coverage before correcting the patterns ships false hallucination warnings to users.
+
+**Correction to the previous draft — the diagnosis was wrong.** That draft added a fifth pattern and asserted its three test cases would pass. Verified against the current tree, one still fails after the change:
+
+```
+PASS   'Loudred, a Ground-type Pokemon, is weak to Water.'
+PASS   'Loudred, a Ground type, is weak to Water.'
+FAIL   'Your Loudred is Ground-type so it fears Water.'   ← still unflagged
+```
+
+`Your Loudred` was never an appositive problem. `_NAME` ([grading.py:27](eval_harness/grading.py:27)) matches *two* capitalised words, so it captures `'Your Loudred'`, the `universe` lookup misses, and `finditer` has already consumed the sentence — there is no retry at `Loudred`. Same for `'The Loudred'`, `'Against Loudred'`, `'For Onix'`. **Adding patterns cannot fix a capture-greediness bug.** The blind spot is the name capture, and it is the same bug Task 8 just fixed on the routing side.
+
+**Correction 2 — the proposed pattern flags correct answers.** `{_NAME}\s*,\s+(?:an?\s+)?{_T}[-\s]?type` does not require the comma-clause to actually be an appositive. Verified, with a backfilled cache:
+
+```
+"To beat Loudred, a Fighting-type attack works well."
+  → [('Loudred', ['fighting'], 'contradiction')]
+"Lead with Onix, a Water-type move will still hurt it."
+  → [('Onix', ['water'], 'contradiction')]
+```
+
+Those are *correct* coaching answers being flagged as typing hallucinations, and "To beat X, a Y-type move…" is the most common sentence shape this product emits. The fix is to require the appositive to **close** — optional `Pokémon`, then a delimiter — which is exactly what distinguishes `Loudred, a Ground-type Pokemon,` from `Loudred, a Fighting-type attack`.
+
+**Correction 3 — mode.** The draft used `"full"`, which also reports `incomplete` when one half of a dual typing is omitted. The appositive is idiomatic shorthand (`Sableye, a Dark-type, is tricky`) where omission is not an error. `"partial"` still catches every invented type — which is all F-A is about — without that noise.
+
+- [ ] **Step 1: Write the test file, negatives first**
+
+```python
+# tests/unit/test_grading.py
+import json
+from pathlib import Path
+import pytest
+from eval_harness.grading import check_type_claims
+from eval_harness.typechart import TypeChart
+
+@pytest.fixture(scope="module")
+def chart():
+    return TypeChart(Path("eval_data/type_cache.json"), offline=True)
+
+@pytest.fixture(scope="module")
+def universe():
+    return json.loads(Path("eval_data/corpus.json").read_text()) + ["Porygon-Z", "Ho-Oh"]
+
+# The bar this task exists to clear: correct answers must not be flagged.
+MUST_NOT_FLAG = [
+    "To beat Loudred, a Fighting-type attack works well.",
+    "Lead with Onix, a Water-type move will still hurt it.",
+    "Against Loudred, a Water-type move is your best bet.",
+    "If you face Gengar, a Dark-type play is safest.",
+    "For Onix, a Water-type or Grass-type will do.",
+    "Switch to Blastoise, a Water-type Pokemon, to win.",   # true appositive, correct typing
+    "Sableye, a Dark-type, is tricky.",                     # shorthand omission, not an error
+    "Send Gyarados, a Water/Flying-type, and set up.",
+    "Surf is a Water-type move.",
+    "Your best option is a Fire-type attack.",
+    "Gengar is a Ghost/Poison type.",
+]
+
+MUST_FLAG = [
+    "Loudred, a Ground-type Pokemon, is weak to Water.",    # F-A: the appositive
+    "Loudred, a Ground type, is weak to Water.",
+    "Your Loudred is Ground-type so it fears Water.",       # the _NAME greediness bug
+    "Loudred is a Ground-type Pokemon.",                    # existing pattern 1
+    "Loudred, which is a Ground-type Pokemon, is weak.",    # existing pattern 2
+    "Loudred (Ground), your lead, faints.",                 # existing pattern 3
+    "Loudred's Ground-type moves hit hard.",                # existing pattern 4
+    "The Porygon-Z, a Fighting-type, resists it.",          # hyphen-digit name
+    "Ho-Oh is a Water-type legendary.",
+]
+
+@pytest.mark.parametrize("sentence", MUST_NOT_FLAG)
+def test_correct_answers_are_not_flagged(chart, universe, sentence):
+    errs = check_type_claims(sentence, chart, universe)
+    assert not errs, f"False positive on a correct answer: {sentence!r} -> {errs}"
+
+@pytest.mark.parametrize("sentence", MUST_FLAG)
+def test_wrong_typings_are_flagged(chart, universe, sentence):
+    assert check_type_claims(sentence, chart, universe), f"Missed: {sentence!r}"
+
+def test_pokemon_field_keeps_universe_casing(chart):
+    """grading.py:239 compares e['pokemon'] == wild by exact string."""
+    errs = check_type_claims("Loudred, a Ground-type Pokemon, is weak.", chart, ["Loudred"])
+    assert errs and errs[0]["pokemon"] == "Loudred"
+```
+
+- [ ] **Step 2: Run — record which fail**
+
+```bash
+pytest tests/unit/test_grading.py -v
+```
+Expected FAIL: the appositive, `Your Loudred`, `Porygon-Z` and `Ho-Oh` cases. Expected PASS: `MUST_NOT_FLAG` (they pass today only because the 315-entry cache hides them — Task 10 would break them, which is why they are pinned here first).
+
+- [ ] **Step 3: Widen `_NAME` and resolve the capture**
+
+Replace [`grading.py:27`](eval_harness/grading.py:27):
+
+```python
+# A deliberately loose candidate span — check_type_claims trims it to the part
+# that actually resolves against `universe`. The old class was
+# [A-Z][a-zA-Z'’]* with an optional second word, which both missed every
+# hyphen/digit name (Porygon-Z, Ho-Oh) and swallowed the determiner in
+# "Your Loudred", killing the match outright.
+_NAME = r"(?-i:(?P<name>[A-Z][A-Za-z0-9'’.\-]*(?:[ :]+[A-Z][A-Za-z0-9'’.\-]*){0,2}))"
+```
+
+Add the guarded appositive as a fifth entry to `TYPE_CLAIM_PATTERNS`:
+
+```python
+    # "Loudred, a Ground-type Pokemon," / "Gyarados, a Water/Flying-type,"
+    # The closing delimiter is load-bearing: without it this also matches
+    # "To beat Loudred, a Fighting-type attack", which is a claim about the
+    # attack, not about Loudred. "partial" because the appositive is idiomatic
+    # shorthand — an omitted second type is not an error, an invented one is.
+    (re.compile(rf"\b{_NAME}\s*,\s+(?:an?\s+)?{_T}[-\s]?type\s*(?:pok[eé]mon)?\s*"
+                rf"(?=[,.;:!?)]|$)", re.I), "partial"),
+```
+
+Then swap the exact-dict lookup in [`check_type_claims`](eval_harness/grading.py:141) for suffix resolution, preserving the caller's casing:
+
+```python
+    from pokedex import pokemon_names
+
+    errors: list[dict] = []
+    seen: set = set()
+    lookup = {n.lower(): n for n in universe}
+    pool = frozenset(lookup)
+    for pattern, mode in TYPE_CLAIM_PATTERNS:
+        for m in pattern.finditer(answer or ""):
+            # Trim "Your Loudred" -> "Loudred". The regex captures a loose span;
+            # the corpus decides where the name actually starts.
+            key = pokemon_names.resolve_suffix(m.group("name"), universe=pool)
+            if not key:
+                continue
+            name = lookup[key]          # caller's casing: grading.py:239 needs it
+            ...                         # rest of the loop body unchanged
+```
+
+`eval_harness` already imports from `pokedex` ([backends.py:161](eval_harness/backends.py:161), [cli.py:23](eval_harness/cli.py:23)), so this adds no new coupling direction.
+
+- [ ] **Step 4: Run — expect all PASS**
+
+```bash
+pytest tests/unit/test_grading.py tests/unit/test_coach_routes.py tests/unit/test_pokemon_names.py -v
+```
+
+- [ ] **Step 5: Run the whole unit suite for regressions**
+
+```bash
+pytest tests/unit -v
+```
+Expected: 31 pre-existing tests still pass, plus the new ones.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add eval_harness/grading.py tests/unit/test_grading.py
+git commit -m "fix(grading): resolve the name capture; add a guarded appositive pattern
+
+Eliminates F-A. The blind spot was not a missing pattern: _NAME swallowed the
+determiner ('Your Loudred'), so the universe lookup missed and finditer never
+retried. Names are now resolved by longest-suffix against the universe, which
+also admits Porygon-Z and Ho-Oh for the first time.
+
+The appositive pattern requires the clause to CLOSE. Without that guard it
+flags 'To beat Loudred, a Fighting-type attack works well' as a Loudred typing
+error — a correct answer, and the commonest sentence shape the coach emits.
+Mode is 'partial': shorthand omission is not an error, invention is."
 ```
 
 ---
 
-### Task 9: Backfill type cache to full corpus (F8)
+### Task 10: Backfill the type cache to the full corpus (F8)
 
 **Files:**
 - Create: `scripts/backfill_type_cache.py`
-- No test needed — the script is a one-shot data job, not application logic.
+- Test: none of its own — but it **re-runs Task 9's suite**, see Step 4.
 
-This script fetches PokeAPI typings for every name in `data/pokemon_db.csv` that is not already in `eval_data/type_cache.json`, writing them into the cache. It respects offline mode by never touching the cache if run with `--dry-run`. Run it once; commit the updated `eval_data/type_cache.json`.
+**Runs last, and is not test-free.** The previous draft called this "a one-shot data job, not application logic." It is not: [coach_api.py:25](pokedex/routes/coach_api.py:25) loads this same cache at startup, and every cache entry added is a sentence the live grader can now flag in the user-facing warning UI. Going from 315 to ~1023 entries roughly triples the grader's reach — over correct answers as well as wrong ones. That is safe only on top of Task 9.
+
+Two corrections to the draft's numbers: the corpus read here is `data/pokemon_db.csv` with **1023** names, not 924 (`eval_data/corpus.json` is the 924-name Coveo-harvested scenario pool — a different list). Missing count today is **708**, not ~700. And `slug()` was copy-pasted from `TypeChart.slug`; duplicating the normaliser is how this family of bugs started, so import it.
 
 - [ ] **Step 1: Write the script**
 
 ```python
 #!/usr/bin/env python3
 """
-Backfill eval_data/type_cache.json to the full 924-name corpus.
+Backfill eval_data/type_cache.json to the full 1023-name corpus.
+
+The cache is read by BOTH the eval harness and the live server
+(pokedex/routes/coach_api.py), so every entry added here widens what the
+user-facing "typing error" warning can fire on. Run this only after the grader
+pattern fixes in Task 9 are in place.
 
 Usage:
     python scripts/backfill_type_cache.py
@@ -1025,18 +1518,11 @@ from pathlib import Path
 
 import requests
 
+from eval_harness.typechart import TypeChart   # reuse the one slug(); do not re-implement
+
 CACHE_PATH   = Path("eval_data/type_cache.json")
 CORPUS_PATH  = Path("data/pokemon_db.csv")
 POKEAPI_BASE = "https://pokeapi.co/api/v2/pokemon"
-
-
-def slug(name: str) -> str:
-    import re
-    s = name.lower().strip()
-    s = s.replace("\u2640", "-f").replace("\u2642", "-m")
-    s = re.sub(r"[.'\u2019:]", "", s)
-    s = re.sub(r"[\s_]+", "-", s)
-    return s
 
 
 def main(dry_run: bool) -> None:
@@ -1045,12 +1531,11 @@ def main(dry_run: bool) -> None:
         cache = json.loads(CACHE_PATH.read_text())
     print(f"Cache: {len(cache)} entries")
 
-    names: list[str] = []
     with CORPUS_PATH.open(newline="", encoding="utf-8") as f:
         names = [row["pokemon"].lower() for row in csv.DictReader(f) if row.get("pokemon")]
     print(f"Corpus: {len(names)} names")
 
-    missing = [n for n in names if slug(n) not in cache]
+    missing = [n for n in names if TypeChart.slug(n) not in cache]
     print(f"Missing: {len(missing)} names")
 
     if dry_run:
@@ -1063,11 +1548,11 @@ def main(dry_run: bool) -> None:
 
     errors: list[str] = []
     for i, name in enumerate(missing, 1):
-        s = slug(name)
+        s = TypeChart.slug(name)
         try:
             r = requests.get(f"{POKEAPI_BASE}/{s}", timeout=15)
             if r.status_code == 404:
-                # Try common variant suffixes before giving up.
+                # Forms whose PokeAPI id carries a suffix the page title omits.
                 for suffix in ("-normal", "-altered", "-land", "-incarnate", "-ordinary"):
                     r2 = requests.get(f"{POKEAPI_BASE}/{s}{suffix}", timeout=15)
                     if r2.status_code == 200:
@@ -1076,9 +1561,8 @@ def main(dry_run: bool) -> None:
             if r.status_code != 200:
                 errors.append(f"{name}: HTTP {r.status_code}")
                 continue
-            types = [t["type"]["name"] for t in r.json()["types"]]
-            cache[s] = types
-            print(f"  [{i}/{len(missing)}] {name} → {types}")
+            cache[s] = [t["type"]["name"] for t in r.json()["types"]]
+            print(f"  [{i}/{len(missing)}] {name} → {cache[s]}")
         except requests.RequestException as exc:
             errors.append(f"{name}: {exc}")
         time.sleep(0.5)   # be polite to PokeAPI
@@ -1095,39 +1579,57 @@ def main(dry_run: bool) -> None:
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("--dry-run", action="store_true")
-    args = p.parse_args()
-    main(args.dry_run)
+    main(p.parse_args().dry_run)
 ```
 
-- [ ] **Step 2: Run it**
+- [ ] **Step 2: Dry run first**
+
+```bash
+python scripts/backfill_type_cache.py --dry-run
+```
+Expected: `Cache: 315 entries`, `Corpus: 1023 names`, `Missing: 708 names`.
+
+- [ ] **Step 3: Run it**
 
 ```bash
 python scripts/backfill_type_cache.py
 ```
-Expected: fetches ~700 entries, prints each, writes updated cache. Takes ~6 minutes at 0.5s/request.
+Expected: ~708 fetches at 0.5s each, ≈6 minutes. Some 404s are expected for forms PokeAPI names differently; the script exits 1 and lists them.
 
-- [ ] **Step 3: Verify coverage**
+- [ ] **Step 4: Re-run Task 9's grader suite against the widened cache**
+
+```bash
+pytest tests/unit/test_grading.py -v
+```
+Expected: all PASS. **This is the real acceptance test for this task.** `MUST_NOT_FLAG` passed before the backfill partly because unknown Pokémon fell through `LookupError`. Now that Gengar, Onix and the rest are cached, those sentences are graded for real — and must still come back clean. A failure here means a pattern is over-matching, not that the data is wrong; fix the pattern, do not shrink the cache.
+
+- [ ] **Step 5: Verify coverage**
 
 ```bash
 python3 -c "
 import json, csv
-cache = json.loads(open('eval_data/type_cache.json').read())
+from eval_harness.typechart import TypeChart
+cache = json.load(open('eval_data/type_cache.json'))
 with open('data/pokemon_db.csv') as f:
-    names = [row['pokemon'].lower() for row in csv.DictReader(f) if row.get('pokemon')]
-print(f'coverage: {len(cache)}/{len(names)} = {len(cache)/len(names)*100:.1f}%')
-print('charizard cached:', 'charizard' in cache)
-print('pikachu cached:', 'pikachu' in cache)
+    names = [r['pokemon'] for r in csv.DictReader(f) if r.get('pokemon')]
+hit = [n for n in names if TypeChart.slug(n) in cache]
+print(f'coverage: {len(hit)}/{len(names)} = {len(hit)/len(names)*100:.1f}%')
+for probe in ['Charizard','Pikachu','Porygon-Z','Ho-Oh','Mr. Mime']:
+    print(f'  {probe}: {TypeChart.slug(probe) in cache}')
 "
 ```
-Expected: coverage ≥ 90%, charizard and pikachu both True.
+Expected: coverage ≥ 90%; Charizard and Pikachu True.
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
 git add eval_data/type_cache.json scripts/backfill_type_cache.py
-git commit -m "data: backfill type_cache to full corpus (~924 entries)
+git commit -m "data: backfill type_cache from 315 to full corpus
 
-Eliminates F8: grader no longer silently skips Charizard, Pikachu, and 600+ others."
+Eliminates F8: the grader no longer silently skips Charizard, Pikachu and 700+
+others. Sequenced after the Task 9 pattern fixes on purpose — this cache is
+also read by the live server, so widening it widens what the user-facing typing
+warning can fire on, false positives included."
 ```
 
 ---
@@ -1136,31 +1638,45 @@ Eliminates F8: grader no longer silently skips Charizard, Pikachu, and 600+ othe
 
 **Spec coverage:**
 
-| Finding | Task |
-|---|---|
-| F1 two-turn delay | Task 2 |
-| F2 5-doc budget | Task 2 (bypassed for matchup questions) |
-| F3 cold abstention | Task 2 (bypassed — no Coveo call) |
-| F4 TypeChart unused | Task 2 |
-| F5 harmful picks | Task 2 |
-| F6 cannot say "none" | Task 2 |
-| F7 typing hallucinations | Tasks 2+9 (computed answer + full cache) |
-| F8 34% grader coverage | Task 9 |
-| F9 CHART_CLAIM_RE blind to Pokémon names | NOT fixed — requires a grading regex rewrite; filed as known limitation |
-| F10 flag discards useful data | Task 7 |
-| F11 Quick Answer republishes hallucination | Task 7 |
-| F12 `or` false positives | Task 8 |
-| F13 challenge double-send | Task 6 |
-| F14 broken abstention check | Task 4 |
-| F15 type-confused JSON 500s | Task 5 |
-| F16 verdict bar duplication | NOT fixed — low leverage; the comparison.verdict field would need decoupling from the answer; left as tech debt |
-| F17 no request size limit | Task 5 |
-| F18 extractor injects English | Task 3 |
+| Finding | Task | Source |
+|---|---|---|
+| F1 two-turn delay | Task 2 | Original report |
+| F2 retrieval budget/salience | Task 2 (bypassed) + Task 3 (entity-name queries) | Original + log Part 7 |
+| F3 cold abstention | Task 2 (bypassed — no Coveo call) | Original report |
+| F4 TypeChart unused | Task 2 | Original report |
+| F5 harmful picks | Task 2 | Original report |
+| F6 cannot say "none" | Task 2 | Original report |
+| F7 typing hallucinations | Tasks 2+10 (computed answer + full cache) | Original report |
+| F8 grader coverage 34% | Task 10 (cache), Task 9 (name capture) | Original report |
+| F9 `CHART_CLAIM_RE` blind to Pokémon names | NOT fixed — but Task 8's `pokemon_names.resolve_suffix` is the missing primitive; file follow-up | Original report |
+| F10 flag discards useful data | Task 7 | Original report |
+| F11 Quick Answer republishes hallucination | Task 7 | Original report |
+| F12 `or` false positives | Task 8 | Original report + log Part 4 addendum |
+| F12b comparison misses on lead-in phrasing | Task 8 | Found while verifying the Task 8 draft |
+| F13 challenge double-send | Task 6 | Original report + log Part 6 |
+| F14 broken abstention check | Task 4 | Original report |
+| F15 type-confused JSON 500s | Task 5 | Original report + log Part 5 |
+| F16 verdict bar duplication | NOT fixed — `comparison.verdict = answer` is intentional; fix requires API shape change; tech debt | Original report + log Part 8 |
+| F17 no request size limit | Task 5 | Original report |
+| F18 extractor injects English | Task 3 | Original report + log Part 4 addendum |
+| F-A appositive grader blind spot | Task 9 | Log Part 9 grader-coverage table |
+| F-E four divergent name regexes over two corpora | Task 8 (root cause of F8/F9/F12/F-A) | Found while verifying the Task 8 draft |
+| F-B ability descriptions ungraded | NOT fixed — no ability oracle exists; out of scope | Log Part 3 J2 |
+| F-C 43% abstention on player-intent | NOT fixed — index scope problem, not application code | Log Part 2 aggregate |
+| F-D "correct" verdicts by silence | Task 2 (type-chart path always gives affirmative answers) | Log Part 9 verdict analysis |
 
-**F9 note:** Fixing `CHART_CLAIM_RE` to match Pokémon names in the defender position requires rewriting the effectiveness claim regex to accept either a type word or a corpus-resolvable name. That is a grading-quality improvement, not a user-facing correctness fix, and is out of scope for this plan. File a follow-up issue.
+**F9 note:** `CHART_CLAIM_RE` requires the defender to be a type word. The model almost always names a Pokémon instead, so the effectiveness checker fires zero times in practice. Fix requires accepting either a type word or a corpus-resolvable name in the defender position — a grading accuracy improvement with no user-facing benefit. File a follow-up issue.
 
-**F16 note:** The comparison verdict/answer duplication is cosmetic. The comparison block is assembled after the answer is set, and `comparison.verdict = answer` is intentional (the client needs it for the verdict bar). Fixing it requires either a separate `comparison_answer` field or client-side truncation. Left as known tech debt.
+**F12 addendum:** The QA log's Part 4 addendum confirmed 5/9 false positives survive in the current working tree, and a true-negative miss (`Porygon-Z or Porygon2?` → `None`). Verifying the draft fix surfaced a third problem it would have introduced: gating on `_closest_pokemon` (edit distance ≤ 2) coerces English words into names (`speed`→`seel`, `null`→`numel`), and `search()`+`continue` turns four common phrasings (`Should I use Charizard or Blastoise…`) into no match at all. Task 8 fixes all three by resolving exactly, over `finditer`, with prefix/suffix trimming.
+
+**F16 note:** The comparison verdict/answer duplication is cosmetic. `comparison.verdict = answer` is intentional — the client needs the text for the verdict bar. Fixing it cleanly requires either a separate `comparison_answer` field or client-side truncation. Left as known tech debt.
+
+**F-B note:** Ability description errors (J2: three wrong descriptions of Starmie's ability in one session) are not graded anywhere in the pipeline. There is no ability oracle to add without a new data source. Out of scope.
+
+**F-C note:** 43% abstention on player-intent questions (themes A, B, D) is a retrieval-index scope problem — Coveo's index is a Pokédex, not a strategy guide. "What held item is best on Dragonite?" has no matching document to retrieve. Fixing this requires index expansion, not application code.
 
 **Placeholder scan:** No TBD, TODO, or "implement later" phrases. All steps include code.
 
-**Type consistency:** `MatchupIntent` defined in Task 1, consumed in Task 2. `detect_matchup_intent` signature consistent throughout. `_ideal_answer` guard added in Task 3 uses same pattern as `TypeChart` guard. `is_abstention` import added to the existing guarded block.
+**Type consistency:** `MatchupIntent` defined in Task 1, consumed in Task 2. `detect_matchup_intent` signature consistent throughout. `_ideal_answer` guard pattern matches existing `TypeChart` guard. `is_abstention` added to the existing guarded import block. `pokedex.pokemon_names` is created in Task 8 and consumed by `coach_api`, `coveo_api` and (Task 9) `eval_harness.grading`; `eval_harness` already imports from `pokedex`, so no new coupling direction. The new `TYPE_CLAIM_PATTERNS` entry in Task 9 reuses the module-scope `_NAME`/`_T`, with `_NAME` widened in the same task.
+
+**Verification status of Tasks 8–10:** every snippet in these three tasks was prototyped against the real corpus (1023 names) and type cache before being written here. Comparison detector: 13 positives + 12 benign, 25/25. Grader: 9 must-flag + 11 must-not-flag, 20/20, casing preserved for [grading.py:239](eval_harness/grading.py:239). The pre-existing 31 unit tests pass unchanged.

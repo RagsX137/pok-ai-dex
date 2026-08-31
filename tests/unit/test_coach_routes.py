@@ -268,3 +268,67 @@ BENIGN = [
 @pytest.mark.parametrize("message", BENIGN)
 def test_detect_comparison_no_false_positives(message):
     assert _detect_comparison(message) is None
+
+
+# ── PokemonDB fact path (branch 2) ───────────────────────────────────────────
+
+def test_fact_question_is_answered_without_calling_coveo(client, monkeypatch):
+    """Abilities come from the parsed page, not from CRGA."""
+    from pokedex.facts import PokemonFacts
+    import pokedex.routes.coach_api as api
+
+    monkeypatch.setattr(
+        api._facts_store, "get",
+        lambda name: PokemonFacts(name="gengar", abilities=["Cursed Body"]),
+    )
+
+    def boom(*a, **k):
+        raise AssertionError("CRGA must not be called for a fact question")
+
+    monkeypatch.setattr(api.CoveoClient, "generated_answer", boom)
+
+    r = client.post("/api/coach", json={"session_id": "s1",
+                                        "message": "What are Gengar's abilities?"})
+    assert r.status_code == 200
+    body = r.get_json()
+    assert "Cursed Body" in body["answer"]
+    assert body["citations"][0]["uri"] == "https://pokemondb.net/pokedex/gengar"
+
+
+def test_a_fact_miss_falls_through_to_coveo(client, monkeypatch):
+    """render_answer returning None must not short-circuit the Coveo path."""
+    import pokedex.routes.coach_api as api
+
+    monkeypatch.setattr(api._facts_store, "get", lambda name: None)
+    monkeypatch.setattr(
+        api.CoveoClient, "generated_answer",
+        lambda self, q, **k: _FakeAnswer(),
+    )
+    r = client.post("/api/coach", json={"session_id": "s2",
+                                        "message": "What are Gengar's abilities?"})
+    assert r.status_code == 200
+    assert r.get_json()["answer"] == "from coveo"
+
+
+class _FakeAnswer:
+    answer = "from coveo"
+    citations: list = []
+    stream_id = "x"
+    stream_completed = True
+    error = None
+
+
+def test_a_raising_facts_store_still_answers(client, monkeypatch):
+    """The fact path is supplementary: it must not cost the user an answer."""
+    import pokedex.routes.coach_api as api
+
+    def boom(name):
+        raise RuntimeError("store exploded")
+
+    monkeypatch.setattr(api._facts_store, "get", boom)
+    monkeypatch.setattr(api.CoveoClient, "generated_answer",
+                        lambda self, q, **k: _FakeAnswer())
+    r = client.post("/api/coach", json={"session_id": "s3",
+                                        "message": "What are Gengar's abilities?"})
+    assert r.status_code == 200
+    assert r.get_json()["answer"] == "from coveo"

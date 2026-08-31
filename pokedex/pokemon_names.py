@@ -21,25 +21,39 @@ from pathlib import Path
 NAME_CHARS = r"A-Za-z0-9''.\-: "
 
 _NAMES: frozenset[str] = frozenset()
+_URLS: dict[str, str] = {}
 
 
 def init(repo_root: Path) -> None:
     """Load the corpus once at import time. Never raises: a missing CSV
     degrades to 'nothing resolves', which is the safe direction."""
-    global _NAMES
+    global _NAMES, _URLS
     try:
         path = Path(repo_root) / "data" / "pokemon_db.csv"
         with path.open(newline="", encoding="utf-8") as f:
-            _NAMES = frozenset(
-                r["pokemon"].strip().lower()
-                for r in csv.DictReader(f) if r.get("pokemon")
-            )
+            rows = [r for r in csv.DictReader(f) if r.get("pokemon")]
+        _NAMES = frozenset(r["pokemon"].strip().lower() for r in rows)
+        _URLS = {
+            r["pokemon"].strip().lower(): (r.get("url") or "").strip()
+            for r in rows if (r.get("url") or "").strip()
+        }
     except Exception:
         _NAMES = frozenset()
+        _URLS = {}
 
 
 def names() -> frozenset[str]:
     return _NAMES
+
+
+def url_for(name: str) -> str | None:
+    """The pokemondb.net page URL for a name, or None.
+
+    Read from the same CSV row as the name itself, so there is no second
+    corpus to drift. Coach cites facts with it: the Passage Retrieval API
+    returns a document title and id but no clickable URL.
+    """
+    return _URLS.get(_norm(name))
 
 
 def _norm(text: str) -> str:

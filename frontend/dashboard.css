@@ -574,3 +574,19 @@ atomic-pager       { display: none !important; }
   .vtag { font-size: 11px; }
   .sub  { font-size: 10px; }
 }
+
+/* ── Passage Evidence (Coveo Passage Retrieval) ─────────────────────────── */
+.ai-ev        { margin-top: 9px; border-top: 1px solid rgba(240,208,64,.18); padding-top: 7px; }
+.ai-ev-head   { display: flex; align-items: baseline; gap: 6px; margin-bottom: 5px; }
+.ai-ev-lbl    { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; color: #8a8aa5; }
+.ai-ev-src    { font-size: 8px; font-weight: 700; letter-spacing: .06em; color: #5f5f7a;
+                border: 1px solid #3a3a52; border-radius: 3px; padding: 1px 4px; }
+.ai-ev-item   { margin-bottom: 6px; }
+.ai-ev-item:last-child { margin-bottom: 0; }
+.ai-ev-meta   { display: flex; align-items: baseline; gap: 5px; margin-bottom: 2px; }
+.ai-ev-title  { font-size: 9px; font-weight: 700; color: #9a9ab5; text-decoration: none;
+                overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 190px; }
+.ai-ev-title:hover { color: #b09aff; text-decoration: underline; }
+.ai-ev-score  { font-size: 8px; font-weight: 700; color: #f0d040; font-family: "Courier New", monospace; flex: none; }
+.ai-ev-text   { font-size: 10px; line-height: 1.45; color: #7f7f99; font-style: italic;
+                display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }

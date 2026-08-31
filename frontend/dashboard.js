@@ -820,6 +820,12 @@ function resetPanels(name) {
   if (tags) tags.innerHTML = '';
   const rec = document.getElementById('ai-rec-txt');
   if (rec) rec.textContent = `No matchup data for ${name}`;
+  // Both are derived from the previous selection; leaving them up would
+  // attribute one Pokémon's pairings and sources to another.
+  const pair = document.getElementById('ai-pair-row');
+  if (pair) { pair.style.display = 'none'; }
+  const ev = document.getElementById('ai-ev');
+  if (ev) { ev.hidden = true; }
   const num = document.getElementById('photo-num');
   if (num) num.textContent = '';
 
@@ -1040,6 +1046,53 @@ function renderMatchupLine(types) {
   if (!summary) return;
   const prose = aiRec.querySelector('.ai-prose')?.outerHTML ?? '';
   aiRec.innerHTML = `<span class="ai-calc">${escapeHtml(summary)}</span>` + prose;
+  renderPairSuggestions(types);
+}
+
+/**
+ * Types whose defences cover what the selected Pokémon is weak to.
+ *
+ * Derived from the type chart rather than retrieved: the corpus is per-Pokémon
+ * Pokédex pages and contains no team-composition content at all, so there is
+ * nothing to retrieve for this. Computing it is also always correct.
+ */
+function pairSuggestions(types) {
+  if (!types?.length) return [];
+  const defTypes   = types.map(t => t.toLowerCase());
+  const weaknesses = ALL_TYPES.filter(atk => typeMultiplier(atk, defTypes) >= 2);
+  if (!weaknesses.length) return [];
+
+  // Require a type to answer at least two weaknesses, so the row is not padded
+  // with technically-true but useless advice — Normal "covers" Gengar because
+  // it is immune to Ghost, which is no reason to pair them. Pokémon with a
+  // single weakness are the exception: there, covering that one weakness is
+  // the whole answer, and demanding two would hide the row for every
+  // mono-weakness Pokémon (Pikachu, Snorlax, Eevee...).
+  const needed = Math.min(2, weaknesses.length);
+  return ALL_TYPES
+    .map(cand => [cand, weaknesses.filter(w => typeMultiplier(w, [cand]) < 1).length])
+    .filter(([, covered]) => covered >= needed)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3);
+}
+
+function renderPairSuggestions(types) {
+  const row = document.getElementById('ai-pair-row');
+  if (!row) return;
+  const picks = pairSuggestions(types);
+  if (!picks.length) { row.style.display = 'none'; return; }
+
+  const cap = t => t.charAt(0).toUpperCase() + t.slice(1);
+  row.innerHTML = '<span class="ai-pair-lbl">Pair with:</span>'
+    + picks.map(([t, covered]) =>
+        `<span class="echip" title="Resists ${covered} of its weaknesses" style="${typeChipStyle(t)}">${cap(t)}</span>`
+      ).join('');
+  row.style.display = 'flex';
+}
+
+function typeChipStyle(type) {
+  const c = TYPE_COLORS[type.toLowerCase()]?.bg ?? '#444';
+  return `background:${c}22;color:${c};border:1px solid ${c}44`;
 }
 
 let _rgaToken = 0;
@@ -1056,6 +1109,10 @@ async function fetchRGA(query, results) {
   // _lastSelectedTypes here — it re-reads it after the await, by which time
   // selectResult has run.
   if (aiAns) { aiAns.textContent = '✦ Thinking…'; aiAns.className = 'ai-ans loading'; aiAns.style.display = ''; }
+
+  // Fire-and-forget: passage evidence is supplementary and must never delay
+  // or fail the answer above it.
+  fetchPassages(query, token);
 
   try {
     let answer;
@@ -1119,6 +1176,60 @@ async function fetchRGA(query, results) {
       ? `<span class="ai-calc">${escapeHtml(summary)}</span>`
       : '(unavailable)';
   }
+}
+
+// ─────────────────────────────────────────────────────────────
+// 16b. Passage evidence — Coveo Passage Retrieval (CPR)
+// ─────────────────────────────────────────────────────────────
+/**
+ * Fetch the indexed passages behind the current query and render them under
+ * Oak's write-up. `rgaToken` is fetchRGA's token, so a superseded search
+ * discards this response too and the evidence can never disagree with the
+ * answer it sits beneath.
+ */
+async function fetchPassages(query, rgaToken) {
+  const box  = document.getElementById('ai-ev');
+  const list = document.getElementById('ai-ev-list');
+  if (!box || !list) return;
+
+  try {
+    const resp = await fetch('/api/passages', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      // Over-fetch: most passages are tables or nav and get filtered server
+      // side, so asking for 3 usually yields fewer than 3.
+      body:    JSON.stringify({ query, maxPassages: 10 }),
+    });
+    if (rgaToken !== _rgaToken) return;
+    if (!resp.ok) { box.hidden = true; return; }
+
+    const { passages = [] } = await resp.json();
+    if (rgaToken !== _rgaToken) return;
+    renderPassages(passages.slice(0, 3));
+  } catch (_) {
+    box.hidden = true;   // supplementary panel: stay silent, never error
+  }
+}
+
+function renderPassages(passages) {
+  const box  = document.getElementById('ai-ev');
+  const list = document.getElementById('ai-ev-list');
+  if (!box || !list) return;
+
+  if (!passages.length) { box.hidden = true; list.innerHTML = ''; return; }
+
+  list.innerHTML = passages.map(p => {
+    const name  = extractPokemonName(p.title) || 'Source';
+    const score = Number(p.score ?? 0).toFixed(3);
+    const title = p.uri
+      ? `<a class="ai-ev-title" href="${escapeHtml(p.uri)}" target="_blank" rel="noopener noreferrer">${escapeHtml(name)}</a>`
+      : `<span class="ai-ev-title">${escapeHtml(name)}</span>`;
+    return `<div class="ai-ev-item">
+        <div class="ai-ev-meta">${title}<span class="ai-ev-score">${score}</span></div>
+        <div class="ai-ev-text">${escapeHtml(p.text)}</div>
+      </div>`;
+  }).join('');
+  box.hidden = false;
 }
 
 // ─────────────────────────────────────────────────────────────

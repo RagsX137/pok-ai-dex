@@ -14,8 +14,15 @@ from pokedex import pokemon_names
 from pokedex.pokemon_names import NAME_CHARS as _NC
 
 from pokedex.matchup import detect_matchup_intent, MatchupIntent  # noqa: E402
+from pokedex.fact_intent import detect_fact_intent  # noqa: E402
+from pokedex.facts import render_answer as render_fact_answer  # noqa: E402
+from pokedex.facts_store import FactsStore  # noqa: E402
 
 coach_bp = Blueprint("coach_api", __name__)
+
+# One store per process: it owns an LRU cache and reads the optional facts
+# file once at construction, neither of which should happen per request.
+_facts_store = FactsStore()
 
 # ── Module-level grading resources (load once at startup) ─────
 # These are optional — if eval_harness is absent the guards below skip grading.
@@ -177,6 +184,33 @@ def coach():
                 # Name not in cache and offline. Fall through to Coveo.
                 answer = None
                 intent = None
+
+    # ── PokemonDB facts ───────────────────────────────────────────────────
+    # Abilities, evolution, breeding, training and flavour text are facts, not
+    # opinions: render them from the indexed page rather than asking a model to
+    # recall them. render_fact_answer returns None when the retrieved passages
+    # did not cover the section, and that falls through to Coveo below rather
+    # than guessing.
+    if answer is None:
+        try:
+            fact_intent = detect_fact_intent(message, history)
+            if fact_intent is not None:
+                facts = _facts_store.get(fact_intent.pokemon)
+                if facts is not None:
+                    rendered = render_fact_answer(fact_intent.topic, facts)
+                    if rendered:
+                        answer = rendered
+                        url = pokemon_names.url_for(fact_intent.pokemon)
+                        if url:
+                            citations = [{
+                                "title": f"{fact_intent.pokemon.title()} | Pokémon Database",
+                                "uri": url,
+                            }]
+        except Exception:
+            # Facts are supplementary; a failure here must not cost the user an
+            # answer that Coveo could still give.
+            current_app.logger.exception("fact path failed")
+            answer = None
 
     # ── Coveo fallback (encyclopaedia questions, unresolved teams, etc.) ──
     if answer is None:

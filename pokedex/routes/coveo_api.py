@@ -125,3 +125,43 @@ def rga_coveo():
     ]
 
     return jsonify({"answer": result.answer, "citations": clean_citations})
+
+
+# Coveo accepts 1-20 passages; sending anything else is a 400 from their side,
+# so the ceiling is enforced here rather than discovered at the API.
+_MAX_PASSAGES = 20
+
+
+@coveo_bp.route("/passages", methods=["POST"])
+def passages():
+    """
+    Coveo Passage Retrieval (CPR) — POST /rest/search/v3/passages/retrieve.
+
+    Distinct from /rga-coveo: that returns generated prose, this returns the
+    indexed text chunks a generated answer would have been built from. The
+    dashboard shows them as evidence beneath Professor Oak's write-up.
+
+    Body: { "query": str, "maxPassages": int? }
+    Returns: { "passages": [{ "text", "score", "title", "uri" }] }
+
+    An empty list is a valid, non-error response: retrieval is supplementary,
+    and the client renders nothing rather than an error state.
+    """
+    data = request.get_json(force=True, silent=True) or {}
+    query = (data.get("query") or "").strip()
+    if not query:
+        return jsonify({"error": "query is required"}), 400
+
+    try:
+        requested = int(data.get("maxPassages", 3))
+    except (TypeError, ValueError):
+        requested = 3
+    max_passages = max(1, min(requested, _MAX_PASSAGES))
+
+    found = CoveoClient().retrieve_passages(query, max_passages=max_passages)
+    return jsonify({
+        "passages": [
+            {"text": p.text, "score": p.score, "title": p.title, "uri": p.uri}
+            for p in found
+        ]
+    })

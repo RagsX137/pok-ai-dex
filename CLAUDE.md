@@ -67,6 +67,24 @@ Three modules exist specifically to be the *only* copy of something. Adding a se
 
 `coach_api.py` imports `eval_harness` **optionally** inside a try/except to grade answers for type/chart errors. Grading is best-effort — the app must keep working when `eval_harness` or `eval_data/*.json` is absent.
 
+### PokemonDB facts (`/coach`)
+
+`facts.py` (pure: markdown → `PokemonFacts` → rendered prose), `fact_intent.py`
+(message → topic + name) and `facts_store.py` (file → LRU → live) add a third
+Coach answer source between the type-chart fast path and CRGA. Answers are
+*rendered* from the parsed dataclass, never generated — same rule as
+`eval_harness/reference.py`.
+
+`render_answer` returning `None` means "this section was not retrieved" and must
+keep falling through to CRGA. Do not make it guess.
+
+Passage text reaches it via `retrieve_passages(..., clean=False)`.
+`clean_passage_text` is the dashboard evidence panel'''s transformation and strips
+headings and short table cells — exactly what the parser slices on. The two
+callers want opposite things from the same API; that is what the flag is for.
+
+`data/pokemon_facts.json` (`make facts`) is optional, like `eval_data/*.json`.
+
 ### The type chart lives twice, on purpose
 
 `frontend/modules/type-chart.js` (browser) and `eval_harness/typechart.py` (grader). `tests/unit/test_type_chart_parity.py` parses the JS object literal and asserts all 18×18 cells match. If you edit one, edit both — a drift means either wrong weaknesses in the UI or a grader marking correct answers wrong.

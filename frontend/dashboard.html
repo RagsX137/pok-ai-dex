@@ -234,6 +234,16 @@
         <div class="ai-pair-row" id="ai-pair-row" style="display:none;">
           <span class="ai-pair-lbl">Pair with:</span>
         </div>
+
+        <!-- Coveo Passage Retrieval (CPR): the indexed text chunks behind the
+             answer above. Hidden until retrieval returns something usable. -->
+        <div class="ai-ev" id="ai-ev" hidden>
+          <div class="ai-ev-head">
+            <span class="ai-ev-lbl">Passage Evidence</span>
+            <span class="ai-ev-src">Coveo CPR</span>
+          </div>
+          <div id="ai-ev-list"></div>
+        </div>
       </div>
 
     </div><!-- /.rp-body -->

@@ -27,6 +27,7 @@ class Settings:
     coveo_pipeline: str
     coveo_rga_pipeline: str
     coveo_search_hub: str
+    coveo_passage_hub: str
     ollama_base_url: str
     ollama_model: str
     port: int
@@ -47,6 +48,16 @@ def load_settings() -> Settings:
         coveo_pipeline=pipeline,
         coveo_rga_pipeline=os.getenv("COVEO_RGA_PIPELINE", pipeline),
         coveo_search_hub=os.getenv("COVEO_SEARCH_HUB", "PokedexUI"),
+        # The Passage Retrieval API (/rest/search/v3) rejects a searchHub that
+        # disagrees with the one baked into the API key, with
+        # "400 Conflicting searchHub value". /rest/search/v2 tolerates the same
+        # mismatch, which is why this is a second setting rather than a fix to
+        # coveo_search_hub: changing that one would re-label all search
+        # analytics. Set COVEO_PASSAGE_SEARCH_HUB to whatever the key is bound
+        # to — scripts/probe_passage_retrieval.py prints it.
+        # Deliberately NOT falling back to COVEO_SEARCH_HUB: that is PokedexUI,
+        # the value v3 rejects. An unset variable must not silently 400.
+        coveo_passage_hub=os.getenv("COVEO_PASSAGE_SEARCH_HUB", "AdminConsole"),
         ollama_base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
         ollama_model=os.getenv("OLLAMA_MODEL", "llama3"),
         port=int(os.getenv("POKEDEX_PORT", DEFAULT_PORT)),
