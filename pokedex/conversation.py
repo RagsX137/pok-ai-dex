@@ -7,12 +7,11 @@ limit is exceeded. No persistence — sessions are lost on server restart.
 from __future__ import annotations
 
 from collections import deque
-from typing import Deque
 
 MAX_TURNS: int = 20
 
 # { session_id: deque of {role, content, pokemon_context} }
-_sessions: dict[str, Deque[dict]] = {}
+_sessions: dict[str, deque[dict]] = {}
 
 
 def get_or_create(session_id: str) -> list[dict]:
