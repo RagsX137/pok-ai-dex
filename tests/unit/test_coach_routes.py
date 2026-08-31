@@ -153,3 +153,19 @@ def test_coach_no_advantage_says_none(client):
     d = r.get_json()
     assert "none" in d["answer"].lower() or "no teammate" in d["answer"].lower()
     MockCoveo.assert_not_called()
+
+
+def test_extract_pokemon_mentions_no_english_words():
+    from pokedex.routes.coach_api import _extract_pokemon_mentions
+    # English words that happen to be capitalised must not appear.
+    result = _extract_pokemon_mentions("I Am Shouting Every Word Here")
+    assert result == [], f"Expected [], got {result}"
+
+def test_extract_pokemon_mentions_finds_real_names():
+    from pokedex.routes.coach_api import _extract_pokemon_mentions
+    result = _extract_pokemon_mentions("Tell me about Lapras and Venusaur")
+    assert "lapras" in result
+    assert "venusaur" in result
+    # "Tell" and "About" must not be in the result.
+    assert "tell" not in result
+    assert "about" not in result

@@ -256,11 +256,30 @@ _POKEMON_MENTION_RE = re.compile(r'\b([A-Z][a-z]{2,}(?:-[A-Z][a-z]+)?)\b')
 
 
 def _extract_pokemon_mentions(text: str) -> list[str]:
-    return list(dict.fromkeys(
-        m.group(1).lower()
-        for m in _POKEMON_MENTION_RE.finditer(text)
-        if m.group(1).lower() not in _STOPWORDS
-    ))[:4]
+    """
+    Return canonical Pokémon names found in `text`, verified against the
+    924-name corpus via _closest_pokemon.  Capitalisation heuristics alone
+    produce too many false positives (ordinary English words, verbs, etc.).
+    """
+    from pokedex.routes.coveo_api import _closest_pokemon, _POKEMON_NAMES
+    if not _POKEMON_NAMES:
+        # Corpus not loaded — fall back to the old capitalised-word heuristic
+        # rather than returning nothing.
+        return list(dict.fromkeys(
+            m.group(1).lower()
+            for m in _POKEMON_MENTION_RE.finditer(text)
+            if m.group(1).lower() not in _STOPWORDS
+        ))[:4]
+
+    seen: dict[str, None] = {}
+    for m in _POKEMON_MENTION_RE.finditer(text):
+        candidate = m.group(1)
+        resolved = _closest_pokemon(candidate, max_dist=1)  # tighter tolerance for context hints
+        if resolved and resolved not in seen:
+            seen[resolved] = None
+        if len(seen) >= 4:
+            break
+    return list(seen)
 
 
 # ── /api/coach-challenge ──────────────────────────────────────
