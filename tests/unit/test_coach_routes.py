@@ -2,6 +2,8 @@
 import pytest
 from unittest.mock import patch, MagicMock
 
+from pokedex.routes.coach_api import _build_context_prompt
+
 
 @pytest.fixture
 def client():
@@ -64,6 +66,40 @@ def test_coach_detect_comparison_intent(client):
     assert d["comparison"] is not None
     assert d["comparison"]["pokemon_a"] == "charizard"
     assert d["comparison"]["pokemon_b"] == "dragonite"
+
+
+def test_build_context_prompt_injects_pokemon_context():
+    """pokemon_context canonical names must appear in the context string so that
+    follow-up pronouns like 'them' can be resolved even after a misspelled query."""
+    history = [
+        {
+            "role": "user",
+            "content": "diff between pikachu and electrabusz",
+            "pokemon_context": ["pikachu", "electabuzz"],
+        },
+        {
+            "role": "assistant",
+            "content": "Pikachu and Electabuzz are both Electric-type Pokémon...",
+            "pokemon_context": ["pikachu", "electabuzz"],
+        },
+    ]
+    result = _build_context_prompt(history, "Can geodude beat either of them?")
+    # Both canonical names must be present so Coveo can resolve 'them'
+    assert "pikachu" in result
+    assert "electabuzz" in result
+    # The misspelling alone is not enough — the canonical hint must be explicit
+    assert "[Pokémon: pikachu, electabuzz]" in result
+
+
+def test_build_context_prompt_no_context_unchanged():
+    """Turns without pokemon_context should not be affected."""
+    history = [
+        {"role": "user", "content": "what type is Charmander?", "pokemon_context": []},
+        {"role": "assistant", "content": "Charmander is a Fire type.", "pokemon_context": None},
+    ]
+    result = _build_context_prompt(history, "And Bulbasaur?")
+    assert "[Pokémon:" not in result
+    assert "And Bulbasaur?" in result
 
 
 def test_coach_challenge_returns_prompt(client):

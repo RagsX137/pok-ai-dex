@@ -65,7 +65,18 @@ export async function fetchPokeData(name) {
   if (!key) return null;
   if (_cache[key]) return _cache[key];
   try {
-    const r = await fetch(`https://pokeapi.co/api/v2/pokemon/${key}`);
+    let r = await fetch(`https://pokeapi.co/api/v2/pokemon/${key}`);
+    // On 404, ask the server for the closest known Pokémon name and retry once.
+    if (r.status === 404) {
+      try {
+        const fix = await fetch(`/api/pokemon-correct?q=${encodeURIComponent(name)}`).then(x => x.json());
+        if (fix.corrected && fix.corrected !== name.toLowerCase()) {
+          const correctedKey = pokeSlug(fix.corrected);
+          if (_cache[correctedKey]) return _cache[correctedKey];
+          r = await fetch(`https://pokeapi.co/api/v2/pokemon/${correctedKey}`);
+        }
+      } catch { /* correction lookup failed — fall through to null */ }
+    }
     if (!r.ok) return null;
     const d = await r.json();
     const byName = new Map();

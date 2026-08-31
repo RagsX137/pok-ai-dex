@@ -389,13 +389,15 @@ function closeSuggestions() {
   _suggestionFocusIdx = -1;
 }
 
-function initSuggestions(engine) {
-  const { buildSearchBox } = window.CoveoHeadless ?? {};
-  if (!buildSearchBox) return;   // Headless not available
+function initSuggestions() {
+  // Use the hidden atomic-search-box's built-in headless SearchBox controller —
+  // the same stable Atomic v3 pattern used by dashboard.js and pokedex-atomic.js.
+  // window.CoveoHeadless is never loaded on this page so we do not use it.
+  const sb = document.querySelector('atomic-search-box');
+  if (!sb?.searchBox) return;
 
-  const sb = buildSearchBox(engine, { options: { numberOfSuggestions: 6 } });
-  // Subscribe once — outside the event handler to avoid accumulation
-  sb.subscribe(() => renderSuggestions(sb.state.suggestions));
+  // Subscribe to suggestion state changes from the controller
+  sb.searchBox.subscribe(() => renderSuggestions(sb.searchBox.state.suggestions));
 
   const input = inputEl();
   if (!input) return;
@@ -403,8 +405,7 @@ function initSuggestions(engine) {
   input.addEventListener('input', () => {
     const q = input.value.trim();
     if (!q) { closeSuggestions(); return; }
-    sb.updateText(q);
-    renderSuggestions(sb.state.suggestions);
+    sb.searchBox.updateText(q);
   });
 
   input.addEventListener('keydown', e => {
@@ -546,8 +547,8 @@ async function initCoveo() {
       searchHub: 'PokedexUI',
     },
   });
-  // Wire query suggestions using the engine if Headless is exposed
-  if (si.engine) initSuggestions(si.engine);
+  // Wire query suggestions via the hidden atomic-search-box controller
+  initSuggestions();
 }
 
 // ── Boot ──────────────────────────────────────────────────────

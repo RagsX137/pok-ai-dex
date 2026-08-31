@@ -37,6 +37,13 @@ _CMP_PATTERNS = [
         r'(?:and|vs\.?|versus)\s+([A-Za-z][A-Za-z\'\-\.♀♂ ]{1,30})',
         re.I
     ),
+    # "between Charizard and Dragonite, ..."
+    # No spaces in capture groups: without a keyword terminator after group 2,
+    # allowing spaces causes runaway matching into the rest of the sentence.
+    re.compile(
+        r'\bbetween\s+([A-Za-z][A-Za-z\'\-\.♀♂]{1,24})\s+and\s+([A-Za-z][A-Za-z\'\-\.♀♂]{1,24})',
+        re.I
+    ),
     # "Charizard vs Dragonite" / "Charizard versus Dragonite"
     re.compile(
         r'\b([A-Za-z][A-Za-z\'\-\.♀♂ ]{1,30}?)\s+'
@@ -78,10 +85,20 @@ def _detect_comparison(message: str) -> tuple[str, str] | None:
     return None
 
 
+_MAX_HISTORY_CHARS = 200  # per-turn cap so a long Oak answer doesn't dominate the query
+
+
 def _build_context_prompt(history: list[dict], message: str) -> str:
     """
     Build the query string for the RGA call, incorporating recent history
     so the model can resolve pronouns like 'it' and 'them'.
+
+    Assistant turns are truncated to _MAX_HISTORY_CHARS so a long previous
+    answer does not crowd out the actual new question sent to Coveo.
+
+    When a turn has a pokemon_context list (canonical resolved names), those
+    names are appended as a hint so pronoun resolution works even when the
+    user typed a misspelling in the original message.
     """
     if not history:
         return message
@@ -90,7 +107,13 @@ def _build_context_prompt(history: list[dict], message: str) -> str:
     lines = []
     for turn in recent:
         role = "Trainer" if turn["role"] == "user" else "Oak"
-        lines.append(f"{role}: {turn['content']}")
+        content = turn["content"]
+        if turn["role"] == "assistant" and len(content) > _MAX_HISTORY_CHARS:
+            content = content[:_MAX_HISTORY_CHARS] + "…"
+        ctx = turn.get("pokemon_context") or []
+        if ctx:
+            content = f"{content} [Pokémon: {', '.join(ctx)}]"
+        lines.append(f"{role}: {content}")
     lines.append(f"Trainer: {message}")
     return "\n".join(lines)
 
@@ -128,8 +151,14 @@ def coach():
     client = CoveoClient()
     result = client.generated_answer(query)
 
-    # Fallback to search excerpts if RGA did not fire
-    if result.stream_completed is False and result.error is None:
+    # Fallback to search excerpts if RGA did not fire OR Coveo abstained
+    # (stream_completed is False  → no stream ID issued; RGA model never ran)
+    # (stream_completed is True and answer empty → Coveo chose not to answer)
+    _rga_abstained = (
+        result.stream_completed is False
+        or (result.stream_completed is True and not result.answer.strip("() "))
+    )
+    if _rga_abstained and result.error is None:
         search_results = client.search(query, num=5).get("results", [])
         snippets = "; ".join(
             r.get("excerpt", r.get("title", ""))[:200]
