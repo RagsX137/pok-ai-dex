@@ -3,6 +3,7 @@ from flask import Flask
 from flask_cors import CORS
 
 from pokedex.config import settings
+from pokedex.routes.coach_api import coach_bp
 from pokedex.routes.coveo_api import coveo_bp
 from pokedex.routes.llm_api import llm_bp
 from pokedex.routes.pages import pages_bp
@@ -17,6 +18,7 @@ def create_app() -> Flask:
         f"http://localhost:{settings.port}",
     ])
     app.register_blueprint(pages_bp)
+    app.register_blueprint(coach_bp, url_prefix="/api")
     app.register_blueprint(coveo_bp, url_prefix="/api")
     app.register_blueprint(llm_bp, url_prefix="/api")
     return app

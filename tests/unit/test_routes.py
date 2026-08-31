@@ -17,6 +17,7 @@ def test_all_routes_are_registered(client):
         "/api/coveo-token", "/api/coveo-proxy",
         "/api/rga", "/api/rga-coveo", "/api/ask",
         "/api/set-model", "/api/models",
+        "/api/coach", "/api/coach-challenge",
     ]:
         assert expected in rules, f"route {expected} disappeared"
 
