@@ -24,7 +24,12 @@ TYPE_WORDS = "|".join(TYPES)
 # LLM answers state typings in several shapes; each of these caught a real
 # error during manual evaluation, so all of them are checked.
 _T = rf"(?P<t1>{TYPE_WORDS})(?:\s*/\s*(?P<t2>{TYPE_WORDS}))?"
-_NAME = r"(?-i:(?P<name>[A-Z][a-zA-Z'\u2019]*(?:\s[A-Z][a-zA-Z'\u2019]*)?))"
+# A deliberately loose candidate span — check_type_claims trims it to the part
+# that actually resolves against `universe`. The old class was
+# [A-Z][a-zA-Z'']* with an optional second word, which both missed every
+# hyphen/digit name (Porygon-Z, Ho-Oh) and swallowed the determiner in
+# "Your Loudred", killing the match outright.
+_NAME = r"(?-i:(?P<name>[A-Z][A-Za-z0-9''.\-]*(?:[ :]+[A-Z][A-Za-z0-9''.\-]*){0,2}))"
 
 # (pattern, mode). "full" asserts the complete typing, so a missing half is an
 # omission worth recording. "partial" only ever names one of the types
@@ -38,6 +43,13 @@ TYPE_CLAIM_PATTERNS = [
     (re.compile(rf"\b{_NAME}\s*\(\s*{_T}\s*(?:type)?\s*\)", re.I), "full"),
     # "Dratini's Dragon-type moves", "Vileplume's Poison-type attacks"
     (re.compile(rf"\b{_NAME}['\u2019]s\s+{_T}[-\s]?type", re.I), "partial"),
+    # "Loudred, a Ground-type Pokemon," / "Gyarados, a Water/Flying-type,"
+    # The closing delimiter is load-bearing: without it this also matches
+    # "To beat Loudred, a Fighting-type attack", which is a claim about the
+    # attack, not about Loudred. "partial" because the appositive is idiomatic
+    # shorthand — an omitted second type is not an error, an invented one is.
+    (re.compile(rf"\b{_NAME}\s*,\s+(?:an?\s+)?{_T}[-\s]?type\s*(?:pok[eé]mon)?\s*"
+                rf"(?=[,.;:!?)]|$)", re.I), "partial"),
 ]
 
 # "Water is super effective against Dark", "Poison and Flying types have
@@ -138,13 +150,18 @@ def check_type_claims(answer: str, chart, universe: list[str]) -> list[dict]:
     """Every typing assertion in the answer, verified against PokeAPI."""
     errors: list[dict] = []
     seen: set = set()
+    from pokedex import pokemon_names
+
     lookup = {n.lower(): n for n in universe}
+    pool = frozenset(lookup)
     for pattern, mode in TYPE_CLAIM_PATTERNS:
         for m in pattern.finditer(answer or ""):
-            raw_name = m.group("name").strip()
-            name = lookup.get(raw_name.lower())
-            if not name:
+            # Trim "Your Loudred" -> "Loudred". The regex captures a loose span;
+            # the corpus decides where the name actually starts.
+            key = pokemon_names.resolve_suffix(m.group("name"), universe=pool)
+            if not key:
                 continue
+            name = lookup[key]          # caller's casing: grading.py:239 needs it
             claimed = [m.group("t1").lower()]
             if m.group("t2"):
                 claimed.append(m.group("t2").lower())

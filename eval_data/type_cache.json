@@ -436,6 +436,10 @@
 "hippopotas": [
 "ground"
 ],
+"ho-oh": [
+"fire",
+"flying"
+],
 "hoopa": [
 "psychic",
 "ghost"
@@ -756,6 +760,9 @@
 "ghost"
 ],
 "porygon": [
+"normal"
+],
+"porygon-z": [
 "normal"
 ],
 "porygon2": [
