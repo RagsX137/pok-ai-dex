@@ -721,6 +721,8 @@ function renderResultsList(results, total, filtering = false) {
       <div class="ritem${i === activeSel ? ' sel' : ''}" data-index="${i}">
         <span class="rname">${escapeHtml(name)}</span>
         <span class="rbadges" data-badges-for="${escapeHtml(name)}"></span>
+        <a class="cmp-btn" href="/coach?compare=${encodeURIComponent(name.toLowerCase())}&with=pikachu"
+           title="Compare in Coach" tabindex="-1">⇌</a>
       </div>`;
   }).join('');
 
@@ -743,6 +745,19 @@ function renderResultsList(results, total, filtering = false) {
       const selected = results[_selectedIndex];
       selectResult(selected, false);
       fetchRGA(extractPokemonName(selected.title), results);
+    });
+  });
+
+  list.querySelectorAll('.cmp-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();   // don't trigger the row click
+      const currentName = document.getElementById('rp-name')?.textContent?.trim() ?? 'pikachu';
+      const compareName = btn.closest('.ritem').querySelector('.rname').textContent.trim();
+      // If comparing a Pokémon against itself, use Bulbasaur as fallback
+      const withName = currentName.toLowerCase() === compareName.toLowerCase()
+        ? 'bulbasaur'
+        : currentName.toLowerCase();
+      btn.href = `/coach?compare=${encodeURIComponent(compareName.toLowerCase())}&with=${encodeURIComponent(withName)}`;
     });
   });
 }
