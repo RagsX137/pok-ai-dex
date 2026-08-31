@@ -229,11 +229,13 @@ export function setPanelHeader(name, types, pokeId, ns = '') {
   const nameEl = document.getElementById(`rp-name${ns}`);
   const tagsEl = document.getElementById(`rp-tags${ns}`);
   if (nameEl) nameEl.textContent = name;
-  if (tagsEl && types.length) {
-    tagsEl.innerHTML = types.map(t => {
-      const colors = TYPE_COLORS[t.toLowerCase()] ?? { bg: '#444', text: '#ccc' };
-      return `<span class="rptag" style="background:${colors.bg}33;color:${colors.bg}">${t.charAt(0).toUpperCase() + t.slice(1)}</span>`;
-    }).join('') + (pokeId ? `<span class="rptag" style="background:rgba(79,195,247,.15);color:#4fc3f7">#${String(pokeId).padStart(3,'0')}</span>` : '');
+  if (tagsEl) {
+    tagsEl.innerHTML = types.length
+      ? types.map(t => {
+          const colors = TYPE_COLORS[t.toLowerCase()] ?? { bg: '#444', text: '#ccc' };
+          return `<span class="rptag" style="background:${colors.bg}33;color:${colors.bg}">${t.charAt(0).toUpperCase() + t.slice(1)}</span>`;
+        }).join('') + (pokeId ? `<span class="rptag" style="background:rgba(79,195,247,.15);color:#4fc3f7">#${String(pokeId).padStart(3,'0')}</span>` : '')
+      : '';
   }
 }
 
