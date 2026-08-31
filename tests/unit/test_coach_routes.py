@@ -169,3 +169,31 @@ def test_extract_pokemon_mentions_finds_real_names():
     # "Tell" and "About" must not be in the result.
     assert "tell" not in result
     assert "about" not in result
+
+
+def test_abstention_fallback_fires_for_sentinel(client):
+    """When Coveo returns the literal sentinel, the excerpt fallback must run — not show the sentinel raw."""
+    mock_result = MagicMock()
+    mock_result.answer = "(no answer generated)"
+    mock_result.citations = []
+    mock_result.stream_completed = True
+    mock_result.error = None
+
+    mock_search = {"results": [
+        {"title": "Pikachu Pokédex", "excerpt": "Pikachu is an Electric-type Pokémon."}
+    ]}
+
+    with patch("pokedex.routes.coach_api.CoveoClient") as MockClient:
+        MockClient.return_value.generated_answer.return_value = mock_result
+        MockClient.return_value.search.return_value = mock_search
+        r = client.post("/api/coach", json={
+            "session_id": "abstain-test",
+            "message": "tell me about Pikachu"
+        })
+
+    assert r.status_code == 200
+    d = r.get_json()
+    # The raw sentinel must not reach the client.
+    assert d["answer"] != "(no answer generated)"
+    # The search fallback text must be present.
+    assert "RGA model did not trigger" in d["answer"] or "Pikachu" in d["answer"]

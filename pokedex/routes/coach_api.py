@@ -20,7 +20,7 @@ coach_bp = Blueprint("coach_api", __name__)
 _grade_chart = None
 _grade_universe: list = []
 try:
-    from eval_harness.grading import check_chart_claims, check_type_claims  # type: ignore
+    from eval_harness.grading import check_chart_claims, check_type_claims, is_abstention  # type: ignore
     from eval_harness.typechart import TypeChart  # type: ignore
     from eval_harness.reference import ideal_answer as _ideal_answer  # type: ignore
 
@@ -32,6 +32,9 @@ except Exception:
     pass  # grading is best-effort; missing eval_harness is fine
 
 _ideal_answer = globals().get("_ideal_answer")  # None if eval_harness absent
+if "is_abstention" not in globals():
+    def is_abstention(answer: str) -> bool:  # type: ignore[misc]
+        return not (answer or "").strip("() ")
 
 # ── Comparison intent detection ───────────────────────────────
 # Patterns (case-insensitive). Each returns (name_a, name_b) or None.
@@ -179,7 +182,7 @@ def coach():
 
         _rga_abstained = (
             result.stream_completed is False
-            or (result.stream_completed is True and not result.answer.strip("() "))
+            or (result.stream_completed is True and is_abstention(result.answer))
         )
         if _rga_abstained and result.error is None:
             search_results = client.search(query, num=5).get("results", [])
