@@ -14,7 +14,7 @@
 import {
   fetchPokeData, pokemonDbArtworkUrl, pokemonDbSpriteUrl,
   renderStatBars, renderMovesTable, renderTypeEffectiveness,
-  updatePhotoCard, setPanelHeader, matchupSummary,
+  updatePhotoCard,
   TYPE_COLORS, STAT_KEYS,
 } from './modules/pokemon-panel.js';
 
@@ -64,6 +64,15 @@ function appendThinking() {
 
 function removeThinking() {
   document.getElementById('thinking-indicator')?.remove();
+}
+
+// ── Render error bubble ───────────────────────────────────────
+function appendErrorBubble(text) {
+  const div = document.createElement('div');
+  div.className = 'bubble bubble-error';
+  div.textContent = text;
+  thread().appendChild(div);
+  thread().scrollTop = thread().scrollHeight;
 }
 
 // ── Render Oak answer bubble (plain text) ─────────────────────
@@ -307,7 +316,7 @@ async function sendMessage(overrideText) {
   closeSuggestions();
 
   appendUserBubble(text);
-  const thinking = appendThinking();
+  appendThinking();
 
   try {
     const resp = await fetch('/api/coach', {
@@ -318,7 +327,7 @@ async function sendMessage(overrideText) {
     removeThinking();
 
     if (!resp.ok) {
-      appendOakBubble('(Error contacting Professor Oak — please try again.)', [], []);
+      appendErrorBubble('(Error contacting Professor Oak — please try again.)');
       return;
     }
 
@@ -344,7 +353,7 @@ async function sendMessage(overrideText) {
 
   } catch (err) {
     removeThinking();
-    appendOakBubble('(Professor Oak is unavailable — check the server.)', [], []);
+    appendErrorBubble('(Professor Oak is unavailable — check the server.)');
   }
 }
 
@@ -362,6 +371,8 @@ function initSuggestions(engine) {
   if (!buildSearchBox) return;   // Headless not available
 
   const sb = buildSearchBox(engine, { options: { numberOfSuggestions: 6 } });
+  // Subscribe once — outside the event handler to avoid accumulation
+  sb.subscribe(() => renderSuggestions(sb.state.suggestions));
 
   const input = inputEl();
   if (!input) return;
@@ -371,8 +382,6 @@ function initSuggestions(engine) {
     if (!q) { closeSuggestions(); return; }
     sb.updateText(q);
     renderSuggestions(sb.state.suggestions);
-    // Subscribe for async updates
-    sb.subscribe(() => renderSuggestions(sb.state.suggestions));
   });
 
   input.addEventListener('keydown', e => {
@@ -452,7 +461,7 @@ async function startChallenge() {
     }
   } catch {
     removeThinking();
-    appendOakBubble('(Challenge mode unavailable right now.)', [], []);
+    appendErrorBubble('(Challenge mode unavailable right now.)');
   }
 }
 
