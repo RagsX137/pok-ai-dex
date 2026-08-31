@@ -97,9 +97,14 @@ function appendOakBubble(text, citations, gradingFlags) {
 
   let flagHtml = '';
   if (gradingFlags?.length) {
-    flagHtml = gradingFlags.map(f =>
-      `<div class="grade-flag">⚠ Type error: ${esc(f.message)}</div>`
-    ).join('');
+    flagHtml = gradingFlags.map(f => {
+      if (f.type === 'type_error' && f.actual?.length && f.claimed?.length) {
+        const claimed = f.claimed.map(t => t.charAt(0).toUpperCase() + t.slice(1)).join('/');
+        const actual  = f.actual.map(t => t.charAt(0).toUpperCase() + t.slice(1)).join('/');
+        return `<div class="grade-flag">⚠ ${esc(f.message)}: claimed ${esc(claimed)} — actually ${esc(actual)}</div>`;
+      }
+      return `<div class="grade-flag">⚠ Type error: ${esc(f.message)}</div>`;
+    }).join('');
   }
 
   div.innerHTML = header + body + citHtml + flagHtml;
@@ -364,7 +369,13 @@ async function sendMessage(overrideText) {
         appendOakBubble(answer, citations, grading_flags);
       }
 
-      updateSnippet(answer);
+      // Don't promote a flagged sentence as the "Quick Answer".
+      const firstSentenceIsFlagged = grading_flags?.some(f => {
+        const firstSentence = answer.split(/[.!?]/)[0].toLowerCase();
+        return f.message && firstSentence.includes(f.message.toLowerCase());
+      });
+      if (!firstSentenceIsFlagged) updateSnippet(answer);
+      else updateSnippet('');
 
       // Update recommendations from first Pokémon mentioned in the answer
       const firstMention = answer.match(/\b([A-Z][a-z]{2,})\b/);

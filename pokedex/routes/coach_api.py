@@ -253,8 +253,13 @@ def _grade_answer(answer: str, cmp_names: tuple[str, str] | None) -> list[dict]:
             flags.append({"type": "chart_error", "message": err["claim"],
                           "quote": err.get("quote", "")})
         for err in check_type_claims(answer, _grade_chart, _grade_universe):  # type: ignore[name-defined]
-            flags.append({"type": "type_error", "message": err.get("pokemon", ""),
-                          "quote": err.get("quote", "")})
+            flags.append({
+                "type":    "type_error",
+                "message": err.get("pokemon", ""),
+                "quote":   err.get("quote", ""),
+                "actual":  err.get("actual", []),
+                "claimed": err.get("claimed", []),
+            })
     except Exception:
         pass
     return flags
