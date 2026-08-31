@@ -20,8 +20,8 @@ from .scenarios import AXES, DEFAULT_AXES, DEFAULT_PROBES, PROBES
 from .store import Store
 from .typechart import TypeChart
 
-ROOT = Path(__file__).parent.parent
-DATA = ROOT / "eval_data"
+from pokedex.config import app_url, settings
+DATA = settings.repo_root / "eval_data"
 DEFAULT_DB = DATA / "pokedex_eval.db"
 
 
@@ -55,7 +55,7 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("--repeats", type=int, default=1, help="passes over the axis list")
     r.add_argument("--label", default=None, help="tag this run, e.g. 'before-typechart-fix'")
     r.add_argument("--notes", default=None)
-    r.add_argument("--app", default=os.getenv("POKEDEX_URL", "http://127.0.0.1:5003"))
+    r.add_argument("--app", default=app_url())
     r.add_argument("--refresh-corpus", action="store_true", help="re-harvest names from Coveo")
     r.add_argument("--quiet", action="store_true")
 
@@ -89,7 +89,7 @@ def _chart() -> TypeChart:
 
 
 def cmd_run(args, store) -> int:
-    load_dotenv(ROOT / ".env")
+    load_dotenv(settings.repo_root / ".env")
     app = AppClient(args.app)
     if not app.health():
         print(f"error: no app at {args.app} - start it with `python app.py`", file=sys.stderr)

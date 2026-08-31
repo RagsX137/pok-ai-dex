@@ -158,7 +158,8 @@ class DirectCoveoClient:
     def __init__(self, org: str, token: str, timeout: int = 60):
         self.org = org
         self.token = token
-        self.base = f"https://{org}.org.coveo.com" if org else "https://platform.cloud.coveo.com"
+        from pokedex.config import settings
+        self.base = settings.coveo_base
         self.timeout = timeout
 
     @property
@@ -200,7 +201,7 @@ class DirectCoveoClient:
                 res.latency_ms = int((time.time() - t0) * 1000)
                 return res
 
-            events, parts, cits, generated = [], [], [], None
+            events, generated = [], None
             rs = requests.get(
                 f"{self.base}/rest/organizations/{self.org}/machinelearning/streaming/{stream_id}",
                 headers={"Authorization": f"Bearer {self.token}", "Accept": "*/*"},
@@ -211,7 +212,26 @@ class DirectCoveoClient:
                 res.latency_ms = int((time.time() - t0) * 1000)
                 return res
 
-            for raw_line in rs.iter_lines():
+            # Use the shared parser for the text/citations/error extraction.
+            # Keep DirectCoveoClient's own answerGenerated extraction — that is
+            # the one thing this class exists for and parse_genqa_stream does
+            # NOT return it (CoveoClient.generated_answer's stream_completed is
+            # a different signal: "stream reached COMPLETED", not "Coveo's own
+            # answerGenerated=true").
+            from pokedex.coveo import parse_genqa_stream
+            # Collect lines first so we can also scan for answerGenerated while
+            # parse_genqa_stream handles text/citations/error.
+            raw_lines = list(rs.iter_lines())
+            answer_text, cits, stream_err = parse_genqa_stream(raw_lines)
+            if stream_err:
+                res.error = f"CRGA error: {stream_err}"
+                res.latency_ms = int((time.time() - t0) * 1000)
+                return res
+
+            # Extract answerGenerated from genqa.endOfStreamType payload —
+            # the authoritative Coveo abstention flag that parse_genqa_stream
+            # intentionally does not surface.
+            for raw_line in raw_lines:
                 if not raw_line:
                     continue
                 line = raw_line.decode("utf-8") if isinstance(raw_line, bytes) else raw_line
@@ -221,29 +241,21 @@ class DirectCoveoClient:
                     ev = json.loads(line[5:].strip())
                 except ValueError:
                     continue
-                ptype = ev.get("payloadType", "")
-                try:
-                    payload = json.loads(ev.get("payload", "") or "{}")
-                except ValueError:
-                    payload = {}
-                events.append({"payloadType": ptype, "finishReason": ev.get("finishReason")})
-
-                if ev.get("finishReason") == "ERROR":
-                    res.error = f"CRGA error: {ev.get('errorMessage', 'unknown')}"
-                    break
-                if ptype == "genqa.messageType":
-                    delta = payload.get("textDelta", "")
-                    if delta and delta.strip():
-                        parts.append(delta)
-                elif ptype == "genqa.citationsType":
-                    cits = payload.get("citations", [])
-                elif ptype == "genqa.endOfStreamType":
+                events.append({
+                    "payloadType": ev.get("payloadType", ""),
+                    "finishReason": ev.get("finishReason"),
+                })
+                if ev.get("payloadType") == "genqa.endOfStreamType":
+                    try:
+                        payload = json.loads(ev.get("payload", "") or "{}")
+                    except ValueError:
+                        payload = {}
                     generated = payload.get("answerGenerated")
                     break
 
-            res.answer = "".join(parts).strip()
+            res.answer = answer_text.strip()
             res.citations = cits
-            res.answer_generated = generated if generated is not None else bool(parts)
+            res.answer_generated = generated if generated is not None else bool(answer_text)
             res.raw = {"stream_id": stream_id, "events": events}
         except requests.RequestException as exc:
             res.error = f"{type(exc).__name__}: {exc}"
