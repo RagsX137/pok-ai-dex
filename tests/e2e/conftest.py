@@ -36,28 +36,26 @@ def dashboard(browser, live_url):
 @pytest.fixture
 def search(dashboard):
     def _search(query: str, expect: str | None = None, timeout: int = 20000):
-        if expect:
-            # Snapshot the tags before searching so we can wait for them to
-            # change. selectResult() sets #rp-name at line 980 (before PokéAPI)
-            # and #rp-tags + #weak-chips only after PokéAPI returns (lines
-            # 1017/1020). PokéAPI results are cached in a JS Map, so re-queries
-            # resolve synchronously — networkidle fires before the DOM update.
-            # Waiting for #rp-tags to differ from the pre-search snapshot is the
-            # reliable "full panel rendered" signal that guarantees #weak-chips
-            # is also up to date for the new Pokémon.
-            prev_tags = dashboard.locator("#rp-tags").inner_html()
-
         dashboard.fill("#search-input", query)
         dashboard.press("#search-input", "Enter")
 
         if expect:
+            # Wait for #rp-tags to be NON-EMPTY, not merely different.
+            # selectResult() calls setPanelHeader(name, [], null) synchronously
+            # before awaiting PokéAPI (dashboard.js:840), which sets #rp-name and
+            # BLANKS #rp-tags on every search. A "tags changed" predicate is
+            # therefore satisfied ~0.27s in, while #weak-chips still holds the
+            # previous Pokemon's chips — the tests then asserted against stale
+            # data. Only the post-await setPanelHeader(name, poke.types, id)
+            # refills #rp-tags, and renderTypeEffectiveness() runs in that same
+            # synchronous block, so non-empty tags guarantee fresh #weak-chips.
             dashboard.wait_for_function(
-                "([name, prev]) => {"
+                "(name) => {"
                 "  const rp = document.querySelector('#rp-name')?.textContent ?? '';"
                 "  const tags = document.querySelector('#rp-tags')?.innerHTML ?? '';"
-                "  return rp.includes(name) && tags !== prev;"
+                "  return rp.includes(name) && tags.trim() !== '';"
                 "}",
-                arg=[expect, prev_tags], timeout=timeout,
+                arg=expect, timeout=timeout,
             )
         else:
             dashboard.wait_for_load_state("networkidle", timeout=timeout)
