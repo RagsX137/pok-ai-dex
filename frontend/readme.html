@@ -444,21 +444,21 @@
       <table class="data-table">
         <thead><tr><th>File</th><th>Responsibility</th></tr></thead>
         <tbody>
-          <tr><td class="fname">app.py</td><td class="fdesc">Flask server — all routes, Coveo proxy, CRGA stream handler, Ollama RGA, model selector.</td></tr>
-          <tr><td class="fname">agent.py</td><td class="fdesc">Agentic loop — <code>_coveo_search()</code> retrieves context, <code>generate_rga_answer()</code> asks Ollama, <code>run_agent()</code> orchestrates.</td></tr>
+          <tr><td class="fname">pokedex/app.py</td><td class="fdesc">Flask application factory — <code>create_app()</code> registers the three blueprints.</td></tr>
+          <tr><td class="fname">pokedex/coveo.py</td><td class="fdesc">Single Coveo client — <code>CoveoClient.search()</code>, <code>generated_answer()</code>, and <code>parse_genqa_stream()</code>.</td></tr>
+          <tr><td class="fname">pokedex/agent.py</td><td class="fdesc">Agentic loop — <code>_coveo_search()</code> retrieves context, <code>generate_rga_answer()</code> asks Ollama, <code>run_agent()</code> orchestrates.</td></tr>
           <tr><td class="fname">frontend/dashboard.html</td><td class="fdesc">3-column dashboard shell. Atomic search interface + hidden search box. Jinja2 template for org ID injection.</td></tr>
           <tr><td class="fname">frontend/dashboard.css</td><td class="fdesc">Dark dashboard design system — grid, sidebar, type chips, generation list, map card, photo card, stats, moves, AI card.</td></tr>
           <tr><td class="fname">frontend/dashboard.js</td><td class="fdesc">Main dashboard controller — Coveo engine init, search orchestration, PokéAPI fetches, type/gen highlight logic, map card, similar Pokémon.</td></tr>
-          <tr><td class="fname">frontend/type-colors.js</td><td class="fdesc">Exported <code>TYPE_COLORS</code> map — canonical Pokémon type → <code>{bg, text}</code> colour pairs.</td></tr>
-          <tr><td class="fname">frontend/index.html</td><td class="fdesc">Original Pokédex-device-shaped UI (red chrome, screen bezel, control row).</td></tr>
-          <tr><td class="fname">frontend/pokedex-atomic.js</td><td class="fdesc">Atomic engine init and Flask proxy bridge for the original device UI.</td></tr>
-          <tr><td class="fname">frontend/pokedex-styles.css</td><td class="fdesc">CSS device chrome for the original Pokédex-shaped UI.</td></tr>
-          <tr><td class="fname">frontend/result-template.js</td><td class="fdesc">Coveo Atomic result template for Pokémon cards.</td></tr>
+          <tr><td class="fname">frontend/modules/type-colors.js</td><td class="fdesc">Exported <code>TYPE_COLORS</code> map — canonical Pokémon type → <code>{bg, text}</code> colour pairs.</td></tr>
+          <tr><td class="fname">frontend/modules/type-chart.js</td><td class="fdesc">Exported <code>TYPE_CHART</code>, <code>typeMultiplier</code>, <code>multLabel</code> — held in parity with <code>eval_harness/typechart.py</code>.</td></tr>
+          <tr><td class="fname">frontend/classic/index.html</td><td class="fdesc">Original Pokédex-device-shaped UI (red chrome, screen bezel, control row).</td></tr>
+          <tr><td class="fname">frontend/classic/pokedex-atomic.js</td><td class="fdesc">Atomic engine init and Flask proxy bridge for the original device UI.</td></tr>
+          <tr><td class="fname">frontend/classic/pokedex-styles.css</td><td class="fdesc">CSS device chrome for the original Pokédex-shaped UI.</td></tr>
           <tr><td class="fname">.env.example</td><td class="fdesc">Template for all required environment variables — copy to <code>.env</code> before running.</td></tr>
-          <tr><td class="fname">eval_cases.json</td><td class="fdesc">Ground-truth query → expected Pokémon pairs for search quality evaluation.</td></tr>
-          <tr><td class="fname">eval_llm_comparison.py</td><td class="fdesc">Head-to-head eval: Coveo CRGA vs Ollama answer quality across eval cases.</td></tr>
-          <tr><td class="fname">tune_cosine_threshold.py</td><td class="fdesc">Threshold tuner for the Semantic-PokEncoder cosine similarity KNN ranking function.</td></tr>
-          <tr><td class="fname">test_e2e_pokedex.py</td><td class="fdesc">End-to-end integration tests against a live Coveo org.</td></tr>
+          <tr><td class="fname">eval_harness/</td><td class="fdesc">Repeatable wild-encounter evaluation harness — see <code>eval_harness/README.md</code>.</td></tr>
+          <tr><td class="fname">scripts/ingest/</td><td class="fdesc">One-off scrapers for Pokémon DB data and artwork.</td></tr>
+          <tr><td class="fname">tests/</td><td class="fdesc">Unit tests (<code>tests/unit/</code>, no server needed) and Playwright e2e tests (<code>tests/e2e/</code>).</td></tr>
         </tbody>
       </table>
     </div>
@@ -481,7 +481,7 @@
           <tr><td><span class="method m-post">POST</span></td><td class="rpath">/api/ask</td><td class="fdesc">Full agentic loop. Body: <code>{query}</code>. Returns <code>{message, pokemon_list}</code>.</td></tr>
           <tr><td><span class="method m-post">POST</span></td><td class="rpath">/api/set-model</td><td class="fdesc">Hot-swaps the active Ollama model at runtime. Body: <code>{model}</code>.</td></tr>
           <tr><td><span class="method m-get">GET</span></td><td class="rpath">/api/models</td><td class="fdesc">Lists all locally pulled Ollama models.</td></tr>
-          <tr><td><span class="method m-get">GET</span></td><td class="rpath">/images/&lt;filename&gt;</td><td class="fdesc">Serves artwork from local <code>pokemon_images/</code> directory.</td></tr>
+          <tr><td><span class="method m-get">GET</span></td><td class="rpath">/images/&lt;filename&gt;</td><td class="fdesc">Serves artwork from local <code>data/images/</code> directory.</td></tr>
         </tbody>
       </table>
     </div>

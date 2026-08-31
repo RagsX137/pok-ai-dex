@@ -1,0 +1,25 @@
+"""Flask application factory."""
+from flask import Flask
+from flask_cors import CORS
+
+from pokedex.config import settings
+from pokedex.routes.coveo_api import coveo_bp
+from pokedex.routes.llm_api import llm_bp
+from pokedex.routes.pages import pages_bp
+
+
+def create_app() -> Flask:
+    app = Flask(__name__)
+    # Scope CORS to this app's own origins. Reflecting any Origin let *any* website
+    # read /api/coveo-token — i.e. the live Coveo API key — from a visitor's browser.
+    CORS(app, origins=[
+        f"http://127.0.0.1:{settings.port}",
+        f"http://localhost:{settings.port}",
+    ])
+    app.register_blueprint(pages_bp)
+    app.register_blueprint(coveo_bp, url_prefix="/api")
+    app.register_blueprint(llm_bp, url_prefix="/api")
+    return app
+
+
+app = create_app()
