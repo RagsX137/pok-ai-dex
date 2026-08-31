@@ -1207,6 +1207,18 @@ function wireMapPan() {
 // ─────────────────────────────────────────────────────────────
 // 19. Boot
 // ─────────────────────────────────────────────────────────────
+// Inject compare-button CSS so it applies on the dashboard page
+// (coach.css is only loaded on /coach)
+(function injectCmpBtnStyles() {
+  const style = document.createElement('style');
+  style.textContent = `
+    .cmp-btn{display:none;font-size:11px;font-weight:700;color:#4fc3f7;text-decoration:none;background:rgba(79,195,247,.08);border:1px solid rgba(79,195,247,.25);border-radius:4px;padding:1px 6px;flex-shrink:0;transition:background .1s;}
+    .ritem:hover .cmp-btn{display:inline-block;}
+    .cmp-btn:hover{background:rgba(79,195,247,.2);}
+  `;
+  document.head.appendChild(style);
+}());
+
 document.addEventListener('DOMContentLoaded', async () => {
   buildTypeGrid();
   wireGenList();
