@@ -211,3 +211,14 @@ def test_coach_rejects_malformed_body(client, body, expected_status):
     r = client.post("/api/coach", data=body,
                     content_type="application/json")
     assert r.status_code == expected_status, f"body={body!r} got {r.status_code}"
+
+
+def test_challenge_does_not_pre_store_turn(client):
+    """coach-challenge must not store a user turn; that is /api/coach's job."""
+    from pokedex.conversation import get_history
+    r = client.post("/api/coach-challenge", json={})
+    assert r.status_code == 200
+    d = r.get_json()
+    # The session returned by challenge must be empty — no pre-stored turn.
+    history = get_history(d["session_id"])
+    assert history == [], f"Expected empty history, got {history}"

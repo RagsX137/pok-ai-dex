@@ -345,7 +345,6 @@ def coach_challenge():
         })
 
     session_id = str(uuid.uuid4())
-    append_turn(session_id, "user", probe_text, pokemon_context=sc.team + [sc.wild])
 
     return jsonify({
         "prompt":     probe_text,
