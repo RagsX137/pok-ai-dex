@@ -1,10 +1,10 @@
 import os
 
 import ollama as ol
-import requests as req_lib
 from dotenv import load_dotenv
 
 from pokedex.config import settings
+from pokedex.coveo import CoveoClient
 
 load_dotenv()
 
@@ -13,32 +13,15 @@ OLLAMA_BASE_URL = settings.ollama_base_url
 
 _client = ol.Client(host=OLLAMA_BASE_URL)
 
-COVEO_ORG   = settings.coveo_org
-COVEO_TOKEN = settings.coveo_token
-COVEO_BASE  = settings.coveo_base
-
 
 def _coveo_search(query: str, num_results: int = 5) -> list[dict]:
     """
     Fire a Coveo REST search and return a list of
     {title, excerpt, url} dicts for the top results.
     """
-    url  = f"{COVEO_BASE}/rest/search/v2?organizationId={COVEO_ORG}"
-    hdrs = {
-        "Authorization": f"Bearer {COVEO_TOKEN}",
-        "Content-Type":  "application/json",
-    }
-    body = {
-        "q":               query,
-        "numberOfResults": num_results,
-        "searchHub":       os.getenv("COVEO_SEARCH_HUB", "PokedexUI"),
-        "pipeline":        os.getenv("COVEO_PIPELINE", "default"),
-        # The Semantic Encoder (Semantic-PokEncoder) runs automatically via the
-        # KNN Ranking Function injected by the pipeline — no mlParameters needed.
-    }
-    resp = req_lib.post(url, json=body, headers=hdrs, timeout=15)
-    resp.raise_for_status()
-    results = resp.json().get("results", [])
+    # The Semantic Encoder (Semantic-PokEncoder) runs automatically via the
+    # KNN Ranking Function injected by the pipeline — no mlParameters needed.
+    results = CoveoClient().search(query, num=num_results)["results"]
     return [
         {
             "title":   r.get("title", ""),

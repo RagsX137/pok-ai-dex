@@ -8,6 +8,7 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 
 from pokedex.config import settings
+from pokedex.coveo import CoveoClient
 
 load_dotenv()
 
@@ -122,57 +123,24 @@ def rga():
 @app.route("/api/rga-coveo", methods=["POST"])
 def rga_coveo():
     """
-    Uses Coveo's Relevance Generative Answering (CRGA / Professor-Oak).
-
-    Flow (matching Coveo Headless GeneratedAnswerAPIClient):
-      1. POST /rest/search/v2 with enableGenerativeQuestionAnswering=True
-         → response.extendedResults.generativeQuestionAnsweringId (streamId)
-      2. GET /rest/organizations/{org}/machinelearning/streaming/{streamId}
-         Accept: */*  → SSE stream of genqa.* events
-      3. Collect textDelta tokens + citations until genqa.endOfStreamType
+    Uses Coveo's Relevance Generative Answering (CRGA / Professor-Oak) via
+    `CoveoClient.generated_answer`. This route only shapes that result into
+    the JSON response: the "RGA model did not trigger" fallback (needs the
+    top search excerpts) and the citation normalisation are HTTP-response
+    concerns, so they stay here rather than in the client.
 
     Body: { "query": str }
     Returns: { "answer": str, "citations": [...] }
     """
-    import time as _time
-
     data  = request.get_json(force=True)
     query = data.get("query", "")
 
-    hdrs_json = {
-        "Authorization": f"Bearer {COVEO_TOKEN}",
-        "Content-Type":  "application/json",
-    }
+    client = CoveoClient()
+    result = client.generated_answer(query)
 
-    # ── Step 1: search to obtain the stream ID ────────────────────────────────
-    search_url = f"{COVEO_BASE}/rest/search/v2?organizationId={COVEO_ORG}"
-    search_body = {
-        "q":                              query,
-        "numberOfResults":                5,
-        "searchHub":                      os.getenv("COVEO_SEARCH_HUB", "PokedexUI"),
-        "pipeline":                       os.getenv("COVEO_RGA_PIPELINE",
-                                                    os.getenv("COVEO_PIPELINE", "default")),
-        "enableGenerativeQuestionAnswering": True,
-    }
-
-    stream_id = None
-    search_results = []
-    for _attempt in range(6):
-        r_search = req_lib.post(search_url, json=search_body, headers=hdrs_json, timeout=15)
-        if r_search.status_code != 200:
-            return jsonify({
-                "answer": f"(Coveo search error: {r_search.status_code})",
-                "citations": [],
-            }), 200
-        search_data   = r_search.json()
-        stream_id     = search_data.get("extendedResults", {}).get("generativeQuestionAnsweringId")
-        search_results = search_data.get("results", [])
-        if stream_id:
-            break
-        _time.sleep(1)
-
-    if not stream_id:
+    if result.answer_generated is False and result.error is None:
         # No RGA model fired — return top search excerpts as a fallback answer
+        search_results = client.search(query, num=5).get("results", [])
         snippets = "; ".join(
             r.get("excerpt", r.get("title", ""))[:200]
             for r in search_results[:3]
@@ -184,71 +152,6 @@ def rga_coveo():
             "citations": [],
         }), 200
 
-    # ── Step 2: consume the SSE stream ───────────────────────────────────────
-    stream_url = (
-        f"{COVEO_BASE}/rest/organizations/{COVEO_ORG}"
-        f"/machinelearning/streaming/{stream_id}"
-    )
-    hdrs_sse = {
-        "Authorization": f"Bearer {COVEO_TOKEN}",
-        "Accept":        "*/*",
-    }
-
-    try:
-        r_stream = req_lib.get(stream_url, headers=hdrs_sse, timeout=45, stream=True)
-    except req_lib.RequestException as exc:
-        return jsonify({"answer": f"(Stream request failed: {exc})", "citations": []}), 200
-
-    if r_stream.status_code != 200:
-        return jsonify({
-            "answer": f"(CRGA stream error: {r_stream.status_code})",
-            "citations": [],
-        }), 200
-
-    # ── Step 3: parse SSE events ──────────────────────────────────────────────
-    answer_parts: list[str] = []
-    citations:    list[dict] = []
-
-    for raw_line in r_stream.iter_lines():
-        if not raw_line:
-            continue
-        line = raw_line.decode("utf-8") if isinstance(raw_line, bytes) else raw_line
-        if not line.startswith("data:"):
-            continue
-        try:
-            event = __import__("json").loads(line[len("data:"):].strip())
-        except ValueError:
-            continue
-
-        payload_type = event.get("payloadType", "")
-        payload_raw  = event.get("payload", "")
-        finish       = event.get("finishReason")
-
-        if event.get("finishReason") == "ERROR":
-            return jsonify({
-                "answer": f"(CRGA error: {event.get('errorMessage', 'unknown')})",
-                "citations": [],
-            }), 200
-
-        if payload_raw:
-            try:
-                payload = __import__("json").loads(payload_raw)
-            except ValueError:
-                payload = {}
-        else:
-            payload = {}
-
-        if payload_type == "genqa.messageType":
-            delta = payload.get("textDelta", "")
-            if delta and delta.strip():
-                answer_parts.append(delta)
-        elif payload_type == "genqa.citationsType":
-            citations = payload.get("citations", [])
-        elif payload_type == "genqa.endOfStreamType" or finish == "COMPLETED":
-            break
-
-    answer = "".join(answer_parts).strip() or "(no answer generated)"
-
     # Normalise citations to a consistent shape
     clean_citations = [
         {
@@ -256,10 +159,10 @@ def rga_coveo():
             "uri":       c.get("uri") or c.get("clickUri", ""),
             "permanentid": c.get("permanentid", ""),
         }
-        for c in citations
+        for c in result.citations
     ]
 
-    return jsonify({"answer": answer, "citations": clean_citations})
+    return jsonify({"answer": result.answer, "citations": clean_citations})
 
 
 # ── Agentic ask ───────────────────────────────────────────────────────────────
