@@ -44,6 +44,7 @@ Three modules exist specifically to be the *only* copy of something. Adding a se
 - `pokedex/config.py` — every port, base URL, pipeline name and directory. `settings` is a frozen dataclass loaded once at import. Nothing else should call `os.getenv` for these values.
 - `pokedex/coveo.py` — the only Coveo client. `CoveoClient.search()` and `.generated_answer()` (the full CRGA flow: search → stream ID → SSE). Routes, `agent.py` and the harness all go through it.
 - `pokedex/ollama_client.py` — the only `ol.Client` construction.
+- `pokedex/pokemon_names.py` — the only answer to "is this string a Pokémon name?". It loads the corpus on first use, so no caller depends on another module having been imported first; `create_app()` calls `init()` only to make the server pay that cost at startup. `resolve`/`resolve_prefix`/`resolve_suffix` are exact and are what decisions must use; `closest` is fuzzy and belongs only to the `/api/pokemon-correct` spell-check.
 
 `pokedex/app.py` is a factory registering four blueprints: `pages` (HTML at `/`, `/dashboard`, `/coach`, `/readme` + static), and `coach`/`coveo`/`llm` all mounted at `/api`.
 
@@ -63,7 +64,9 @@ Three modules exist specifically to be the *only* copy of something. Adding a se
 
 ### Coach (`/coach`)
 
-`pokedex/routes/coach_api.py` + `pokedex/conversation.py`. Sessions are in-memory only: an `OrderedDict` of `deque(maxlen=20)`, LRU-evicted at 1000 sessions, lost on restart. History is inlined into the RGA query (last 4 turns, assistant turns truncated to 200 chars) so pronouns resolve. Comparison intent is regex-detected before the LLM call; `_STOPWORDS` guards the loose "X or Y" pattern.
+`pokedex/routes/coach_api.py` + `pokedex/conversation.py`. Sessions are in-memory only: an `OrderedDict` of `deque(maxlen=20)`, LRU-evicted at 1000 sessions, lost on restart. History is inlined into the RGA query (last 4 turns, assistant turns truncated to 200 chars) so pronouns resolve. Comparison intent is regex-detected before the LLM call; both sides of the loose "X or Y" pattern must then resolve *exactly* against the name corpus, which is what keeps "fire or water" from being read as a matchup.
+
+Anything written to `pokemon_context` is a routing input, not a display string: it is inlined into the retrieval query by `_build_context_prompt` and read back as the wild Pokémon by `matchup._extract_wild_from_history` on the next turn. Resolve it with `pokemon_names.resolve*`, never `closest` — at edit distance 1 "Steel" becomes "Seel".
 
 `coach_api.py` imports `eval_harness` **optionally** inside a try/except to grade answers for type/chart errors. Grading is best-effort — the app must keep working when `eval_harness` or `eval_data/*.json` is absent.
 

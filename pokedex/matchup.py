@@ -27,29 +27,22 @@ def _resolve(name: str) -> str | None:
 
 
 # ── team extraction ──────────────────────────────────────────────────────────
-# Matches "My team is A, B, C, D, E and F" (6 names, various separators).
-_TEAM_RE = re.compile(
-    r"(?:my\s+)?team\s+is\s+"
-    r"([A-Za-z][A-Za-z\-' ]{1,20})"          # name 1
-    r"(?:,\s*([A-Za-z][A-Za-z\-' ]{1,20}))"  # name 2
-    r"(?:,\s*([A-Za-z][A-Za-z\-' ]{1,20}))"  # name 3
-    r"(?:,\s*([A-Za-z][A-Za-z\-' ]{1,20}))"  # name 4
-    r"(?:,\s*([A-Za-z][A-Za-z\-' ]{1,20}))"  # name 5
-    r"(?:,?\s+and\s+([A-Za-z][A-Za-z\-' ]{1,20}))",  # name 6
-    re.I,
-)
+# The lead-in, then one greedy span of "things a name list is made of".
+#
+# These used to be six mandatory capture groups, so ONLY an exactly-six-name
+# team matched and every real trainer with three or four Pokémon fell through
+# to the LLM — the deterministic path was reachable almost exclusively by the
+# eval harness's own phrasing. The span is split and resolved instead, which
+# makes the arity free: the list ends where the names stop resolving.
+_LIST_SPAN = r"([A-Za-z][A-Za-z0-9'’.\-: ,]{1,200})"
+_TEAM_RE = re.compile(r"(?:my\s+)?team\s+is\s+" + _LIST_SPAN, re.I)
+_WHICH_OF_RE = re.compile(r"(?:which\s+of|out\s+of)\s+" + _LIST_SPAN, re.I)
 
-# "which of A, B, C, D, E and F …" or "Out of A, B, C, D, E and F …"
-_WHICH_OF_RE = re.compile(
-    r"(?:which\s+of|out\s+of)\s+"
-    r"([A-Za-z][A-Za-z\-' ]{1,20})"          # name 1
-    r"(?:,\s*([A-Za-z][A-Za-z\-' ]{1,20}))"  # name 2
-    r"(?:,\s*([A-Za-z][A-Za-z\-' ]{1,20}))"  # name 3
-    r"(?:,\s*([A-Za-z][A-Za-z\-' ]{1,20}))"  # name 4
-    r"(?:,\s*([A-Za-z][A-Za-z\-' ]{1,20}))"  # name 5
-    r"(?:,?\s+and\s+([A-Za-z][A-Za-z\-' ]{1,20}))",  # name 6
-    re.I,
-)
+# Splits the span on the separators a spoken list uses. A name never contains
+# a comma or the standalone word "and".
+_LIST_SEP = re.compile(r",|\band\b", re.I)
+
+_MAX_TEAM = 6
 
 # ── probe classification ─────────────────────────────────────────────────────
 _AVOID_RE = re.compile(r"\b(avoid|bad idea|bad choice|worst|not send|shouldn't send|should not send)\b", re.I)
@@ -70,13 +63,45 @@ class MatchupIntent:
     probe: str        # "advantage" | "avoid" | "ranking"
 
 
+def _names_in_span(span: str) -> list[str]:
+    """Resolve a comma/and-separated span into the names it opens with.
+
+    Two rules end the list, both needed because the span runs past the end of
+    the sentence (a period is legal inside "Mr. Mime", so it cannot terminate
+    the capture):
+
+      1. A piece that resolves to nothing — "which single one is the safest
+         switch-in against Raichu" — ends it.
+      2. A piece with trailing prose after the name it starts with —
+         "Gothita. Which of them has an advantage" — is the last entry. Names
+         in a following sentence are not team members.
+    """
+    from pokedex import pokemon_names
+
+    out: list[str] = []
+    for piece in _LIST_SEP.split(span):
+        piece = piece.strip(" \t.,")
+        if not piece:
+            continue
+        name = pokemon_names.resolve_prefix(piece, max_words=3)
+        if not name:
+            break
+        if name not in out:
+            out.append(name)
+        # The name did not use up the whole piece: prose has begun.
+        if len(piece.split(" ")) > len(name.split(" ")):
+            break
+        if len(out) >= _MAX_TEAM:
+            break
+    return out
+
+
 def _extract_team(text: str) -> list[str] | None:
-    """Return a list of up to 6 resolved names, or None if fewer than 2 resolve."""
+    """Return the 2–6 resolved names the message lists, or None."""
     for pattern in (_TEAM_RE, _WHICH_OF_RE):
         m = pattern.search(text)
         if m:
-            raw = [g for g in m.groups() if g]
-            resolved = [r for r in (_resolve(n) for n in raw) if r]
+            resolved = _names_in_span(m.group(1))
             if len(resolved) >= 2:
                 return resolved
     return None

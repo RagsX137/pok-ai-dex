@@ -63,6 +63,40 @@ def test_falls_back_to_history_for_wild():
     assert result.wild == "lapras"
 
 
+@pytest.mark.parametrize("team_phrase,expected", [
+    ("Charizard and Blastoise", 2),
+    ("Charizard, Blastoise and Venusaur", 3),
+    ("Charizard, Blastoise, Venusaur and Pikachu", 4),
+    ("Charizard, Blastoise, Venusaur, Pikachu and Snorlax", 5),
+    ("Charizard, Blastoise, Venusaur, Pikachu, Snorlax and Geodude", 6),
+])
+def test_team_of_any_size_between_two_and_six(team_phrase, expected):
+    """A real trainer rarely has exactly six. The old fixed-arity regex only
+    matched a 6-name list, so every shorter team fell through to the LLM."""
+    msg = f"My team is {team_phrase}. Which of them has an advantage against Onix?"
+    result = detect_matchup_intent(msg, [])
+    assert result is not None, f"{expected}-name team was not detected"
+    assert len(result.team) == expected
+    assert result.wild == "onix"
+
+
+def test_which_of_accepts_short_list():
+    msg = "Which of Pikachu, Bulbasaur and Geodude should I use against Gengar?"
+    result = detect_matchup_intent(msg, [])
+    assert result is not None
+    assert result.team == ["pikachu", "bulbasaur", "geodude"]
+    assert result.wild == "gengar"
+
+
+def test_list_stops_at_the_end_of_the_sentence():
+    """The name list ends at the first entry followed by other prose — a
+    Pokémon named in a later sentence is not a team member."""
+    msg = "My team is Pikachu and Charizard. Gengar, Onix are scary. Advantage against Onix?"
+    result = detect_matchup_intent(msg, [])
+    assert result is not None
+    assert result.team == ["pikachu", "charizard"]
+
+
 def test_ranking_probe():
     msg = (
         "Out of Pikachu, Bulbasaur, Charmander, Squirtle, Jigglypuff and Geodude, "

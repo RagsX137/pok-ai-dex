@@ -332,3 +332,53 @@ def test_a_raising_facts_store_still_answers(client, monkeypatch):
                                         "message": "What are Gengar's abilities?"})
     assert r.status_code == 200
     assert r.get_json()["answer"] == "from coveo"
+
+
+# ── conversation context extraction ──────────────────────────────────────────
+
+@pytest.mark.parametrize("text", [
+    "Steel and Fairy are strong here.",
+    "Which one has the best Speed stat?",
+    "Is it a good Tank?",
+    "Type: Null is unrelated to Null pointers.",
+])
+def test_mentions_never_invents_a_pokemon(text):
+    """pokemon_context is a routing input, not a spell-check surface: it is
+    inlined into the retrieval query and read back as the wild Pokémon on the
+    next turn. Fuzzy matching turned 'Steel' into 'seel' and poisoned both."""
+    from pokedex.routes.coach_api import _extract_pokemon_mentions
+    assert "seel" not in _extract_pokemon_mentions(text)
+    assert "sawk" not in _extract_pokemon_mentions(text)
+    assert "numel" not in _extract_pokemon_mentions(text)
+
+
+@pytest.mark.parametrize("text,expected", [
+    ("Tell me about Gengar", ["gengar"]),
+    ("Charizard beats Venusaur", ["charizard", "venusaur"]),
+    ("How does Mr. Mime fare?", ["mr. mime"]),
+    ("Steel and Fairy are strong here.", []),
+])
+def test_mentions_resolve_exactly(text, expected):
+    from pokedex.routes.coach_api import _extract_pokemon_mentions
+    assert _extract_pokemon_mentions(text) == expected
+
+
+def test_comparison_follows_up_from_history():
+    """"How do they stack up?" names nobody. The two Pokémon already in the
+    conversation's context are the ones being compared."""
+    from pokedex.routes.coach_api import _detect_comparison
+    history = [
+        {"role": "user", "content": "Charizard or Blastoise?",
+         "pokemon_context": ["charizard", "blastoise"]},
+        {"role": "assistant", "content": "...",
+         "pokemon_context": ["charizard", "blastoise"]},
+    ]
+    assert _detect_comparison("how do they stack up?", history) == ("charizard", "blastoise")
+
+
+def test_comparison_follow_up_needs_exactly_two():
+    """Three names in context is not a comparison — it is a team."""
+    from pokedex.routes.coach_api import _detect_comparison
+    history = [{"role": "user", "content": "x",
+                "pokemon_context": ["charizard", "blastoise", "venusaur"]}]
+    assert _detect_comparison("how do they stack up?", history) is None

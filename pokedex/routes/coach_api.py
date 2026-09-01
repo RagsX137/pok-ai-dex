@@ -65,19 +65,13 @@ _CMP_PATTERNS = [
                rf'(?=\s*[?,]|\s+for|\s+on|\s+against|\s*$)', re.I),
 ]
 
-# Single-word Pokémon names that would produce false positives in the "or" pattern.
-# Still used by _extract_pokemon_mentions.
-_STOPWORDS = {
-    'a', 'an', 'the', 'my', 'your', 'his', 'her', 'their', 'our',
-    'not', 'no', 'yes', 'can', 'will', 'should', 'would', 'could',
-    'what', 'which', 'who', 'when', 'where', 'why', 'how',
-    'fire', 'water', 'grass', 'electric', 'ice', 'fighting', 'poison',
-    'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon',
-    'dark', 'steel', 'fairy', 'normal',
-}
+# _STOPWORDS used to guard the loose "X or Y" pattern and the mention scan
+# against ordinary English words and type names. Both now resolve exactly
+# against the corpus, which rejects "steel" and "which" on its own terms, so
+# the hand-maintained deny-list has no remaining caller.
 
 
-def _detect_comparison(message: str) -> tuple[str, str] | None:
+def _detect_comparison(message: str, history: list[dict] | None = None) -> tuple[str, str] | None:
     """Return (pokemon_a, pokemon_b) if the message is a comparison request.
 
     Both sides must resolve EXACTLY against the corpus. Fuzzy matching is
@@ -88,6 +82,11 @@ def _detect_comparison(message: str) -> tuple[str, str] | None:
     finditer, not search: the first match of a pattern is often the wrong span
     ("should i use charizard" / "blastoise against this"). Later matches, and
     the prefix/suffix trim, recover the real names.
+
+    When the message contains no Pokémon names (e.g. "how do they stack up?"),
+    fall back to the conversation history: if the last few turns share exactly
+    two Pokémon in their pokemon_context, treat this as a continuation of that
+    comparison.
     """
     for pattern in _CMP_PATTERNS:
         for m in pattern.finditer(message or ""):
@@ -95,6 +94,20 @@ def _detect_comparison(message: str) -> tuple[str, str] | None:
             b = pokemon_names.resolve_prefix(m.group(2))
             if a and b and a != b:
                 return a, b
+
+    # Follow-up resolution: scan recent history for a stable two-Pokémon context.
+    if history:
+        seen: list[str] = []
+        for turn in reversed(history[-6:]):
+            ctx = turn.get("pokemon_context") or []
+            for name in ctx:
+                if name not in seen:
+                    seen.append(name)
+            if len(seen) >= 2:
+                break
+        if len(seen) == 2:
+            return seen[0], seen[1]
+
     return None
 
 
@@ -160,11 +173,13 @@ def coach():
     session_id = session_id.strip()
     message = message.strip()
 
-    # Detect comparison intent before calling the LLM
-    comparison = None
-    cmp_names = _detect_comparison(message)
-
     history = get_history(session_id)
+
+    # Detect comparison intent before calling the LLM.
+    # history is passed so pronoun follow-ups ("how do they stack up?") resolve
+    # to the two Pokémon established in the previous turns.
+    comparison = None
+    cmp_names = _detect_comparison(message, history)
 
     # ── Type-chart fast path ──────────────────────────────────────────────
     # If we can resolve the team and the wild Pokémon from this message, compute
@@ -297,34 +312,43 @@ def _grade_answer(answer: str, cmp_names: tuple[str, str] | None) -> list[dict]:
     return flags
 
 
-# Very lightweight — just look for capitalised words that could be Pokémon names.
-_POKEMON_MENTION_RE = re.compile(r'\b([A-Z][a-z]{2,}(?:-[A-Z][a-z]+)?)\b')
+# A word as it appears in prose, including the punctuation that is part of a
+# canonical name ("Mr.", "Type:", "Farfetch'd", "Porygon-Z").
+_WORD_RE = re.compile(r"[A-Za-z0-9'’.\-:]+")
+
+# Longest canonical name is three words ("Type: Null", "Iron Treads", "Mr. Mime").
+_MENTION_MAX_WORDS = 3
 
 
 def _extract_pokemon_mentions(text: str) -> list[str]:
     """
-    Return canonical Pokémon names found in `text`, verified against the
-    corpus via _closest_pokemon.  Capitalisation heuristics alone
-    produce too many false positives (ordinary English words, verbs, etc.).
-    """
-    from pokedex.routes.coveo_api import _closest_pokemon
-    if not pokemon_names.names():
-        # Corpus not loaded — fall back to the old capitalised-word heuristic
-        # rather than returning nothing.
-        return list(dict.fromkeys(
-            m.group(1).lower()
-            for m in _POKEMON_MENTION_RE.finditer(text)
-            if m.group(1).lower() not in _STOPWORDS
-        ))[:4]
+    Return canonical Pokémon names found in `text`, resolved EXACTLY.
 
+    Fuzzy matching is deliberately not used here, for the same reason it is
+    not used in _detect_comparison. This list is written to pokemon_context,
+    which is not cosmetic: it is inlined into the retrieval query by
+    _build_context_prompt, and read back as the wild Pokémon by
+    matchup._extract_wild_from_history on the next turn. At edit distance 1
+    "Steel" resolves to "Seel", so a question about the Steel type used to
+    poison both — the retrieval query gained "[Pokémon: seel]" and the next
+    matchup answer was computed against a sea lion.
+
+    Runs of up to three words are tried longest-first so multi-word names
+    ("Mr. Mime", "Type: Null") survive; a run must start capitalised, which
+    is the same heuristic the old regex used to bound the search.
+    """
+    words = _WORD_RE.findall(text or "")
     seen: dict[str, None] = {}
-    for m in _POKEMON_MENTION_RE.finditer(text):
-        candidate = m.group(1)
-        resolved = _closest_pokemon(candidate, max_dist=1)  # tighter tolerance for context hints
-        if resolved and resolved not in seen:
-            seen[resolved] = None
-        if len(seen) >= 4:
-            break
+    i = 0
+    while i < len(words) and len(seen) < 4:
+        if words[i][:1].isupper():
+            run = " ".join(words[i:i + _MENTION_MAX_WORDS])
+            hit = pokemon_names.resolve_prefix(run, max_words=_MENTION_MAX_WORDS)
+            if hit:
+                seen.setdefault(hit, None)
+                i += len(hit.split(" "))
+                continue
+        i += 1
     return list(seen)
 
 

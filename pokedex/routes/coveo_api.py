@@ -8,8 +8,6 @@ from pokedex import pokemon_names
 from pokedex.config import settings
 from pokedex.coveo import CoveoClient
 
-pokemon_names.init(settings.repo_root)
-
 
 def _closest_pokemon(name: str, max_dist: int = 2) -> str | None:
     """Kept for /api/pokemon-correct. Delegates to the shared resolver.
